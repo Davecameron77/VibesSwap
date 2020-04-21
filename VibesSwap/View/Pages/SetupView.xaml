@@ -1,0 +1,242 @@
+﻿<UserControl x:Class="VibesSwap.View.Pages.SetupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:helpers="clr-namespace:VibesSwap.ViewModel.Helpers"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" 
+             d:DesignWidth="960">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   Text="Application Setup"
+                   Style="{StaticResource PageHeader}"/>
+
+        <!--#region  Hosts-->
+        
+        <Grid Grid.Row="1"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       Style="{StaticResource PageSubHeader}"
+                       Text="Setup Hosts" />
+
+            <ListBox Grid.Row="1"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     ItemsSource="{Binding DisplayHosts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedItem="{Binding SelectedHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     DisplayMemberPath="Name" />
+
+            <Button Grid.Row="2"
+                    Grid.Column="1"
+                    Content="Add New Host"
+                    Style="{StaticResource FormButton}"
+                    Command="{Binding AddRemoveHostCommand}"
+                    CommandParameter="{x:Static helpers:GuiOperations.Add}"/>
+            <Button Grid.Row="3"
+                    Grid.Column="1"
+                    Content="Remove Selected Host"
+                    IsEnabled="{Binding CanEditHost}"
+                    Style="{StaticResource FormButton}"
+                    Command="{Binding AddRemoveHostCommand}" 
+                    CommandParameter="{x:Static helpers:GuiOperations.Remove}"/>
+
+            <TextBlock Grid.Row="4"
+                       Grid.Column="0"
+                       Text="Host Type"
+                       Style="{StaticResource FormTextBlock}"/>
+            <ComboBox Grid.Row="4"
+                      Grid.Column="1"
+                      IsEnabled="{Binding CanEditHost}"
+                      ItemsSource="{Binding HostTypes, Mode=OneTime}"
+                      SelectedItem="{Binding SelectedHostType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource FormComboBox}"/>
+
+            <TextBlock Grid.Row="5"
+                       Grid.Column="0"
+                       Text="Clustered"
+                       Style="{StaticResource FormTextBlock}"/>
+            <CheckBox Grid.Row="5"
+                      Grid.Column="1"
+                      Style="{StaticResource FormCheckBox}"
+                      IsEnabled="{Binding CanEditHost}"
+                      IsChecked="{Binding SelectedHost.IndClustered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="6"
+                       Grid.Column="0"
+                       Text="Host Name"
+                       Style="{StaticResource FormTextBlock}" />
+            <TextBox Grid.Row="6"
+                     Grid.Column="1"
+                     IsEnabled="{Binding CanEditHost}"
+                     Text="{Binding SelectedHost.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormTextBox}"/>
+
+            <TextBlock Grid.Row="7"
+                       Grid.Column="0"
+                       Text="Host Url"
+                       Style="{StaticResource FormTextBlock}" />
+            <TextBox Grid.Row="7"
+                     Grid.Column="1"
+                     IsEnabled="{Binding CanEditHost}"
+                     Text="{Binding SelectedHost.Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormTextBox}"/>
+
+            <TextBlock Grid.Row="8"
+                       Grid.Column="0"
+                       Text="SSH Username"
+                       Style="{StaticResource FormTextBlock}" />
+            <TextBox Grid.Row="8"
+                     Grid.Column="1"
+                     IsEnabled="{Binding CanEditHost}"
+                     Text="{Binding SelectedHost.SshUsername, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormTextBox}"/>
+
+            <TextBlock Grid.Row="9"
+                       Grid.Column="0"
+                       Text="SSH Password"
+                       Style="{StaticResource FormTextBlock}" />
+            <TextBox Grid.Row="9"
+                     Grid.Column="1"
+                     IsEnabled="{Binding CanEditHost}"
+                     Text="{Binding SelectedHost.SshPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormTextBox}"/>
+        </Grid>
+        
+        <!--#endregion-->
+        
+        <!--#region CMs-->
+
+        <Grid Grid.Row="1"
+              Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       Style="{StaticResource PageSubHeader}"
+                       Text="Setup CM's" />
+
+            <ListBox Grid.Row="1"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     ItemsSource="{Binding DisplayCms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedItem="{Binding SelectedCm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     DisplayMemberPath="CmResourceName" />
+
+            <Button Grid.Row="2"
+                    Grid.Column="1"
+                    Content="Add New CM"
+                    Style="{StaticResource FormButton}"
+                    Command="{Binding AddRemoveCmCommand}"
+                    CommandParameter="{x:Static helpers:GuiOperations.Add}"/>
+            <Button Grid.Row="3"
+                    Grid.Column="1"
+                    Content="Remove Selected CM"
+                    IsEnabled="{Binding CanEditCm}"
+                    Style="{StaticResource FormButton}"
+                    Command="{Binding AddRemoveCmCommand}"
+                    CommandParameter="{x:Static helpers:GuiOperations.Remove}"/>
+
+            <TextBlock Grid.Row="4"
+                       Grid.Column="0"
+                       Text="CM Type"
+                       Style="{StaticResource FormTextBlock}"/>
+            <ComboBox Grid.Row="4"
+                      Grid.Column="1"
+                      IsEnabled="{Binding CanEditCm}"
+                      ItemsSource="{Binding CmTypes, Mode=OneTime}"
+                      SelectedItem="{Binding SelectedCmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource FormComboBox}"/>
+
+            <TextBlock Grid.Row="5"
+                       Grid.Column="0"
+                       Text="CM Resource ID"
+                       Style="{StaticResource FormTextBlock}" />
+            <TextBox Grid.Row="5"
+                     Grid.Column="1"
+                     IsEnabled="{Binding CanEditCm}"
+                     Text="{Binding SelectedCm.CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormTextBox}"/>
+
+            <TextBlock Grid.Row="6"
+                       Grid.Column="0"
+                       Text="CM Core Path"
+                       Style="{StaticResource FormTextBlock}" />
+            <TextBox Grid.Row="6"
+                     Grid.Column="1"
+                     IsEnabled="{Binding CanEditCm}"
+                     Text="{Binding SelectedCm.CmCorePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormTextBox}"/>
+
+            <TextBlock Grid.Row="7"
+                       Grid.Column="0"
+                       Text="CM Path"
+                       Style="{StaticResource FormTextBlock}" />
+            <TextBox Grid.Row="7"
+                     Grid.Column="1"
+                     IsEnabled="{Binding CanEditCm}"
+                     Text="{Binding SelectedCm.CmPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormTextBox}"/>
+
+            <TextBlock Grid.Row="8"
+                       Grid.Column="0"
+                       Text="CM Port"
+                       Style="{StaticResource FormTextBlock}" />
+            <TextBox Grid.Row="8"
+                     Grid.Column="1"
+                     IsEnabled="{Binding CanEditCm}"
+                     Text="{Binding SelectedCm.CmPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormTextBox}"/>
+        </Grid>
+        
+        <!--#endregion-->
+    </Grid>
+</UserControl>
