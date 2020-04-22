@@ -5,7 +5,7 @@ namespace VibesSwap.Model.Dimensional
     /// <summary>
     /// Models key-value pairs for deployment properties
     /// </summary>
-    class DeploymentProperty
+    public class DeploymentProperty
     {
         [Key]
         public int Id { get; set; }

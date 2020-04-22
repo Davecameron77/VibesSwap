@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\App.xaml
-42023757941
+6-1842534396
 3827794282
-19-1469457569
-56-723405814
-View\MainWindow.xaml;View\Pages\SetupView.xaml;View\Pages\SwapEc.xaml;View\Style\ApplicationStyle.xaml;
+24-1802679879
+57-1545463467
+View\Dialogs\DeploymentPropertiesDisplayView.xaml;View\Dialogs\HostsFileDisplayView.xaml;View\MainWindow.xaml;View\Pages\SetupView.xaml;View\Pages\SwapEc.xaml;View\Style\ApplicationStyle.xaml;
 
 True
 

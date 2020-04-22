@@ -1,6 +1,6 @@
 ﻿namespace VibesSwap.Model.Dimensional
 {
-    internal enum HostTypes
+    public enum HostTypes
     {
         COMM1,
         COMM2,
@@ -13,7 +13,7 @@
         ENS
     }
 
-    internal enum CmTypes
+    public enum CmTypes
     {
         CM_EC,
         CM_LM,
@@ -29,7 +29,7 @@
         CM_BSIS
     }
 
-    internal enum CmStates
+    public enum CmStates
     {
         Alive,
         Offline,

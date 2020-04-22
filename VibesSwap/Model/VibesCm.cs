@@ -8,8 +8,13 @@ namespace VibesSwap.Model
     /// <summary>
     /// Models a VibesCm
     /// </summary>
-    class VibesCm : INotifyPropertyChanged
+    public class VibesCm : INotifyPropertyChanged
     {
+        public VibesCm()
+        {
+            DeploymentProperties = new List<DeploymentProperty>();
+        }
+
         [Key]
         public int Id { get; set; }
         public string CmResourceName { get; set; }

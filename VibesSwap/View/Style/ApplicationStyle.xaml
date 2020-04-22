@@ -48,6 +48,7 @@
     <Style TargetType="{x:Type Button}"
            x:Key="FormButton">
         <Setter Property="Margin" Value="3,5" />
+        <Setter Property="Padding" Value="3" />
     </Style>
     <Style TargetType="{x:Type TextBox}"
            x:Key="FormTextBox">

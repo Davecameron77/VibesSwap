@@ -8,7 +8,7 @@ namespace VibesSwap.Model
     /// <summary>
     /// Models a VIBES host
     /// </summary>
-    class VibesHost : INotifyPropertyChanged
+    public class VibesHost : INotifyPropertyChanged
     {
         [Key]
         public int Id { get; set; }

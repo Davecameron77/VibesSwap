@@ -11,12 +11,4 @@
         Add = 1,
         Remove = 2
     }
-
-    internal enum CmStates
-    {
-        Alive,
-        Offline,
-        Unchecked,
-        Polling
-    }
 }

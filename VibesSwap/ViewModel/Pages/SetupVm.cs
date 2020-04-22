@@ -5,9 +5,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using VibesSwap.ViewModel.Helpers;
 using VibesSwap.Model;
 using VibesSwap.Model.Dimensional;
-using VibesSwap.ViewModel.Helpers;
 
 namespace VibesSwap.ViewModel.Pages
 {
@@ -64,7 +64,7 @@ namespace VibesSwap.ViewModel.Pages
                 {
                     _selectedCm = value;
                     // Set CmType combobox
-                    _selectedCmType = value.CmType.ToString();
+                    SelectedCmType = value.CmType.ToString();
                     // Bind live save handler
                     SelectedCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                 }
@@ -173,6 +173,7 @@ namespace VibesSwap.ViewModel.Pages
                             foreach (VibesHost host in context.EnvironmentHosts)
                             {
                                 DisplayHosts.Add(host);
+                                host.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                             }
                             // Set GUI particulars and reload CM's
                             SelectedHost = objectId == 0 ? DisplayHosts.FirstOrDefault() : context.EnvironmentHosts.SingleOrDefault(h => h.Id == objectId);
@@ -195,6 +196,7 @@ namespace VibesSwap.ViewModel.Pages
                             foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == SelectedHost.Id))
                             {
                                 DisplayCms.Add(cm);
+                                cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                             }
                             // Set GUI particulars
                             SelectedCm = objectId == 0 ? DisplayCms.FirstOrDefault() : context.HostCms.SingleOrDefault(c => c.Id == objectId);
