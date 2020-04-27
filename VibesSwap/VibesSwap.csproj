@@ -203,9 +203,6 @@
     <Compile Include="ViewModel\Pages\EcSwapVm.cs" />
     <Compile Include="ViewModel\Pages\SetupVm.cs" />
     <Compile Include="ViewModel\VmBase.cs" />
-    <Compile Include="View\Dialogs\DeploymentPropertiesDisplayView.xaml.cs">
-      <DependentUpon>DeploymentPropertiesDisplayView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\Dialogs\HostsFileDisplayView.xaml.cs">
       <DependentUpon>HostsFileDisplayView.xaml</DependentUpon>
     </Compile>
@@ -247,10 +244,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="View\Dialogs\DeploymentPropertiesDisplayView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="View\Dialogs\HostsFileDisplayView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

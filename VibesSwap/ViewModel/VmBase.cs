@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,10 +32,12 @@ namespace VibesSwap.ViewModel
         {
             try
             {
-                DataContext context = new DataContext();
-                VibesHost hostToPoll = context.EnvironmentHosts.Single(h => h.Id == cmToPoll.VibesHostId);
-                Task.Run(() => CmHttpHelper.CheckCmStatus(hostToPoll, cmToPoll, GetHashCode()));
-                cmToPoll.CmStatus = CmStates.Polling;
+                using (DataContext context = new DataContext())
+                {
+                    VibesHost hostToPoll = context.EnvironmentHosts.Single(h => h.Id == cmToPoll.VibesHostId);
+                    Task.Run(() => CmHttpHelper.CheckCmStatus(hostToPoll, cmToPoll, GetHashCode()));
+                    cmToPoll.CmStatus = CmStates.Polling;
+                }
             }
             catch (Exception ex)
             {
@@ -43,7 +46,7 @@ namespace VibesSwap.ViewModel
         }
 
         /// <summary>
-        /// Autosave CM changes when PropertyChanged fires
+        /// Autosave CM changes when PropertyChanged fires, used to live save objects on keypress
         /// </summary>
         /// <param name="sender">The object changed</param>
         /// <param name="args">Propertychanged args</param>
@@ -83,6 +86,7 @@ namespace VibesSwap.ViewModel
                                 cmToUpdate.DeploymentProperties.Add(prop);
                             }
                         }
+                        context.Update(cmToUpdate);
                         context.SaveChanges();
                     }
                 }
@@ -109,26 +113,43 @@ namespace VibesSwap.ViewModel
         }
 
         /// <summary>
-        /// Raise popup for deployment properties if attached
+        /// Stores deployment properties if returned by SSH command
         /// </summary>
-        /// <param name="args">CmHelperEventArgs</param>
-        internal void PopupDeploymentProperties(CmHelperEventArgs args)
+        /// <param name="cmChanged">The CM which was queried</param>
+        /// <param name="deploymentProperties">The deployment properties file fetched</param>
+        internal void PopulateLocalDeploymentProperties(VibesCm cmChanged, string deploymentProperties)
         {
-            try
+            using (DataContext context = new DataContext())
             {
-                if (!string.IsNullOrEmpty(args.DeploymentProperties))
+                VibesCm cmToUpdate = context.HostCms.SingleOrDefault(c => c.Id == cmChanged.Id);
+                XDocument xProperties = XDocument.Parse(deploymentProperties);
+
+                foreach (XElement node in xProperties.Descendants("parameter"))
                 {
-                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    if (node.Value.ToLower().Contains("http:"))
                     {
-                        XDocument deploymentProperties = XDocument.Parse(args.DeploymentProperties);
-                        DeploymentPropertiesDisplayView popup = new DeploymentPropertiesDisplayView(deploymentProperties);
-                        popup.Show();
-                    });
+                        string propertyKey = node.Attribute("name").Value;
+                        string propertyVal = node.Value;
+                        if (context.DeploymentProperties.Any(p => p.CmId == cmChanged.Id && p.PropertyKey == propertyKey))
+                        {
+                            DeploymentProperty propToUpdate = context.DeploymentProperties.SingleOrDefault(p => p.CmId == cmChanged.Id && p.PropertyKey == propertyKey);
+                            propToUpdate.PropertyValue = propertyVal;
+                            context.Update(propToUpdate);
+                            continue;
+                        }
+                        else
+                        {
+                            context.DeploymentProperties.Add(new DeploymentProperty
+                            {
+                                PropertyKey = propertyKey,
+                                PropertyValue = propertyVal,
+                                Cm = context.HostCms.Single(c => c.Id == cmChanged.Id),
+                                CmId = context.HostCms.Single(c => c.Id == cmChanged.Id).Id
+                            });
+                        }
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error creating deployment properties popup: {ex.Message}");
+                context.SaveChanges();
             }
         }
 

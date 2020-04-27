@@ -31,8 +31,11 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
             </Grid.ColumnDefinitions>
             
             <TextBlock Grid.Row="0"
@@ -89,8 +92,15 @@
                 </DataGrid.Columns>
             </DataGrid>
 
+            <GridSplitter Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
             <StackPanel Grid.Row="1"
-                        Grid.Column="1"
+                        Grid.Column="2"
                         Orientation="Horizontal">
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
@@ -115,7 +125,7 @@
             </StackPanel>
             
             <DataGrid Grid.Row="2"
-                      Grid.Column="1"
+                      Grid.Column="2"
                       ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -128,12 +138,14 @@
                                         Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="False"
-                                        Width="*"
+                                        Width="Auto"
                                         Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTextColumn Header="New Value"
-                                        IsReadOnly="False"
+                    <DataGridTextColumn Header="Search Pattern"
                                         Width="*"
-                                        Binding="{Binding NewPropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Replace Pattern"
+                                        Width="*"
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTemplateColumn Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -144,6 +156,8 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
+        
+        
 
         <Grid Grid.Row="2"
               Grid.Column="0">
@@ -153,8 +167,11 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
             </Grid.ColumnDefinitions>
             
             <TextBlock Grid.Row="0"
@@ -211,8 +228,15 @@
                 </DataGrid.Columns>
             </DataGrid>
 
+            <GridSplitter Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+            
             <StackPanel Grid.Row="1"
-                        Grid.Column="1"
+                        Grid.Column="2"
                         Orientation="Horizontal">
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
@@ -233,7 +257,7 @@
             </StackPanel>
 
             <DataGrid Grid.Row="2"
-                      Grid.Column="1"
+                      Grid.Column="2"
                       ItemsSource="{Binding SelectedCmCommTwo.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -246,12 +270,14 @@
                                         Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="False"
-                                        Width="*"
+                                        Width="Auto"
                                         Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTextColumn Header="New Value"
-                                        IsReadOnly="False"
+                    <DataGridTextColumn Header="Search Pattern"
                                         Width="*"
-                                        Binding="{Binding NewPropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Replace Pattern"
+                                        Width="*"
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTemplateColumn Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

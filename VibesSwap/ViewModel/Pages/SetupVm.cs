@@ -55,21 +55,6 @@ namespace VibesSwap.ViewModel.Pages
                 }
             }
         }
-        public VibesCm SelectedCm
-        {
-            get { return _selectedCm; }
-            set 
-            { 
-                if (value != null)
-                {
-                    _selectedCm = value;
-                    // Set CmType combobox
-                    SelectedCmType = value.CmType.ToString();
-                    // Bind live save handler
-                    SelectedCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                }
-            }
-        }
         public string SelectedHostType
         {
             get { return _selectedHostTYpe; }
@@ -80,6 +65,21 @@ namespace VibesSwap.ViewModel.Pages
                     _selectedHostTYpe = value;
                     // Set hosttype on selected host
                     SelectedHost.HostType = (HostTypes)Enum.Parse(typeof(HostTypes), value);
+                }
+            }
+        }
+        public VibesCm SelectedCm
+        {
+            get { return _selectedCm; }
+            set
+            {
+                if (value != null)
+                {
+                    _selectedCm = value;
+                    // Set CmType combobox
+                    SelectedCmType = value.CmType.ToString();
+                    // Bind live save handler
+                    SelectedCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                 }
             }
         }
@@ -161,22 +161,22 @@ namespace VibesSwap.ViewModel.Pages
                     case GuiObjectTypes.VibesHost:
                         using (DataContext context = new DataContext())
                         {
+                            DisplayHosts.Clear();
                             // Nothing found, load boilerplate and terminate
                             if (!context.EnvironmentHosts.Any())
                             {
-                                DisplayHosts.Clear();
                                 LoadBoilerPlate();
                                 return;
                             }
-                            // Clear previous data from display and load Hosts from DB
-                            DisplayHosts.Clear();
+                            // Load Hosts from DB
                             foreach (VibesHost host in context.EnvironmentHosts)
                             {
-                                DisplayHosts.Add(host);
-                                host.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                VibesHost newHost = host.DeepCopy();
+                                newHost.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                DisplayHosts.Add(newHost);
                             }
                             // Set GUI particulars and reload CM's
-                            SelectedHost = objectId == 0 ? DisplayHosts.FirstOrDefault() : context.EnvironmentHosts.SingleOrDefault(h => h.Id == objectId);
+                            SelectedHost = objectId == 0 ? DisplayHosts.FirstOrDefault() : DisplayHosts.SingleOrDefault(h => h.Id == objectId);
                             CanEditHost = true;
                             LoadData(GuiObjectTypes.VibesCm);
                         }
@@ -184,22 +184,23 @@ namespace VibesSwap.ViewModel.Pages
                     case GuiObjectTypes.VibesCm:
                         using (DataContext context = new DataContext())
                         {
+                            DisplayCms.Clear();
                             // Nothing found, load boilerplate and terminate
                             if (!context.HostCms.Any(c => c.VibesHostId == SelectedHost.Id))
                             {
-                                DisplayCms.Clear();
                                 LoadBoilerPlate();
                                 return;
                             }
-                            // Clear previous data from display and load CMs from DB
+                            // Load CMs from DB
                             DisplayCms.Clear();
                             foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == SelectedHost.Id))
                             {
-                                DisplayCms.Add(cm);
-                                cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                VibesCm newCm = cm.DeepCopy();
+                                newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                DisplayCms.Add(newCm);
                             }
                             // Set GUI particulars
-                            SelectedCm = objectId == 0 ? DisplayCms.FirstOrDefault() : context.HostCms.SingleOrDefault(c => c.Id == objectId);
+                            SelectedCm = objectId == 0 ? DisplayCms.FirstOrDefault() : DisplayCms.SingleOrDefault(c => c.Id == objectId);
                             CanEditCm = true;
                         }
                         break;
@@ -260,7 +261,9 @@ namespace VibesSwap.ViewModel.Pages
                             {
                                 CanEditHost = true;
                                 LoadData(GuiObjectTypes.VibesHost, context.EnvironmentHosts.OrderByDescending(h => h.Id).FirstOrDefault().Id);
+                                return;
                             }
+                            MessageBox.Show("Error adding host", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                         break;
                     case GuiOperations.Remove:
@@ -308,14 +311,16 @@ namespace VibesSwap.ViewModel.Pages
                         {
                             context.Add(new VibesCm { 
                                 CmResourceName = "Please enter a CM resource name", 
-                                VibesHost = context.EnvironmentHosts.SingleOrDefault(h => h.Id == SelectedHost.Id), 
+                                VibesHost = context.EnvironmentHosts.SingleOrDefault(h => h.Id == SelectedHost.Id),
                                 VibesHostId = context.EnvironmentHosts.SingleOrDefault(h => h.Id == SelectedHost.Id).Id
                             });
                             if (context.SaveChanges() == 1)
                             {
                                 CanEditCm = true;
                                 LoadData(GuiObjectTypes.VibesCm, context.HostCms.OrderByDescending(c => c.Id).FirstOrDefault().Id);
+                                return;
                             }
+                            MessageBox.Show("Error adding CM", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                         break;
                     case GuiOperations.Remove:

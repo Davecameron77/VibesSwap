@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:pages="clr-namespace:VibesSwap.View.Pages"
         mc:Ignorable="d"
-        Title="MainWindow" 
-        Height="520" 
-        Width="960">
+        Title="Vibes Swap" 
+        WindowStartupLocation="CenterOwner"
+        Height="900" 
+        Width="1600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

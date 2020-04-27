@@ -1,5 +1,7 @@
-﻿using Serilog;
+﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -18,6 +20,9 @@ namespace VibesSwap.ViewModel.Pages
 
         public EcSwapVm()
         {
+            CmsDisplayCommOne = new ObservableCollection<VibesCm>();
+            CmsDisplayCommTwo = new ObservableCollection<VibesCm>();
+
             RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
             StartCmCommand = new RelayCommand(StartCm);
@@ -106,78 +111,36 @@ namespace VibesSwap.ViewModel.Pages
                 using (DataContext context = new DataContext())
                 {
                     // Comm1
-                    if (CmsDisplayCommOne == null)
-                    {
-                        CmsDisplayCommOne = new ObservableCollection<VibesCm>();
-                    }
+                    CmsDisplayCommOne.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.COMM1))
                     {
-                        CmsDisplayCommOne.Clear();
                         foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.COMM1))
                         {
-                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id))
+                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
                             {
-                                /// Deep copy for presentation
-                                VibesCm newCm = new VibesCm
-                                {
-                                    CmResourceName = cm.CmResourceName,
-                                    CmPort = cm.CmPort,
-                                    CmCorePath = cm.CmCorePath,
-                                    CmPath = cm.CmPath,
-                                    CmType = cm.CmType,
-                                    CmStatus = cm.CmStatus,
-                                    VibesHost = cm.VibesHost,
-                                    VibesHostId = cm.VibesHostId,
-                                    Id = cm.Id
-                                };
-                                foreach (DeploymentProperty prop in cm.DeploymentProperties)
-                                {
-                                    newCm.DeploymentProperties.Add(prop);
-                                };
+                                var newCm = cm.DeepCopy();
+                                newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                                 CmsDisplayCommOne.Add(newCm);
                             }
                         }
                         SelectedCmCommOne = CmsDisplayCommOne.FirstOrDefault();
                     }
                     // Comm2
-                    if (CmsDisplayCommOne.Count == 0)
-                    {
-                        LoadBoilerPlate();
-                    }
-                    if (CmsDisplayCommTwo == null)
-                    {
-                        CmsDisplayCommTwo = new ObservableCollection<VibesCm>();
-                    }
+                    CmsDisplayCommTwo.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.COMM2))
                     {
-                        CmsDisplayCommTwo.Clear();
                         foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.COMM2))
                         {
-                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id))
+                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
                             {
-                                /// Deep copy for presentation
-                                VibesCm newCm = new VibesCm
-                                {
-                                    CmResourceName = cm.CmResourceName,
-                                    CmPort = cm.CmPort,
-                                    CmCorePath = cm.CmCorePath,
-                                    CmPath = cm.CmPath,
-                                    CmType = cm.CmType,
-                                    CmStatus = cm.CmStatus,
-                                    VibesHost = cm.VibesHost,
-                                    VibesHostId = cm.VibesHostId,
-                                    Id = cm.Id
-                                };
-                                foreach (DeploymentProperty prop in cm.DeploymentProperties)
-                                {
-                                    newCm.DeploymentProperties.Add(prop);
-                                };
-                                CmsDisplayCommTwo.Add(cm);
+                                var newCm = cm.DeepCopy();
+                                newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                CmsDisplayCommTwo.Add(newCm);
                             }
                         }
                         SelectedCmCommTwo = CmsDisplayCommTwo.FirstOrDefault();
                     }
-                    if (CmsDisplayCommTwo.Count == 0)
+                    if (CmsDisplayCommOne.Count == 0 || CmsDisplayCommTwo.Count == 0)
                     {
                         LoadBoilerPlate();
                     }
@@ -315,13 +278,22 @@ namespace VibesSwap.ViewModel.Pages
                     case HostTypes.COMM1:
                         foreach (VibesCm cm in CmsDisplayCommOne)
                         {
-                            Task.Run(() => CmSshHelper.StartCm(SelectedHostCommOne, cm, GetHashCode()));
+                            using (DataContext context = new DataContext())
+                            {
+                                SelectedHostCommOne = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
+                                Task.Run(() => CmSshHelper.StartCm(SelectedHostCommOne, cm, GetHashCode()));
+                            }
+                                
                         }
                         break;
                     case HostTypes.COMM2:
                         foreach (VibesCm cm in CmsDisplayCommTwo)
                         {
-                            Task.Run((() => CmSshHelper.StartCm(SelectedHostCommTwo, cm, GetHashCode())));
+                            using (DataContext context = new DataContext())
+                            {
+                                SelectedHostCommTwo = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
+                                Task.Run((() => CmSshHelper.StartCm(SelectedHostCommTwo, cm, GetHashCode())));
+                            }
                         }
                         break;
                 }
@@ -346,13 +318,21 @@ namespace VibesSwap.ViewModel.Pages
                     case HostTypes.COMM1:
                         foreach (VibesCm cm in CmsDisplayCommOne)
                         {
-                            Task.Run(() => CmSshHelper.StopCm(SelectedHostCommOne, cm, GetHashCode()));
+                            using (DataContext context = new DataContext())
+                            {
+                                SelectedHostCommOne = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
+                                Task.Run(() => CmSshHelper.StopCm(SelectedHostCommOne, cm, GetHashCode()));
+                            }
                         }
                         break;
                     case HostTypes.COMM2:
                         foreach (VibesCm cm in CmsDisplayCommTwo)
                         {
-                            Task.Run(() => CmSshHelper.StopCm(SelectedHostCommTwo, cm, GetHashCode()));
+                            using (DataContext context = new DataContext())
+                            {
+                                SelectedHostCommTwo = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
+                                Task.Run(() => CmSshHelper.StopCm(SelectedHostCommTwo, cm, GetHashCode()));
+                            }
                         }
                         break;
                 }
@@ -445,10 +425,21 @@ namespace VibesSwap.ViewModel.Pages
                 {
                     return;
                 }
+                if (e.DeploymentProperties != null && (e.Host.HostType == HostTypes.COMM1 || e.Host.HostType == HostTypes.COMM2))
+                {
+                    PopulateLocalDeploymentProperties(e.CmChanged, e.DeploymentProperties);
+                    System.Windows.Application.Current.Dispatcher.Invoke(delegate
+                    {
+                        LoadData(null);
+                        if (e.CmChanged != null)
+                        {
+                            PollCmAsync(e.CmChanged);
+                        }
+                    });
+                }
                 if (CmsDisplayCommOne.Contains(e.CmChanged))
                 {
                     CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    PopulateLocalDeploymentProperties(e.CmChanged, e.DeploymentProperties);
                 }
                 else if (CmsDisplayCommTwo.Contains(e.CmChanged))
                 {
@@ -463,35 +454,7 @@ namespace VibesSwap.ViewModel.Pages
             {
                 Log.Error($"Error updating GUI with CM changes: {ex.Message}");
             }
-        }
-
-        private void PopulateLocalDeploymentProperties(VibesCm cmChanged, string deploymentProperties)
-        {
-            using (DataContext context = new DataContext())
-            {
-                VibesCm cmToUpdate = context.HostCms.SingleOrDefault(c => c.Id == cmChanged.Id);
-                XDocument xProperties = XDocument.Parse(deploymentProperties);
-
-                foreach (XElement node in xProperties.Descendants("parameter"))
-                {
-                    if (node.Value.ToLower().Contains("http:"))
-                    {
-                        string propertyKey = node.Attribute("name").Value;
-                        string propertyVal = node.Value;
-                        if (cmToUpdate.DeploymentProperties.Any(c => c.PropertyKey == propertyKey))
-                        {
-                            cmToUpdate.DeploymentProperties.Single(c => c.PropertyKey == propertyKey).PropertyValue = propertyVal;
-                        }
-                        else
-                        {
-                            cmToUpdate.DeploymentProperties.Add(new DeploymentProperty { PropertyKey = propertyKey, PropertyValue = propertyVal });
-                        }
-                    }
-                }
-                context.SaveChanges();
-            }
-            LoadData(null);
-        }
+        }       
 
         #endregion
 

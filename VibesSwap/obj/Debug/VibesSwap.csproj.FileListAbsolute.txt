@@ -1,6 +1,5 @@
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\bin\Debug\Microsoft.EntityFrameworkCore.xml
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.csprojAssemblyReference.cache
-C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Dialogs\DeploymentPropertiesDisplayView.g.cs
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Dialogs\HostsFileDisplayView.g.cs
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\MainWindow.g.cs
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Pages\SetupView.g.cs
@@ -90,7 +89,6 @@ C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\bin\Debug\System.Numerics.Vecto
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\App.baml
-C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Dialogs\DeploymentPropertiesDisplayView.baml
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Dialogs\HostsFileDisplayView.baml
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\MainWindow.baml
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Pages\SetupView.baml
