@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Linq;
 using VibesSwap.Model;
 using VibesSwap.Model.Dimensional;
@@ -108,42 +109,18 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
-                using (DataContext context = new DataContext())
+                // Comm1
+                CmsDisplayCommOne.Clear();
+                LoadCmForSwap(CmsDisplayCommOne, HostTypes.COMM1);
+                SelectedCmCommOne = CmsDisplayCommOne.FirstOrDefault();
+                // Comm2
+                CmsDisplayCommTwo.Clear();
+                LoadCmForSwap(CmsDisplayCommTwo, HostTypes.COMM2);
+                SelectedCmCommTwo = CmsDisplayCommTwo.FirstOrDefault();
+
+                if (CmsDisplayCommOne.Count == 0 || CmsDisplayCommTwo.Count == 0)
                 {
-                    // Comm1
-                    CmsDisplayCommOne.Clear();
-                    if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.COMM1))
-                    {
-                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.COMM1))
-                        {
-                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
-                            {
-                                var newCm = cm.DeepCopy();
-                                newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                                CmsDisplayCommOne.Add(newCm);
-                            }
-                        }
-                        SelectedCmCommOne = CmsDisplayCommOne.FirstOrDefault();
-                    }
-                    // Comm2
-                    CmsDisplayCommTwo.Clear();
-                    if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.COMM2))
-                    {
-                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.COMM2))
-                        {
-                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
-                            {
-                                var newCm = cm.DeepCopy();
-                                newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                                CmsDisplayCommTwo.Add(newCm);
-                            }
-                        }
-                        SelectedCmCommTwo = CmsDisplayCommTwo.FirstOrDefault();
-                    }
-                    if (CmsDisplayCommOne.Count == 0 || CmsDisplayCommTwo.Count == 0)
-                    {
-                        LoadBoilerPlate();
-                    }
+                    LoadBoilerPlate();
                 }
             }
             catch (Exception ex)
@@ -238,9 +215,33 @@ namespace VibesSwap.ViewModel.Pages
             }
         }
 
+        /// <summary>
+        /// Modifies a remote CM based on provided search/replace parameters
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
         private void SwapCm(object parameter)
         {
-
+            try
+            {
+                var targets = SetTargets(parameter);
+                if (targets.Item2.CmStatus == CmStates.Alive)
+                {
+                    MessageBox.Show("CM must be stopped prior to editing!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                foreach (DeploymentProperty propertyToChange in targets.Item2.DeploymentProperties)
+                {
+                    if (string.IsNullOrEmpty(propertyToChange.SearchPattern) || string.IsNullOrEmpty(propertyToChange.ReplacePattern))
+                    {
+                        continue;
+                    }
+                    Task.Run(() => CmSshHelper.AlterCm(targets.Item1, targets.Item2, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Unable to modify CM, Error: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -373,9 +374,36 @@ namespace VibesSwap.ViewModel.Pages
             }
         }
 
+        /// <summary>
+        /// Swaps all CM's on specified host
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
         private void SwapAll(object parameter)
         {
-
+            try
+            {
+                switch (parameter)
+                {
+                    case HostTypes.COMM1:
+                        foreach (VibesCm cm in CmsDisplayCommOne)
+                        {
+                            SelectedCmCommOne = cm;
+                            SwapCm(HostTypes.COMM1);
+                        }
+                        break;
+                    case HostTypes.COMM2:
+                        foreach (VibesCm cm in CmsDisplayCommTwo)
+                        {
+                            SelectedCmCommTwo = cm;
+                            SwapCm(HostTypes.COMM2);
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error swapping all CM's, Error: {ex.Message}");
+            }
         }
 
         #endregion
@@ -431,10 +459,6 @@ namespace VibesSwap.ViewModel.Pages
                     System.Windows.Application.Current.Dispatcher.Invoke(delegate
                     {
                         LoadData(null);
-                        if (e.CmChanged != null)
-                        {
-                            PollCmAsync(e.CmChanged);
-                        }
                     });
                 }
                 if (CmsDisplayCommOne.Contains(e.CmChanged))

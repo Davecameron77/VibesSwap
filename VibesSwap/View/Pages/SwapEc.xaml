@@ -137,22 +137,19 @@
                                         Width="Auto"
                                         Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
-                                        IsReadOnly="False"
+                                        IsReadOnly="True"
                                         Width="Auto"
                                         Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
+                                        IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="100"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
+                                        IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="100"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTemplateColumn Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="Update" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -269,22 +266,17 @@
                                         Width="Auto"
                                         Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <DataGridTextColumn Header="Value"
-                                        IsReadOnly="False"
+                                        IsReadOnly="True"
                                         Width="Auto"
                                         Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
+                                        IsReadOnly="False"
                                         Width="*"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
+                                        IsReadOnly="False"
                                         Width="*"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTemplateColumn Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="Update" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

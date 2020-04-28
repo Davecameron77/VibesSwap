@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -173,6 +174,38 @@ namespace VibesSwap.ViewModel
             catch (Exception ex)
             {
                 Log.Error($"Error creating hosts file popup: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Loads stored CM's into provided collection
+        /// </summary>
+        /// <param name="cmCollection">The collection to load</param>
+        /// <param name="hostType">The type of host from which to fetch CM's</param>
+        internal void LoadCmForSwap(ICollection<VibesCm> cmCollection, HostTypes hostType)
+        {
+            try
+            {
+                using (DataContext context = new DataContext())
+                {
+                    if (context.EnvironmentHosts.Any(h => h.HostType == hostType))
+                    {
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == hostType))
+                        {
+                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
+                            {
+                                var newCm = cm.DeepCopy();
+                                newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                cmCollection.Add(newCm);
+                                PollCmAsync(newCm);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error loading CM's to GUI: {ex.Message}");
             }
         }
 
