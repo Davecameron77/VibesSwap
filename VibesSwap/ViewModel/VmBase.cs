@@ -95,7 +95,7 @@ namespace VibesSwap.ViewModel
             catch (Exception ex)
             {
                 Log.Error($"Unable to persist target changes on {sender.GetType()}, Error: {ex.Message}");
-            }   
+            }
         }
 
         /// <summary>
@@ -210,5 +210,6 @@ namespace VibesSwap.ViewModel
         }
 
         #endregion
+
     }
 }

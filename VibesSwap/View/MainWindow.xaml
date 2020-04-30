@@ -25,11 +25,13 @@
             </TabItem>
             <TabItem Header="Swap CM EC">
                 <ScrollViewer>
-                    <pages:SwapEc />
+                    <pages:SwapEcView />
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Swap VIBES CM">
-                
+                <ScrollViewer>
+                    <pages:SwapVibesCmView />
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </Grid>

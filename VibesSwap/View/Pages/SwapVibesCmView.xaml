@@ -1,0 +1,838 @@
+﻿<UserControl x:Class="VibesSwap.View.Pages.SwapVibesCmView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:model="clr-namespace:VibesSwap.Model.Dimensional"
+             mc:Ignorable="d" 
+             d:DesignHeight="1000" 
+             d:DesignWidth="960">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Text="Swap VIBES CM's"
+                   Style="{StaticResource PageHeader}"/>
+
+        <Grid Grid.Row="1"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="400 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Style="{StaticResource PageSubHeader}"
+                       Text="EXEC" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+                <Button Content="Refresh CM Data"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding RefreshCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Poll All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="0"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="CM Type"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM"
+                                        Width="*"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM Status"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <GridSplitter Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button Content="Poll CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Update Properties"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding UpdatePropertiesCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="2"
+                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Property"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Value"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Search Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Replace Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <Grid Grid.Row="2"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="400 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Style="{StaticResource PageSubHeader}"
+                       Text="OPERDB" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+                <Button Content="Refresh CM Data"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding RefreshCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Poll All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="0"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="CM Type"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM"
+                                        Width="*"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM Status"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <GridSplitter Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button Content="Poll CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Update Properties"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding UpdatePropertiesCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="2"
+                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Property"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Value"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Search Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Replace Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <Grid Grid.Row="3"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="400 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Style="{StaticResource PageSubHeader}"
+                       Text="OPERAPP ONE" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+                <Button Content="Refresh CM Data"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding RefreshCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Poll All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="0"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="CM Type"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM"
+                                        Width="*"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM Status"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <GridSplitter Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button Content="Poll CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Update Properties"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding UpdatePropertiesCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="2"
+                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Property"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Value"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Search Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Replace Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <Grid Grid.Row="4"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="400 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Style="{StaticResource PageSubHeader}"
+                       Text="OPERAPP TWO" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+                <Button Content="Refresh CM Data"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding RefreshCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Poll All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="0"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="CM Type"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM"
+                                        Width="*"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM Status"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <GridSplitter Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button Content="Poll CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Update Properties"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding UpdatePropertiesCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="2"
+                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Property"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Value"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Search Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Replace Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <Grid Grid.Row="5"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="400 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Style="{StaticResource PageSubHeader}"
+                       Text="MS" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+                <Button Content="Refresh CM Data"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding RefreshCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Poll All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="0"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="CM Type"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM"
+                                        Width="*"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM Status"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <GridSplitter Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button Content="Poll CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Update Properties"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding UpdatePropertiesCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="2"
+                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Property"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Value"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Search Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Replace Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <Grid Grid.Row="6"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="400 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="400"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Style="{StaticResource PageSubHeader}"
+                       Text="ENS" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+                <Button Content="Refresh CM Data"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding RefreshCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Poll All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap All CM's"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="0"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="CM Type"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM"
+                                        Width="*"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="CM Status"
+                                        Width="Auto"
+                                        IsReadOnly="True"
+                                        Binding="{Binding CmStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <GridSplitter Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button Content="Poll CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PollCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Start CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StartCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Stop CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding StopCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Swap CM"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwapCmCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                <Button Content="Update Properties"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding UpdatePropertiesCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      Grid.Column="2"
+                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      AutoGenerateColumns="False"
+                      Style="{StaticResource FormDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Property"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Value"
+                                        IsReadOnly="True"
+                                        Width="Auto"
+                                        MaxWidth="500"
+                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Search Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Replace Pattern"
+                                        IsReadOnly="False"
+                                        Width="*"
+                                        MinWidth="100"
+                                        MaxWidth="500"
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</UserControl>

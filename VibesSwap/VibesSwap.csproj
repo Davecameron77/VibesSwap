@@ -202,6 +202,7 @@
     <Compile Include="ViewModel\Helpers\ViewModelEnum.cs" />
     <Compile Include="ViewModel\Pages\EcSwapVm.cs" />
     <Compile Include="ViewModel\Pages\SetupVm.cs" />
+    <Compile Include="ViewModel\Pages\VibesCmSwapVm.cs" />
     <Compile Include="ViewModel\VmBase.cs" />
     <Compile Include="View\Dialogs\HostsFileDisplayView.xaml.cs">
       <DependentUpon>HostsFileDisplayView.xaml</DependentUpon>
@@ -212,8 +213,11 @@
     <Compile Include="View\Pages\SetupView.xaml.cs">
       <DependentUpon>SetupView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Pages\SwapEc.xaml.cs">
-      <DependentUpon>SwapEc.xaml</DependentUpon>
+    <Compile Include="View\Pages\SwapEcView.xaml.cs">
+      <DependentUpon>SwapEcView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\SwapVibesCmView.xaml.cs">
+      <DependentUpon>SwapVibesCmView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -256,7 +260,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Pages\SwapEc.xaml">
+    <Page Include="View\Pages\SwapEcView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\SwapVibesCmView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
