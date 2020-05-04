@@ -25,6 +25,8 @@
                    Text="Swap VIBES CM's"
                    Style="{StaticResource PageHeader}"/>
 
+        <!--#region Exec-->
+        
         <Grid Grid.Row="1"
               Grid.Column="0">
             <Grid.RowDefinitions>
@@ -51,23 +53,23 @@
                 <Button Content="Refresh CM Data"
                         Style="{StaticResource FormButton}"
                         Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.EXEC}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Start All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Stop All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -75,8 +77,8 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding CmsDisplayExec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmExec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource FormDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="CM Type"
@@ -107,28 +109,28 @@
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Start CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Stop CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Swap CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Update Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.EXEC}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
                       Grid.Column="2"
-                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      ItemsSource="{Binding SelectedCmExec.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -160,6 +162,10 @@
             </DataGrid>
         </Grid>
 
+        <!--#endregion-->
+        
+        <!--#region OperDb-->
+        
         <Grid Grid.Row="2"
               Grid.Column="0">
             <Grid.RowDefinitions>
@@ -186,23 +192,23 @@
                 <Button Content="Refresh CM Data"
                         Style="{StaticResource FormButton}"
                         Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.OPERDB}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
                 <Button Content="Start All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
                 <Button Content="Stop All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -210,8 +216,8 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding CmsDisplayOperDb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmOperDb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource FormDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="CM Type"
@@ -242,28 +248,28 @@
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
                 <Button Content="Start CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
                 <Button Content="Stop CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
                 <Button Content="Swap CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
                 <Button Content="Update Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.OPERDB}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
                       Grid.Column="2"
-                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      ItemsSource="{Binding SelectedCmOperDb.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -295,6 +301,10 @@
             </DataGrid>
         </Grid>
 
+        <!--#endregion-->
+        
+        <!--#region OperAppOne-->
+        
         <Grid Grid.Row="3"
               Grid.Column="0">
             <Grid.RowDefinitions>
@@ -321,23 +331,23 @@
                 <Button Content="Refresh CM Data"
                         Style="{StaticResource FormButton}"
                         Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.OPERAPP1}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Start All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Stop All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -345,8 +355,8 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding CmsDisplayOperAppOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmOperAppOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource FormDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="CM Type"
@@ -377,28 +387,28 @@
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Start CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Stop CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Swap CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Update Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.OPERAPP1}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
                       Grid.Column="2"
-                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      ItemsSource="{Binding SelectedCmOperAppOne.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -430,6 +440,10 @@
             </DataGrid>
         </Grid>
 
+        <!--#endregion-->
+        
+        <!--#region OperAppTwo-->
+        
         <Grid Grid.Row="4"
               Grid.Column="0">
             <Grid.RowDefinitions>
@@ -456,23 +470,23 @@
                 <Button Content="Refresh CM Data"
                         Style="{StaticResource FormButton}"
                         Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.OPERAPP2}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Start All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Stop All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -480,8 +494,8 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding CmsDisplayOperAppTwo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmOperAppTwo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource FormDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="CM Type"
@@ -512,28 +526,28 @@
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Start CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Stop CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Swap CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Update Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.OPERAPP2}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
                       Grid.Column="2"
-                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      ItemsSource="{Binding SelectedCmOperAppTwo.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -564,6 +578,10 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
+
+        <!--#endregion-->
+
+        <!--#region ENS-->
 
         <Grid Grid.Row="5"
               Grid.Column="0">
@@ -591,23 +609,23 @@
                 <Button Content="Refresh CM Data"
                         Style="{StaticResource FormButton}"
                         Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.ENS}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
                 <Button Content="Start All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
                 <Button Content="Stop All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -615,8 +633,8 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding CmsDisplayEns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmEns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource FormDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="CM Type"
@@ -647,28 +665,28 @@
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
                 <Button Content="Start CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
                 <Button Content="Stop CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
                 <Button Content="Swap CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
                 <Button Content="Update Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.ENS}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
                       Grid.Column="2"
-                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      ItemsSource="{Binding SelectedCmEns.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -699,6 +717,10 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
+
+        <!--#endregion-->
+
+        <!--#region MS-->
 
         <Grid Grid.Row="6"
               Grid.Column="0">
@@ -726,23 +748,23 @@
                 <Button Content="Refresh CM Data"
                         Style="{StaticResource FormButton}"
                         Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.MS}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
                 <Button Content="Start All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
                 <Button Content="Stop All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -750,8 +772,8 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding CmsDisplayMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedItem="{Binding SelectedCmMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource FormDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="CM Type"
@@ -782,28 +804,28 @@
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
                 <Button Content="Start CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
                 <Button Content="Stop CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
                 <Button Content="Swap CM"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
                 <Button Content="Update Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.MS}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
                       Grid.Column="2"
-                      ItemsSource="{Binding SelectedCmCommOne.DeploymentProperties}"
+                      ItemsSource="{Binding SelectedCmMs.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -834,5 +856,7 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
+        
+        <!--#endregion-->
     </Grid>
 </UserControl>
