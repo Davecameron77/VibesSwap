@@ -23,6 +23,8 @@ namespace VibesSwap.ViewModel.Pages
 
             RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
+            SetProdHostsCommand = new RelayCommand(SetProdHosts);
+            SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
             StartCmCommand = new RelayCommand(StartCm);
             StopCmCommand = new RelayCommand(StopCm);
             PollCmCommand = new RelayCommand(PollCm);
@@ -83,6 +85,8 @@ namespace VibesSwap.ViewModel.Pages
 
         public RelayCommand RefreshCommand { get; set; }
         public RelayCommand UpdatePropertiesCommand { get; set; }
+        public RelayCommand SetProdHostsCommand { get; set; }
+        public RelayCommand SetHlcHostsCommand { get; set; }
 
         public RelayCommand StartCmCommand { get; set; }
         public RelayCommand StopCmCommand { get; set; }
@@ -258,6 +262,40 @@ namespace VibesSwap.ViewModel.Pages
             }
         }
 
+        /// <summary>
+        /// Sets production hosts file for host
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
+        private void SetProdHosts(object parameter)
+        {
+            try
+            {
+                var targets = SetTargets(parameter);
+                Task.Run(() => CmSshHelper.SwitchHostsFile(targets.Item1, true, GetHashCode()));
+            }
+            catch(Exception ex)
+            {
+                Log.Error($"Unable to set production hosts, Error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Sets hlc hosts file for host
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
+        private void SetHlcHosts(object parameter)
+        {
+            try
+            {
+                var targets = SetTargets(parameter);
+                Task.Run(() => CmSshHelper.SwitchHostsFile(targets.Item1, false, GetHashCode()));
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Unable to set production hosts, Error: {ex.Message}");
+            }
+        }
+
         #endregion
 
         #region Bulk Transaction
@@ -417,10 +455,12 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
+                // This VM is not the sender, return
                 if (GetHashCode() != e.SubscriberHashCode)
                 {
                     return;
                 }
+                // Set CM Status
                 if (CmsDisplayCommOne.Contains(e.Cm))
                 {
                     CmsDisplayCommOne.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;

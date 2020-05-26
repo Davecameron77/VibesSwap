@@ -6,8 +6,8 @@
              xmlns:model="clr-namespace:VibesSwap.Model.Dimensional"
              xmlns:local="clr-namespace:VibesSwap.View.Pages"
              mc:Ignorable="d" 
-             d:DesignHeight="500" 
-             d:DesignWidth="960">
+             d:DesignHeight="1050" 
+             d:DesignWidth="1680">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -53,19 +53,27 @@
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
                 <Button Content="Start All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StartAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
                 <Button Content="Stop All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding StopAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Set Prod Hosts"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SetProdHostsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}" />
+                <Button Content="Set Hlc Hosts"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SetHlcHostsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}" />
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -203,6 +211,14 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.COMM2}"/>
+                <Button Content="Set Prod Hosts"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SetProdHostsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM2}" />
+                <Button Content="Set Hlc Hosts"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SetHlcHostsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM2}" />
             </StackPanel>
 
             <DataGrid Grid.Row="2"
