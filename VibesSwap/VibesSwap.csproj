@@ -189,21 +189,22 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModel\Pages\Base\CmControlBase.cs" />
     <Compile Include="ViewModel\Helpers\CmHelperEventArgs.cs" />
     <Compile Include="Model\DataContext.cs" />
     <Compile Include="Model\Dimensional\DeploymentProperty.cs" />
     <Compile Include="Model\Dimensional\ModelEnum.cs" />
     <Compile Include="Model\VibesCm.cs" />
     <Compile Include="Model\VibesHost.cs" />
-    <Compile Include="ViewModel\CmHttpHelper.cs" />
-    <Compile Include="ViewModel\CmSshHelper.cs" />
+    <Compile Include="ViewModel\Helpers\CmHttpHelper.cs" />
+    <Compile Include="ViewModel\Helpers\CmSshHelper.cs" />
     <Compile Include="ViewModel\Helpers\RelayCommand.cs" />
     <Compile Include="ViewModel\Helpers\StaticGlobals.cs" />
     <Compile Include="ViewModel\Helpers\ViewModelEnum.cs" />
     <Compile Include="ViewModel\Pages\EcSwapVm.cs" />
     <Compile Include="ViewModel\Pages\SetupVm.cs" />
     <Compile Include="ViewModel\Pages\VibesCmSwapVm.cs" />
-    <Compile Include="ViewModel\VmBase.cs" />
+    <Compile Include="ViewModel\Pages\Base\VmBase.cs" />
     <Compile Include="View\Dialogs\HostsFileDisplayView.xaml.cs">
       <DependentUpon>HostsFileDisplayView.xaml</DependentUpon>
     </Compile>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using VibesSwap.Model;
 using VibesSwap.ViewModel.Helpers;
 
-namespace VibesSwap.ViewModel
+namespace VibesSwap.ViewModel.Helpers
 {
     /// <summary>
     /// Helper class for SSH commands relating to CM status

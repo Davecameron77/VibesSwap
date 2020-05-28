@@ -4,15 +4,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using System.Windows;
 using VibesSwap.Model;
 using VibesSwap.Model.Dimensional;
 using VibesSwap.ViewModel.Helpers;
+using VibesSwap.ViewModel.Pages.Base;
 
 namespace VibesSwap.ViewModel.Pages
 {
-    class VibesCmSwapVm : VmBase
+    class VibesCmSwapVm : CmControlBase
     {
         #region Constructors
 
@@ -171,7 +171,7 @@ namespace VibesSwap.ViewModel.Pages
         public RelayCommand UpdatePropertiesCommand { get; set; }
         public RelayCommand SetProdHostsCommand { get; set; }
         public RelayCommand SetHlcHostsCommand { get; set; }
-
+        
         public RelayCommand StartCmCommand { get; set; }
         public RelayCommand StopCmCommand { get; set; }
         public RelayCommand PollCmCommand { get; set; }
@@ -185,6 +185,8 @@ namespace VibesSwap.ViewModel.Pages
         #endregion
 
         #region Methods
+
+        #region Setup
 
         /// <summary>
         /// Load data from database
@@ -227,6 +229,8 @@ namespace VibesSwap.ViewModel.Pages
             catch (Exception ex)
             {
                 Log.Error($"Error loading CM's from DB: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+                MessageBox.Show("Error loading data to GUI", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -274,145 +278,7 @@ namespace VibesSwap.ViewModel.Pages
             catch (Exception ex)
             {
                 Log.Error($"Error loading boilerplate for EC Swap: {ex.Message}");
-            }
-        }
-
-        #region Single Transaction
-
-        /// <summary>
-        /// Starts a remote CM
-        /// An event is expected back on command complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void StartCm(object parameter)
-        {
-            try
-            {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.StartCm(targets.Item1, targets.Item2, GetHashCode()));
-                targets.Item2.CmStatus = CmStates.Polling;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Unable to start CM, Error: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Stops a remote CM
-        /// An event is expected back on command complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void StopCm(object parameter)
-        {
-            try
-            {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.StopCm(targets.Item1, targets.Item2, GetHashCode()));
-                targets.Item2.CmStatus = CmStates.Polling;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Unable to stop CM, Error: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Polls a remote CM
-        /// An event is expected back on command complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void PollCm(object parameter)
-        {
-            try
-            {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmHttpHelper.CheckCmStatus(targets.Item1, targets.Item2, GetHashCode()));
-                targets.Item2.CmStatus = CmStates.Polling;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Unable to poll CM, Error: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Modifies a remote CM based on provided search/replace parameters
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void SwapCm(object parameter)
-        {
-            try
-            {
-                var targets = SetTargets(parameter);
-                if (targets.Item2.CmStatus == CmStates.Alive)
-                {
-                    MessageBox.Show("CM must be stopped prior to editing!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-                foreach (DeploymentProperty propertyToChange in targets.Item2.DeploymentProperties)
-                {
-                    if (string.IsNullOrEmpty(propertyToChange.SearchPattern) || string.IsNullOrEmpty(propertyToChange.ReplacePattern))
-                    {
-                        continue;
-                    }
-                    Task.Run(() => CmSshHelper.AlterCm(targets.Item1, targets.Item2, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Unable to modify CM, Error: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Gets deployment.properties from a remote CM
-        /// </summary>
-        /// <param name="parameter">The cluster the CM is on</param>
-        private void UpdateProperties(object parameter)
-        {
-            try
-            {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.GetCmParams(targets.Item1, targets.Item2, GetHashCode()));
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Unable to get deployment properties, Error: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Sets production hosts file for host
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void SetProdHosts(object parameter)
-        {
-            try
-            {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.SwitchHostsFile(targets.Item1, true, GetHashCode()));
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Unable to set production hosts, Error: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Sets hlc hosts file for host
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void SetHlcHosts(object parameter)
-        {
-            try
-            {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.SwitchHostsFile(targets.Item1, false, GetHashCode()));
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Unable to set production hosts, Error: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
             }
         }
 
@@ -432,70 +298,30 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.EXEC:
-                        foreach (VibesCm cm in CmsDisplayExec)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run(() => CmSshHelper.StartCm(SelectedHostExec, cm, GetHashCode()));
-                            }
-                        }
+                        StartCollection(CmsDisplayExec);
                         break;
                     case HostTypes.OPERDB:
-                        foreach (VibesCm cm in CmsDisplayOperDb)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostOperDb = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StartCm(SelectedHostOperDb, cm, GetHashCode())));
-                            }
-                        }
+                        StartCollection(CmsDisplayOperDb);
                         break;
                     case HostTypes.OPERAPP1:
-                        foreach (VibesCm cm in CmsDisplayOperAppOne)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostOperAppOne = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StartCm(SelectedHostOperAppOne, cm, GetHashCode())));
-                            }
-                        }
+                        StartCollection(CmsDisplayOperAppOne);
                         break;
                     case HostTypes.OPERAPP2:
-                        foreach (VibesCm cm in CmsDisplayOperAppTwo)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostOperAppTwo = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StartCm(SelectedHostOperAppTwo, cm, GetHashCode())));
-                            }
-                        }
+                        StartCollection(CmsDisplayOperAppTwo);
                         break;
                     case HostTypes.ENS:
-                        foreach (VibesCm cm in CmsDisplayEns)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostEns = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StartCm(SelectedHostEns, cm, GetHashCode())));
-                            }
-                        }
+                        StartCollection(CmsDisplayEns);
                         break;
                     case HostTypes.MS:
-                        foreach (VibesCm cm in CmsDisplayMs)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostMs = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StartCm(SelectedHostMs, cm, GetHashCode())));
-                            }
-                        }
+                        StartCollection(CmsDisplayMs);
                         break;
                 }
             }
             catch (Exception ex)
             {
                 Log.Error($"Unable to start all CM's, Error: {ex.Message}");
+                Log.Error($"Stack Trace {ex.Message}");
+                MessageBox.Show("Error starting all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -511,70 +337,30 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.EXEC:
-                        foreach (VibesCm cm in CmsDisplayExec)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run(() => CmSshHelper.StopCm(SelectedHostExec, cm, GetHashCode()));
-                            }
-                        }
+                        StopCollection(CmsDisplayExec);
                         break;
                     case HostTypes.OPERDB:
-                        foreach (VibesCm cm in CmsDisplayOperDb)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostOperDb = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StopCm(SelectedHostOperDb, cm, GetHashCode())));
-                            }
-                        }
+                        StopCollection(CmsDisplayOperDb);
                         break;
                     case HostTypes.OPERAPP1:
-                        foreach (VibesCm cm in CmsDisplayOperAppOne)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostOperAppOne = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StopCm(SelectedHostOperAppOne, cm, GetHashCode())));
-                            }
-                        }
+                        StopCollection(CmsDisplayOperAppOne);
                         break;
                     case HostTypes.OPERAPP2:
-                        foreach (VibesCm cm in CmsDisplayOperAppTwo)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostOperAppTwo = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StopCm(SelectedHostOperAppTwo, cm, GetHashCode())));
-                            }
-                        }
+                        StopCollection(CmsDisplayOperAppTwo);
                         break;
                     case HostTypes.ENS:
-                        foreach (VibesCm cm in CmsDisplayEns)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostEns = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StopCm(SelectedHostEns, cm, GetHashCode())));
-                            }
-                        }
+                        StopCollection(CmsDisplayEns);
                         break;
                     case HostTypes.MS:
-                        foreach (VibesCm cm in CmsDisplayMs)
-                        {
-                            using (DataContext context = new DataContext())
-                            {
-                                SelectedHostMs = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                                Task.Run((() => CmSshHelper.StopCm(SelectedHostMs, cm, GetHashCode())));
-                            }
-                        }
+                        StopCollection(CmsDisplayMs);
                         break;
                 }
             }
             catch (Exception ex)
             {
                 Log.Error($"Unable to stop all CM's, Error: {ex.Message}");
+                Log.Error($"Stack Trace {ex.Message}");
+                MessageBox.Show("Error stopping all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -589,46 +375,30 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.EXEC:
-                        foreach (VibesCm cm in CmsDisplayExec)
-                        {
-                            PollCmAsync(cm);
-                        }
+                        PollCollection(CmsDisplayExec);
                         break;
                     case HostTypes.OPERDB:
-                        foreach (VibesCm cm in CmsDisplayOperDb)
-                        {
-                            PollCmAsync(cm);
-                        }
+                        PollCollection(CmsDisplayOperDb);
                         break;
                     case HostTypes.OPERAPP1:
-                        foreach (VibesCm cm in CmsDisplayOperAppOne)
-                        {
-                            PollCmAsync(cm);
-                        }
+                        PollCollection(CmsDisplayOperAppOne);
                         break;
                     case HostTypes.OPERAPP2:
-                        foreach (VibesCm cm in CmsDisplayOperAppTwo)
-                        {
-                            PollCmAsync(cm);
-                        }
+                        PollCollection(CmsDisplayOperAppTwo);
                         break;
                     case HostTypes.ENS:
-                        foreach (VibesCm cm in CmsDisplayEns)
-                        {
-                            PollCmAsync(cm);
-                        }
+                        PollCollection(CmsDisplayEns);
                         break;
                     case HostTypes.MS:
-                        foreach (VibesCm cm in CmsDisplayMs)
-                        {
-                            PollCmAsync(cm);
-                        }
+                        PollCollection(CmsDisplayMs);
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Log.Error($"Unable to poll CM, Error: {ex.Message}");
+                Log.Error($"Unable to poll all CM's, Error: {ex.Message}");
+                Log.Error($"Stack Trace {ex.Message}");
+                MessageBox.Show("Error polling all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -643,52 +413,30 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.EXEC:
-                        foreach (VibesCm cm in CmsDisplayExec)
-                        {
-                            SelectedCmExec = cm;
-                            SwapCm(HostTypes.EXEC);
-                        }
+                        SwapCollection(CmsDisplayExec);
                         break;
                     case HostTypes.OPERDB:
-                        foreach (VibesCm cm in CmsDisplayOperDb)
-                        {
-                            SelectedCmOperDb = cm;
-                            SwapCm(HostTypes.OPERDB);
-                        }
+                        SwapCollection(CmsDisplayOperDb);
                         break;
                     case HostTypes.OPERAPP1:
-                        foreach (VibesCm cm in CmsDisplayOperAppOne)
-                        {
-                            SelectedCmOperAppOne = cm;
-                            SwapCm(HostTypes.OPERAPP1);
-                        }
+                        SwapCollection(CmsDisplayOperAppOne);
                         break;
                     case HostTypes.OPERAPP2:
-                        foreach (VibesCm cm in CmsDisplayOperAppTwo)
-                        {
-                            SelectedCmOperAppTwo = cm;
-                            SwapCm(HostTypes.OPERAPP2);
-                        }
+                        SwapCollection(CmsDisplayOperAppTwo);
                         break;
                     case HostTypes.ENS:
-                        foreach (VibesCm cm in CmsDisplayEns)
-                        {
-                            SelectedCmEns = cm;
-                            SwapCm(HostTypes.ENS);
-                        }
+                        SwapCollection(CmsDisplayEns);
                         break;
                     case HostTypes.MS:
-                        foreach (VibesCm cm in CmsDisplayMs)
-                        {
-                            SelectedCmMs = cm;
-                            SwapCm(HostTypes.MS);
-                        }
+                        SwapCollection(CmsDisplayMs);
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Log.Error($"Error swapping all CM's, Error: {ex.Message}");
+                Log.Error($"Unable to swap all CM's, Error: {ex.Message}");
+                Log.Error($"Stack Trace {ex.Message}");
+                MessageBox.Show("Error swapping all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -740,6 +488,7 @@ namespace VibesSwap.ViewModel.Pages
             catch (Exception ex)
             {
                 Log.Error($"Error updating GUI with CM changes: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
             }
         }
 
@@ -753,18 +502,13 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
+                // This VM is not the sender, return
                 if (e.SubscriberHashCode != GetHashCode())
                 {
                     return;
                 }
-                if (e.DeploymentProperties != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERDB || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2 || e.Host.HostType == HostTypes.ENS || e.Host.HostType == HostTypes.MS))
-                {
-                    PopulateLocalDeploymentProperties(e.CmChanged, e.DeploymentProperties);
-                    System.Windows.Application.Current.Dispatcher.Invoke(delegate
-                    {
-                        LoadData(null);
-                    });
-                }
+
+                // Set CM Status
                 if (CmsDisplayExec.Contains(e.CmChanged))
                 {
                     CmsDisplayExec.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
@@ -789,6 +533,18 @@ namespace VibesSwap.ViewModel.Pages
                 {
                     CmsDisplayMs.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
                 }
+
+                // Update properties
+                if (e.DeploymentProperties != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERDB || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2 || e.Host.HostType == HostTypes.ENS || e.Host.HostType == HostTypes.MS))
+                {
+                    PopulateLocalDeploymentProperties(e.CmChanged, e.DeploymentProperties);
+                    Application.Current.Dispatcher.Invoke(delegate
+                    {
+                        LoadData(null);
+                    });
+                }
+
+                // Popup hosts
                 if (e.Host != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERDB || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2 || e.Host.HostType == HostTypes.ENS || e.Host.HostType == HostTypes.MS))
                 {
                     PopupHostsFile(e);
@@ -797,6 +553,7 @@ namespace VibesSwap.ViewModel.Pages
             catch (Exception ex)
             {
                 Log.Error($"Error updating GUI with CM changes: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
             }
         }
 
@@ -810,46 +567,73 @@ namespace VibesSwap.ViewModel.Pages
         /// </summary>
         /// <param name="target">The HostType to target</param>
         /// <returns>Tuple containing the target Host/Cm, validated</returns>
-        private (VibesHost, VibesCm) SetTargets(object target)
+        internal override sealed (VibesHost, VibesCm) SetTargets(object target)
         {
-            VibesHost hostToPoll = null;
-            VibesCm cmToPoll = null;
-
-            switch (target)
+            try
             {
-                case HostTypes.EXEC:
-                    CheckForMissingParams(SelectedHostExec, SelectedCmExec);
-                    hostToPoll = SelectedHostExec;
-                    cmToPoll = SelectedCmExec;
-                    break;
-                case HostTypes.OPERDB:
-                    CheckForMissingParams(SelectedHostOperDb, SelectedCmOperDb);
-                    hostToPoll = SelectedHostOperDb;
-                    cmToPoll = SelectedCmOperDb;
-                    break;
-                case HostTypes.OPERAPP1:
-                    CheckForMissingParams(SelectedHostOperAppOne, SelectedCmOperAppOne);
-                    hostToPoll = SelectedHostOperAppOne;
-                    cmToPoll = SelectedCmOperAppOne;
-                    break;
-                case HostTypes.OPERAPP2:
-                    CheckForMissingParams(SelectedHostOperAppTwo, SelectedCmOperAppTwo);
-                    hostToPoll = SelectedHostOperAppTwo;
-                    cmToPoll = SelectedCmOperAppTwo;
-                    break;
-                case HostTypes.ENS:
-                    CheckForMissingParams(SelectedHostEns, SelectedCmEns);
-                    hostToPoll = SelectedHostEns;
-                    cmToPoll = SelectedCmEns;
-                    break;
-                case HostTypes.MS:
-                    CheckForMissingParams(SelectedHostMs, SelectedCmMs);
-                    hostToPoll = SelectedHostMs;
-                    cmToPoll = SelectedCmMs;
-                    break;
-            }
+                VibesHost hostToPoll = null;
+                VibesCm cmToPoll = null;
 
-            return (hostToPoll, cmToPoll);
+                switch (target)
+                {
+                    case HostTypes.EXEC:
+                        if (!RequiredParametersProvided(SelectedHostExec, SelectedCmExec))
+                        {
+                            throw new ArgumentNullException($"Required parameters not provided");
+                        }
+                        hostToPoll = SelectedHostExec;
+                        cmToPoll = SelectedCmExec;
+                        break;
+                    case HostTypes.OPERDB:
+                        if (!RequiredParametersProvided(SelectedHostOperDb, SelectedCmOperDb))
+                        {
+                            throw new ArgumentNullException($"Required parameters not provided");
+                        }
+                        hostToPoll = SelectedHostOperDb;
+                        cmToPoll = SelectedCmOperDb;
+                        break;
+                    case HostTypes.OPERAPP1:
+                        if (!RequiredParametersProvided(SelectedHostOperAppOne, SelectedCmOperAppOne))
+                        {
+                            throw new ArgumentNullException($"Required parameters not provided");
+                        }
+                        hostToPoll = SelectedHostOperAppOne;
+                        cmToPoll = SelectedCmOperAppOne;
+                        break;
+                    case HostTypes.OPERAPP2:
+                        if (!RequiredParametersProvided(SelectedHostOperAppTwo, SelectedCmOperAppTwo))
+                        {
+                            throw new ArgumentNullException($"Required parameters not provided");
+                        }
+                        hostToPoll = SelectedHostOperAppTwo;
+                        cmToPoll = SelectedCmOperAppTwo;
+                        break;
+                    case HostTypes.ENS:
+                        if (!RequiredParametersProvided(SelectedHostEns, SelectedCmEns))
+                        {
+                            throw new ArgumentNullException($"Required parameters not provided");
+                        }
+                        hostToPoll = SelectedHostEns;
+                        cmToPoll = SelectedCmEns;
+                        break;
+                    case HostTypes.MS:
+                        if (!RequiredParametersProvided(SelectedHostMs, SelectedCmMs))
+                        {
+                            throw new ArgumentNullException($"Required parameters not provided");
+                        }
+                        hostToPoll = SelectedHostMs;
+                        cmToPoll = SelectedCmMs;
+                        break;
+                }
+
+                return (hostToPoll, cmToPoll);
+            }
+            catch(Exception ex)
+            {
+                Log.Error($"Error setting parameters for CM command");
+                Log.Error($"StackTrace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         #endregion

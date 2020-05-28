@@ -8,6 +8,7 @@ using System.Windows;
 using VibesSwap.ViewModel.Helpers;
 using VibesSwap.Model;
 using VibesSwap.Model.Dimensional;
+using VibesSwap.ViewModel.Pages.Base;
 
 namespace VibesSwap.ViewModel.Pages
 {
