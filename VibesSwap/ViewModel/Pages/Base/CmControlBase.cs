@@ -63,7 +63,7 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// </summary>
         /// <param name="cmChanged">The CM which was queried</param>
         /// <param name="deploymentProperties">The deployment properties file fetched</param>
-        internal void PopulateLocalDeploymentProperties(VibesCm cmChanged, string deploymentProperties)
+        internal void StoreDeploymentProperties(VibesCm cmChanged, string deploymentProperties)
         {
             try
             {
@@ -105,7 +105,7 @@ namespace VibesSwap.ViewModel.Pages.Base
             }
             catch (Exception ex)
             {
-                Log.Error($"Error populating deployment properties: {ex.Message}");
+                Log.Error($"Error storing deployment properties: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
                 throw;
             }
@@ -243,7 +243,7 @@ namespace VibesSwap.ViewModel.Pages.Base
                 MessageBox.Show($"Unable to poll CM", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        
         /// <summary>
         /// Modifies a remote CM based on provided search/replace parameters
         /// </summary>

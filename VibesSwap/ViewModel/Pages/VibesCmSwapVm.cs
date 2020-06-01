@@ -537,7 +537,7 @@ namespace VibesSwap.ViewModel.Pages
                 // Update properties
                 if (e.DeploymentProperties != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERDB || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2 || e.Host.HostType == HostTypes.ENS || e.Host.HostType == HostTypes.MS))
                 {
-                    PopulateLocalDeploymentProperties(e.CmChanged, e.DeploymentProperties);
+                    StoreDeploymentProperties(e.CmChanged, e.DeploymentProperties);
                     Application.Current.Dispatcher.Invoke(delegate
                     {
                         LoadData(null);

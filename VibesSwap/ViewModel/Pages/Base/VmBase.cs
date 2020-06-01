@@ -40,7 +40,7 @@ namespace VibesSwap.ViewModel.Pages.Base
                         context.SaveChanges();
                     }
                 }
-                if (sender is VibesCm newCmValues)
+                else if (sender is VibesCm newCmValues)
                 {
                     using (DataContext context = new DataContext())
                     {
@@ -62,10 +62,15 @@ namespace VibesSwap.ViewModel.Pages.Base
                         context.SaveChanges();
                     }
                 }
+                else
+                {
+                    throw new ArgumentException("Unkonwn type supplied");
+                }
             }
             catch (Exception ex)
             {
                 Log.Error($"Unable to persist target changes on {sender.GetType()}, Error: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
             }
         }
 

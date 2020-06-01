@@ -181,14 +181,6 @@ namespace VibesSwap.ViewModel.Pages
                     case HostTypes.COMM2:
                         StartCollection(CmsDisplayCommTwo);
                         break;
-                    /*
-                    Example from other VM
-                    CmsDisplayExec does not exist in this VM, CmsDisplayCommOne does not exist in the other
-                    Otherwise Functionally identical
-                    case HostTypes.Exec:
-                        StartCollection(CmsDisplayExec);
-                        break;
-                    */
                 }
             }
             catch (Exception ex)
@@ -343,7 +335,7 @@ namespace VibesSwap.ViewModel.Pages
                 // Update properties
                 if (e.DeploymentProperties != null && (e.Host.HostType == HostTypes.COMM1 || e.Host.HostType == HostTypes.COMM2))
                 {
-                    PopulateLocalDeploymentProperties(e.CmChanged, e.DeploymentProperties);
+                    StoreDeploymentProperties(e.CmChanged, e.DeploymentProperties);
                     Application.Current.Dispatcher.Invoke(delegate
                     {
                         LoadData(null);
@@ -369,7 +361,7 @@ namespace VibesSwap.ViewModel.Pages
 
         /// <summary>
         /// Setups up Host/CM target and checks for missing params
-        /// Common code used by all CM commands, but specific to this host
+        /// Common code used by all CM commands, but spefcific to this host
         /// </summary>
         /// <param name="target">The HostType to target</param>
         /// <returns>Tuple containing the target Host/Cm, validated</returns>

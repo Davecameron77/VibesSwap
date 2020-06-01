@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using VibesSwap.Model;
-using VibesSwap.ViewModel.Helpers;
 
 namespace VibesSwap.ViewModel.Helpers
 {
@@ -45,38 +45,71 @@ namespace VibesSwap.ViewModel.Helpers
         public static async Task<HttpStatusCode> CheckCmStatus(VibesHost hostToCheck, VibesCm cmToCheck, int hashCode)
         {
             HttpStatusCode statusCode = HttpStatusCode.ServiceUnavailable;
-            int port = 80;
-
-            if (hostToCheck == null || cmToCheck == null)
+            try
             {
-                string missingParameter = hostToCheck == null ? "Selected Host" : "Selected CM";
-                throw new Exception($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
-            }
-
-            int.TryParse(cmToCheck.CmPort, out port);
-            using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(500) })
-            {
-                var builder = new UriBuilder("http", hostToCheck.Url, port)
+                if (hostToCheck == null || cmToCheck == null)
                 {
-                    Path = "status"
-                };
-                Uri uri = builder.Uri;
+                    string missingParameter = hostToCheck == null ? "Selected Host" : "Selected CM";
+                    throw new Exception($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
+                }
 
-                var response = await client.GetAsync(uri);
-                if (response.IsSuccessStatusCode)
+                int port;
+                int.TryParse(cmToCheck.CmPort, out port);
+                using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(2000) })
                 {
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    if (!string.IsNullOrEmpty(responseBody) && responseBody.Contains("CM = Alive!"))
+                    var builder = new UriBuilder("http", hostToCheck.Url, port)
                     {
-                        statusCode = HttpStatusCode.OK;
+                        Path = "status"
+                    };
+                    Uri uri = builder.Uri;
+
+                    var response = await client.GetAsync(uri);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        if (!string.IsNullOrEmpty(responseBody) && responseBody.Contains("CM = Alive!"))
+                        {
+                            statusCode = HttpStatusCode.OK;
+                        }
+                    }
+                    else
+                    {
+                        statusCode = HttpStatusCode.ServiceUnavailable;
                     }
                 }
-                else
-                {
-                    statusCode = HttpStatusCode.ServiceUnavailable;
-                }
             }
+            catch (Exception ex)
+            {
+                // HTTP timeout, CM offline
+                if(ex.Message.Contains("A task was canceled."))
+                {
+                    Log.Information($"Request to {cmToCheck.CmResourceName} timed out");
+                    statusCode = HttpStatusCode.RequestTimeout;
+                    OnPollComplete(cmToCheck, statusCode, hashCode);
+                    return statusCode;
+                }
+                // Unkonwn Host
+                else if(ex.InnerException.ToString().Contains("The remote name could not be resolved"))
+                {
+                    Log.Information($"Unable to resolve hostname {cmToCheck.VibesHost.Url} for CM {cmToCheck.CmResourceName}");
+                    statusCode = HttpStatusCode.NotFound;
+                    OnPollComplete(cmToCheck, statusCode, hashCode);
+                    return statusCode;
+                }
+                // Other error
+                else if (ex.InnerException.ToString().Contains("Unable to connect to the remote server"))
+                {
+                    Log.Information($"Unable to connect to CM {cmToCheck.CmResourceName} on {cmToCheck.VibesHost.Url}");
+                    statusCode = HttpStatusCode.ServiceUnavailable;
+                    OnPollComplete(cmToCheck, statusCode, hashCode);
+                    return statusCode;
+                }
 
+                Log.Error($"Error polling CM: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+                OnPollComplete(cmToCheck, statusCode, hashCode);
+            }
+            
             OnPollComplete(cmToCheck, statusCode, hashCode);
             return statusCode;
         }
