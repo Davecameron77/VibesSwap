@@ -126,7 +126,7 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
                         CommandParameter="{x:Static  model:HostTypes.COMM1}"/>
-                <Button Content="Update Properties"
+                <Button Content="Get Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.COMM1}"/>
@@ -271,6 +271,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
                         CommandParameter="{x:Static  model:HostTypes.COMM2}"/>
+                <Button Content="Get Properties"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding UpdatePropertiesCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM2}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"

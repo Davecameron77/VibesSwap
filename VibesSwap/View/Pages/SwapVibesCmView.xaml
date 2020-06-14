@@ -130,7 +130,7 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
                         CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
-                <Button Content="Update Properties"
+                <Button Content="Get Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.EXEC}"/>
@@ -269,7 +269,7 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
-                <Button Content="Update Properties"
+                <Button Content="Get Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.OPERDB}"/>
@@ -416,7 +416,7 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
-                <Button Content="Update Properties"
+                <Button Content="Get Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.OPERAPP1}"/>
@@ -563,7 +563,7 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
-                <Button Content="Update Properties"
+                <Button Content="Get Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.OPERAPP2}"/>
@@ -841,7 +841,7 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
                         CommandParameter="{x:Static  model:HostTypes.MS}"/>
-                <Button Content="Update Properties"
+                <Button Content="Get Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.MS}"/>

@@ -4,7 +4,6 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using VibesSwap.Model;
-using VibesSwap.ViewModel.Helpers;
 
 namespace VibesSwap.ViewModel.Helpers
 {

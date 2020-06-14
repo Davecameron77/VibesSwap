@@ -62,9 +62,13 @@ namespace VibesSwap.ViewModel.Pages.Base
                         context.SaveChanges();
                     }
                 }
+                else if (sender is VibesCmSwapVm || sender is EcSwapVm)
+                {
+                    return;
+                }
                 else
                 {
-                    throw new ArgumentException("Unkonwn type supplied");
+                    throw new ArgumentException("Unknown type supplied");
                 }
             }
             catch (Exception ex)

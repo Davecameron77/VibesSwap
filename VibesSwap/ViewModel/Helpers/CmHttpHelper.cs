@@ -55,7 +55,7 @@ namespace VibesSwap.ViewModel.Helpers
 
                 int port;
                 int.TryParse(cmToCheck.CmPort, out port);
-                using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(2000) })
+                using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(3000) })
                 {
                     var builder = new UriBuilder("http", hostToCheck.Url, port)
                     {

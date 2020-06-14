@@ -2,7 +2,6 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,6 +41,25 @@ namespace VibesSwap.ViewModel.Pages.Base
                 if (host == null || cm == null)
                 {
                     string missingParameter = host == null ? "Selected Host" : "Selected CM";
+
+                    Log.Error($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
+                    parametersProvided = false;
+                }
+                if (string.IsNullOrEmpty(host.SshUsername) || string.IsNullOrEmpty(host.SshPassword))
+                {
+                    string missingParameter = string.IsNullOrEmpty(host.SshUsername) ? "SSH Username" : "SSH Password";
+
+                    Log.Error($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
+                    parametersProvided = false;
+                }
+                if (string.IsNullOrEmpty(cm.CmResourceName))
+                {
+                    Log.Error($"Error starting/stopping/editing CM, Missing parameter CM Resource Name");
+                    parametersProvided = false;
+                }
+                if (string.IsNullOrEmpty(cm.CmCorePath) || string.IsNullOrEmpty(cm.CmPath))
+                {
+                    string missingParameter = string.IsNullOrEmpty(cm.CmCorePath) ? "CM Core Path" : "CM Path";
 
                     Log.Error($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
                     parametersProvided = false;
