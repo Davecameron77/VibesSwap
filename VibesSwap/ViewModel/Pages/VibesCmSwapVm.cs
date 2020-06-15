@@ -58,24 +58,12 @@ namespace VibesSwap.ViewModel.Pages
         public ObservableCollection<VibesCm> CmsDisplayEns { get; set; }
 
         public VibesHost SelectedHostExec { get; set; }
-        private VibesCm _selectedCmExec;
-        public VibesHost SelectedHostOperDb { get; set; }
-        private VibesCm _selectedCmOperDb;
-        public VibesHost SelectedHostOperAppOne { get; set; }
-        private VibesCm _selectedCmOperAppOne;
-        public VibesHost SelectedHostOperAppTwo { get; set; }
-        private VibesCm _selectedCmOperAppTwo;
-        public VibesHost SelectedHostMs { get; set; }
-        private VibesCm _selectedCmEns;
-        public VibesHost SelectedHostEns { get; set; }
-        private VibesCm _selectedCmMs;
-
         public VibesCm SelectedCmExec
         {
             get { return _selectedCmExec; }
-            set 
-            { 
-                _selectedCmExec = value; 
+            set
+            {
+                _selectedCmExec = value;
                 if (value != null)
                 {
                     PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
@@ -86,11 +74,14 @@ namespace VibesSwap.ViewModel.Pages
                 }
             }
         }
+        private VibesCm _selectedCmExec;
+
+        public VibesHost SelectedHostOperDb { get; set; }
         public VibesCm SelectedCmOperDb
         {
             get { return _selectedCmOperDb; }
-            set 
-            { 
+            set
+            {
                 _selectedCmOperDb = value;
                 if (value != null)
                 {
@@ -102,11 +93,14 @@ namespace VibesSwap.ViewModel.Pages
                 }
             }
         }
+        private VibesCm _selectedCmOperDb;
+
+        public VibesHost SelectedHostOperAppOne { get; set; }
         public VibesCm SelectedCmOperAppOne
         {
             get { return _selectedCmOperAppOne; }
-            set 
-            { 
+            set
+            {
                 _selectedCmOperAppOne = value;
                 if (value != null)
                 {
@@ -118,11 +112,14 @@ namespace VibesSwap.ViewModel.Pages
                 }
             }
         }
+        private VibesCm _selectedCmOperAppOne;
+
+        public VibesHost SelectedHostOperAppTwo { get; set; }
         public VibesCm SelectedCmOperAppTwo
         {
             get { return _selectedCmOperAppTwo; }
-            set 
-            { 
+            set
+            {
                 _selectedCmOperAppTwo = value;
                 if (value != null)
                 {
@@ -134,27 +131,14 @@ namespace VibesSwap.ViewModel.Pages
                 }
             }
         }
-        public VibesCm SelectedCmEns
-        {
-            get { return _selectedCmEns; }
-            set 
-            { 
-                _selectedCmEns = value;
-                if (value != null)
-                {
-                    PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    using (DataContext context = new DataContext())
-                    {
-                        SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == value.VibesHostId);
-                    }
-                }
-            }
-        }
+        private VibesCm _selectedCmOperAppTwo;
+
+        public VibesHost SelectedHostMs { get; set; }
         public VibesCm SelectedCmMs
         {
             get { return _selectedCmMs; }
-            set 
-            { 
+            set
+            {
                 _selectedCmMs = value;
                 if (value != null)
                 {
@@ -166,6 +150,26 @@ namespace VibesSwap.ViewModel.Pages
                 }
             }
         }
+        private VibesCm _selectedCmMs;
+
+        public VibesHost SelectedHostEns { get; set; }
+        public VibesCm SelectedCmEns
+        {
+            get { return _selectedCmEns; }
+            set
+            {
+                _selectedCmEns = value;
+                if (value != null)
+                {
+                    PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                    using (DataContext context = new DataContext())
+                    {
+                        SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == value.VibesHostId);
+                    }
+                }
+            }
+        }
+        private VibesCm _selectedCmEns;
 
         public RelayCommand RefreshCommand { get; set; }
         public RelayCommand UpdatePropertiesCommand { get; set; }
@@ -511,27 +515,27 @@ namespace VibesSwap.ViewModel.Pages
                 // Set CM Status
                 if (CmsDisplayExec.Contains(e.CmChanged))
                 {
-                    CmsDisplayExec.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
                 }
                 else if (CmsDisplayOperDb.Contains(e.CmChanged))
                 {
-                    CmsDisplayOperDb.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
                 }
                 else if (CmsDisplayOperAppOne.Contains(e.CmChanged))
                 {
-                    CmsDisplayOperAppOne.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
                 }
                 else if (CmsDisplayOperAppTwo.Contains(e.CmChanged))
                 {
-                    CmsDisplayOperAppTwo.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
                 }
                 else if (CmsDisplayEns.Contains(e.CmChanged))
                 {
-                    CmsDisplayEns.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
                 }
                 else if (CmsDisplayMs.Contains(e.CmChanged))
                 {
-                    CmsDisplayMs.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
                 }
 
                 // Update properties

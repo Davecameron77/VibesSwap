@@ -11,10 +11,16 @@ namespace VibesSwap.Model
     /// </summary>
     public class VibesCm : INotifyPropertyChanged
     {
+        #region Constructors
+
         public VibesCm()
         {
             DeploymentProperties = new List<DeploymentProperty>();
         }
+
+        #endregion
+
+        #region Members
 
         [Key]
         public int Id { get; set; }
@@ -29,9 +35,12 @@ namespace VibesSwap.Model
         // Relations
         public int VibesHostId { get; set; }
         public VibesHost VibesHost { get; set; }
-        
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        #region Methods
 
         public VibesCm DeepCopy()
         {
@@ -56,5 +65,7 @@ namespace VibesSwap.Model
             }
             return newCm;
         }
+
+        #endregion
     }
 }

@@ -172,7 +172,11 @@ namespace VibesSwap.ViewModel.Pages.Base
                             foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
                             {
                                 var newCm = cm.DeepCopy();
-                                newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                // newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                foreach(DeploymentProperty prop in newCm.DeploymentProperties)
+                                {
+                                    prop.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                                }
                                 cmCollection.Add(newCm);
                                 PollCmAsync(newCm);
                             }

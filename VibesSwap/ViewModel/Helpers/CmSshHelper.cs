@@ -1,5 +1,6 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
+using Serilog;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -74,8 +75,18 @@ namespace VibesSwap.ViewModel.Helpers
         public static async Task<bool> StopCm(VibesHost host, VibesCm cm, int hashCode)
         {
             ValidateParameters(host, cm);
-            string sshCommand = host.IndClustered ? $"sudo -s /usr/sbin/crm_resource stop { cm.CmResourceName }" : $"sudo -iu vibes sh { cm.CmCorePath }/bin/cm_stop -i { cm.CmResourceName }";
-            string sshResult = await ExecuteSshCommand(host, sshCommand);
+            string sshCommand = host.IndClustered ? $"sudo -s /usr/sbin/crm resource stop { cm.CmResourceName }" : $"sudo -iu vibes sh { cm.CmCorePath }/bin/cm_stop -i { cm.CmResourceName }";
+            string sshResult = string.Empty;
+
+            try
+            {
+                sshResult = await ExecuteSshCommand(host, sshCommand);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error Stopping CM: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
 
             OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.BadRequest, hashCode: hashCode);
             return sshResult.Contains("running") ? true : false;
@@ -90,8 +101,18 @@ namespace VibesSwap.ViewModel.Helpers
         public static async Task<bool> StartCm(VibesHost host, VibesCm cm, int hashCode)
         {
             ValidateParameters(host, cm);
-            string sshCommand = host.IndClustered ? $"sudo -s /usr/sbin/crm_resource start { cm.CmResourceName }" : $"sudo -iu vibes sh { cm.CmCorePath }/bin/cm_start -i { cm.CmResourceName }";
-            string sshResult = await ExecuteSshCommand(host, sshCommand);
+            string sshCommand = host.IndClustered ? $"sudo -s /usr/sbin/crm resource start { cm.CmResourceName }" : $"sudo -iu vibes sh { cm.CmCorePath }/bin/cm_start -i { cm.CmResourceName }";
+            string sshResult = string.Empty;
+            
+            try
+            {
+                sshResult = await ExecuteSshCommand(host, sshCommand);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error Starting CM: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }          
 
             OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.BadRequest, hashCode: hashCode);
             return sshResult.Contains("running") ? true : false;
@@ -106,16 +127,24 @@ namespace VibesSwap.ViewModel.Helpers
         /// <param name="paramToReplace">The text pattern to replace with</param>
         public static async void AlterCm(VibesHost host, VibesCm cm, string paramToEdit, string paramToReplace, int hashCode)
         {
-            ValidateParameters(host, cm);
-            if (string.IsNullOrEmpty(paramToEdit) || string.IsNullOrEmpty(paramToReplace))
+            try
             {
-                throw new ArgumentNullException($"Attempted to alter CM {cm.CmResourceName} without parameters to add/remove");
+                ValidateParameters(host, cm);
+                if (string.IsNullOrEmpty(paramToEdit) || string.IsNullOrEmpty(paramToReplace))
+                {
+                    throw new ArgumentNullException($"Attempted to alter CM {cm.CmResourceName} without parameters to add/remove");
+                }
+
+                string sshCommand = $"sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
+                _ = await ExecuteSshCommand(host, sshCommand);
+
+                OnCmCommandComplete(cm, HttpStatusCode.NoContent, hashCode: hashCode);
             }
-
-            string sshCommand = $"sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
-            _ = await ExecuteSshCommand(host, sshCommand);
-
-            OnCmCommandComplete(cm, hashCode: hashCode);
+            catch (Exception ex)
+            {
+                Log.Error($"Error altering CM: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
@@ -126,10 +155,19 @@ namespace VibesSwap.ViewModel.Helpers
         /// <returns>string containing contents of CM deployment.properties</returns>
         public static async Task<string> GetCmParams(VibesHost host, VibesCm cm, int hashCode)
         {
-            ValidateParameters(host, cm);
+            string sshResult = string.Empty;
 
-            string sshCommand = $"cat {cm.CmPath}/conf/deployment.properties";
-            string sshResult = await ExecuteSshCommand(host, sshCommand);
+            try
+            {
+                string sshCommand = $"cat {cm.CmPath}/conf/deployment.properties";
+                ValidateParameters(host, cm);              
+                sshResult = await ExecuteSshCommand(host, sshCommand);               
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error Getting Deployment Properties: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
 
             OnCmCommandComplete(host, cm, sshResult, hashCode: hashCode);
             return sshResult;
@@ -143,9 +181,17 @@ namespace VibesSwap.ViewModel.Helpers
         public static async Task<string> GetHostsFile(VibesHost host, int hashCode)
         {
             ValidateParameters(host);
-
             string sshCommand = $"cat /etc/hosts";
-            string sshResult = await ExecuteSshCommand(host, sshCommand);
+            string sshResult = string.Empty;
+            try
+            {
+                sshResult = await ExecuteSshCommand(host, sshCommand);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error Getting Hosts File: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
 
             OnCmCommandComplete(host, sshResult, hashCode: hashCode);
             return sshResult;
@@ -158,12 +204,19 @@ namespace VibesSwap.ViewModel.Helpers
         /// <param name="indMoveToProd">True if moving from hlcint to prod, false for opposite</param>
         public static async void SwitchHostsFile(VibesHost host, bool indMoveToProd, int hashCode)
         {
-            ValidateParameters(host, null);
-
-            string sshCommand = indMoveToProd ? "sudo -s cp /etc/hosts.prod /etc/hosts" : "sudo -s cp /etc/hosts.hlcint /etc/hosts";
-            string sshResult = await ExecuteSshCommand(host, sshCommand);
-            // Get hostsfile after switch
-            await GetHostsFile(host, hashCode);
+            try
+            {
+                ValidateParameters(host, null);
+                string sshCommand = indMoveToProd ? "sudo -s cp /etc/hosts.prod /etc/hosts" : "sudo -s cp /etc/hosts.hlcint /etc/hosts";
+                string sshResult = await ExecuteSshCommand(host, sshCommand);
+                // Get hostsfile after switch
+                await GetHostsFile(host, hashCode);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error swapping Hosts File: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
         }
 
         #region Event Methods

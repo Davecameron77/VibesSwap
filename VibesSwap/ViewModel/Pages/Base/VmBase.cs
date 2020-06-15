@@ -26,6 +26,7 @@ namespace VibesSwap.ViewModel.Pages.Base
         {
             try
             {
+                // Host on setup page
                 if (sender is VibesHost newHostValues)
                 {
                     using (DataContext context = new DataContext())
@@ -40,6 +41,7 @@ namespace VibesSwap.ViewModel.Pages.Base
                         context.SaveChanges();
                     }
                 }
+                // CM on setup page
                 else if (sender is VibesCm newCmValues)
                 {
                     using (DataContext context = new DataContext())
@@ -50,6 +52,7 @@ namespace VibesSwap.ViewModel.Pages.Base
                         cmToUpdate.CmPath = newCmValues.CmPath ?? cmToUpdate.CmPath;
                         cmToUpdate.CmCorePath = newCmValues.CmCorePath ?? cmToUpdate.CmCorePath;
                         cmToUpdate.CmType = newCmValues.CmType;
+                        /*
                         if (cmToUpdate.DeploymentProperties.Any())
                         {
                             cmToUpdate.DeploymentProperties.Clear();
@@ -58,8 +61,25 @@ namespace VibesSwap.ViewModel.Pages.Base
                                 cmToUpdate.DeploymentProperties.Add(prop);
                             }
                         }
+                        */
                         context.Update(cmToUpdate);
                         context.SaveChanges();
+                    }
+                }
+                // CM deployment properties on swap page
+                else if (sender is DeploymentProperty property)
+                {
+                    using (DataContext context = new DataContext())
+                    {
+                        if (context.HostCms.Any(p => p.Id == property.CmId))
+                        {
+                            // VibesCm cmToUpdate = context.HostCms.Single(c => c.Id == property.CmId).Include(c => c.DeploymentProperties);
+                            DeploymentProperty propToUpdate = context.DeploymentProperties.SingleOrDefault(p => p.Id == property.Id);
+                            propToUpdate.SearchPattern = property.SearchPattern;
+                            propToUpdate.ReplacePattern = property.ReplacePattern;
+                            context.Update(propToUpdate);
+                            context.SaveChanges();
+                        }
                     }
                 }
                 else if (sender is VibesCmSwapVm || sender is EcSwapVm)

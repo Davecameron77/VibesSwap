@@ -6,6 +6,7 @@
         xmlns:pages="clr-namespace:VibesSwap.View.Pages"
         mc:Ignorable="d"
         Title="Vibes Swap" 
+        Icon="icon.png"
         WindowStartupLocation="CenterOwner"
         Height="900" 
         Width="1600">
