@@ -130,7 +130,15 @@
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditHost}"
                      Text="{Binding SelectedHost.SshPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource FormTextBox}"/>
+                     Style="{StaticResource FormTextBox}"
+                     FontFamily="pack://application:,,,/View/Style/#password">
+                <TextBox.InputBindings>
+                    <!--Disable CTRL+C -->
+                    <KeyBinding Command="ApplicationCommands.NotACommand"
+                    Key="C"
+                    Modifiers="Control" />
+                </TextBox.InputBindings>
+            </TextBox>
         </Grid>
         
         <!--#endregion-->

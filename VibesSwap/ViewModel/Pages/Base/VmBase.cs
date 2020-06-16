@@ -32,12 +32,14 @@ namespace VibesSwap.ViewModel.Pages.Base
                     using (DataContext context = new DataContext())
                     {
                         VibesHost hostToUpdate = context.EnvironmentHosts.Single(h => h.Id == newHostValues.Id);
+
                         hostToUpdate.Name = newHostValues.Name ?? hostToUpdate.Name;
                         hostToUpdate.Url = newHostValues.Url ?? hostToUpdate.Url;
                         hostToUpdate.SshUsername = newHostValues.SshUsername ?? hostToUpdate.SshUsername;
                         hostToUpdate.SshPassword = newHostValues.SshPassword ?? hostToUpdate.SshPassword;
                         hostToUpdate.HostType = newHostValues.HostType;
                         hostToUpdate.IndClustered = newHostValues.IndClustered;
+
                         context.SaveChanges();
                     }
                 }
@@ -47,22 +49,13 @@ namespace VibesSwap.ViewModel.Pages.Base
                     using (DataContext context = new DataContext())
                     {
                         VibesCm cmToUpdate = context.HostCms.Single(c => c.Id == newCmValues.Id);
+
                         cmToUpdate.CmResourceName = newCmValues.CmResourceName ?? cmToUpdate.CmResourceName;
                         cmToUpdate.CmPort = newCmValues.CmPort ?? cmToUpdate.CmPort;
                         cmToUpdate.CmPath = newCmValues.CmPath ?? cmToUpdate.CmPath;
                         cmToUpdate.CmCorePath = newCmValues.CmCorePath ?? cmToUpdate.CmCorePath;
                         cmToUpdate.CmType = newCmValues.CmType;
-                        /*
-                        if (cmToUpdate.DeploymentProperties.Any())
-                        {
-                            cmToUpdate.DeploymentProperties.Clear();
-                            foreach (DeploymentProperty prop in newCmValues.DeploymentProperties)
-                            {
-                                cmToUpdate.DeploymentProperties.Add(prop);
-                            }
-                        }
-                        */
-                        context.Update(cmToUpdate);
+
                         context.SaveChanges();
                     }
                 }
@@ -73,11 +66,11 @@ namespace VibesSwap.ViewModel.Pages.Base
                     {
                         if (context.HostCms.Any(p => p.Id == property.CmId))
                         {
-                            // VibesCm cmToUpdate = context.HostCms.Single(c => c.Id == property.CmId).Include(c => c.DeploymentProperties);
                             DeploymentProperty propToUpdate = context.DeploymentProperties.SingleOrDefault(p => p.Id == property.Id);
+
                             propToUpdate.SearchPattern = property.SearchPattern;
                             propToUpdate.ReplacePattern = property.ReplacePattern;
-                            context.Update(propToUpdate);
+
                             context.SaveChanges();
                         }
                     }

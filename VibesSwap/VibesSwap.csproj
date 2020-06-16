@@ -265,6 +265,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="View\Style\password.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

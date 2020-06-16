@@ -27,6 +27,7 @@ namespace VibesSwap.ViewModel.Pages
 
             RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
+            GetHostsCommand = new RelayCommand(GetHosts);
             SetProdHostsCommand = new RelayCommand(SetProdHosts);
             SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
 
@@ -173,6 +174,7 @@ namespace VibesSwap.ViewModel.Pages
 
         public RelayCommand RefreshCommand { get; set; }
         public RelayCommand UpdatePropertiesCommand { get; set; }
+        public RelayCommand GetHostsCommand { get; set; }
         public RelayCommand SetProdHostsCommand { get; set; }
         public RelayCommand SetHlcHostsCommand { get; set; }
         
@@ -200,6 +202,52 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
+                // Called from GUI binding
+                if (Enum.IsDefined(typeof(HostTypes), parameter))
+                {
+                    switch (parameter)
+                    {
+                        case HostTypes.EXEC:
+                            CmsDisplayExec.Clear();
+                            LoadCmForSwap(CmsDisplayExec, HostTypes.EXEC);
+                            SelectedCmExec = CmsDisplayExec.FirstOrDefault();
+                            break;
+                        case HostTypes.OPERDB:
+                            CmsDisplayOperDb.Clear();
+                            LoadCmForSwap(CmsDisplayOperDb, HostTypes.OPERDB);
+                            SelectedCmOperDb = CmsDisplayOperDb.FirstOrDefault();
+                            break;
+                        case HostTypes.OPERAPP1:
+                            CmsDisplayOperAppOne.Clear();
+                            LoadCmForSwap(CmsDisplayOperAppOne, HostTypes.OPERAPP1);
+                            SelectedCmOperAppOne = CmsDisplayOperAppOne.FirstOrDefault();
+                            break;
+                        case HostTypes.OPERAPP2:
+                            CmsDisplayOperAppTwo.Clear();
+                            LoadCmForSwap(CmsDisplayOperAppTwo, HostTypes.OPERAPP2);
+                            SelectedCmOperAppTwo = CmsDisplayOperAppTwo.FirstOrDefault();
+                            break;
+                        case HostTypes.ENS:
+                            CmsDisplayEns.Clear();
+                            LoadCmForSwap(CmsDisplayEns, HostTypes.ENS);
+                            SelectedCmEns = CmsDisplayEns.FirstOrDefault();
+                            break;
+                        case HostTypes.MS:
+                            CmsDisplayMs.Clear();
+                            LoadCmForSwap(CmsDisplayMs, HostTypes.MS);
+                            SelectedCmMs = CmsDisplayMs.FirstOrDefault();
+                            break;
+                    }   
+
+                    if (CmsDisplayExec.Count == 0 || CmsDisplayOperDb.Count == 0 || CmsDisplayOperAppOne.Count == 0 || CmsDisplayOperAppTwo.Count == 0 || CmsDisplayEns.Count == 0 || CmsDisplayMs.Count == 0)
+                    {
+                        LoadBoilerPlate();
+                    }
+
+                    return;
+                }
+
+
                 // Exec
                 CmsDisplayExec.Clear();
                 LoadCmForSwap(CmsDisplayExec, HostTypes.EXEC);
@@ -232,7 +280,7 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch (Exception ex)
             {
-                Log.Error($"Error loading CM's from DB: {ex.Message}");
+                Log.Error($"Error loading VIBES CM's from DB: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
                 MessageBox.Show("Error loading data to GUI", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -281,7 +329,7 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch (Exception ex)
             {
-                Log.Error($"Error loading boilerplate for EC Swap: {ex.Message}");
+                Log.Error($"Error loading boilerplate for Vibes CM Swap: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
             }
         }

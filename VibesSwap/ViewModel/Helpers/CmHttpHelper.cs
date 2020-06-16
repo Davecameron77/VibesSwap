@@ -53,8 +53,7 @@ namespace VibesSwap.ViewModel.Helpers
                     throw new Exception($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
                 }
 
-                int port;
-                int.TryParse(cmToCheck.CmPort, out port);
+                int.TryParse(cmToCheck.CmPort, out int port);
                 using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(3000) })
                 {
                     var builder = new UriBuilder("http", hostToCheck.Url, port)
@@ -83,7 +82,7 @@ namespace VibesSwap.ViewModel.Helpers
                 // HTTP timeout, CM offline
                 if(ex.Message.Contains("A task was canceled."))
                 {
-                    Log.Information($"Request to {cmToCheck.CmResourceName} timed out");
+                    Log.Information($"HTTP error: Request to {cmToCheck.CmResourceName} timed out");
                     statusCode = HttpStatusCode.RequestTimeout;
                     OnPollComplete(cmToCheck, statusCode, hashCode);
                     return statusCode;
@@ -91,7 +90,7 @@ namespace VibesSwap.ViewModel.Helpers
                 // Unkonwn Host
                 else if(ex.InnerException.ToString().Contains("The remote name could not be resolved"))
                 {
-                    Log.Information($"Unable to resolve hostname {cmToCheck.VibesHost.Url} for CM {cmToCheck.CmResourceName}");
+                    Log.Information($"HTTP error: Unable to resolve hostname {cmToCheck.VibesHost.Url} for CM {cmToCheck.CmResourceName}");
                     statusCode = HttpStatusCode.NotFound;
                     OnPollComplete(cmToCheck, statusCode, hashCode);
                     return statusCode;
@@ -99,7 +98,7 @@ namespace VibesSwap.ViewModel.Helpers
                 // Other error
                 else if (ex.InnerException.ToString().Contains("Unable to connect to the remote server"))
                 {
-                    Log.Information($"Unable to connect to CM {cmToCheck.CmResourceName} on {cmToCheck.VibesHost.Url}");
+                    Log.Information($"HTTP error: Unable to complete request to CM {cmToCheck.CmResourceName} on {cmToCheck.VibesHost.Url}");
                     statusCode = HttpStatusCode.ServiceUnavailable;
                     OnPollComplete(cmToCheck, statusCode, hashCode);
                     return statusCode;

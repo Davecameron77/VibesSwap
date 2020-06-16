@@ -8,6 +8,7 @@
         Title="Vibes Swap" 
         Icon="icon.png"
         WindowStartupLocation="CenterOwner"
+        WindowState="Maximized"
         Height="900" 
         Width="1600">
     <Grid>

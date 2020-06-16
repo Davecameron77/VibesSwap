@@ -23,6 +23,7 @@ namespace VibesSwap.ViewModel.Pages
 
             RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
+            GetHostsCommand = new RelayCommand(GetHosts);
             SetProdHostsCommand = new RelayCommand(SetProdHosts);
             SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
             StartCmCommand = new RelayCommand(StartCm);
@@ -87,6 +88,7 @@ namespace VibesSwap.ViewModel.Pages
 
         public RelayCommand RefreshCommand { get; set; }
         public RelayCommand UpdatePropertiesCommand { get; set; }
+        public RelayCommand GetHostsCommand { get; set; }
         public RelayCommand SetProdHostsCommand { get; set; }
         public RelayCommand SetHlcHostsCommand { get; set; }
 
@@ -112,6 +114,32 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
+                // Called from GUI binding
+                if (Enum.IsDefined(typeof(HostTypes), parameter))
+                {
+                    switch (parameter)
+                    {
+                        case HostTypes.COMM1:
+                            CmsDisplayCommOne.Clear();
+                            LoadCmForSwap(CmsDisplayCommOne, HostTypes.COMM1);
+                            SelectedCmCommOne = CmsDisplayCommOne.FirstOrDefault();
+                            break; ;
+                        case HostTypes.COMM2:
+                            CmsDisplayCommTwo.Clear();
+                            LoadCmForSwap(CmsDisplayCommTwo, HostTypes.COMM2);
+                            SelectedCmCommTwo = CmsDisplayCommTwo.FirstOrDefault();
+                            break;
+                    }
+                    
+                    if (CmsDisplayCommOne.Count == 0 || CmsDisplayCommTwo.Count == 0)
+                    {
+                        LoadBoilerPlate();
+                    }
+
+                    return;
+                }
+
+                // Called from window loader
                 // Comm1
                 CmsDisplayCommOne.Clear();
                 LoadCmForSwap(CmsDisplayCommOne, HostTypes.COMM1);
@@ -128,7 +156,7 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch (Exception ex)
             {
-                Log.Error($"Error loading CM's from DB: {ex.Message}");
+                Log.Error($"Error loading CM EC's from DB: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
                 MessageBox.Show("Error loading data to GUI", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -296,12 +324,12 @@ namespace VibesSwap.ViewModel.Pages
                 }
                 else if (CmsDisplayCommTwo.Contains(e.Cm))
                 {
-                    CmsDisplayCommOne.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayCommTwo.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
                 }
             }
             catch (Exception ex)
             {
-                Log.Error($"Error updating GUI with CM changes: {ex.Message}");
+                Log.Error($"Error updating EC Swap GUI with HTTP status: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
             }
         }
@@ -350,7 +378,7 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch (Exception ex)
             {
-                Log.Error($"Error updating GUI with CM changes: {ex.Message}");
+                Log.Error($"Error updating EC Swap GUI with CM changes: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
             }
         }       

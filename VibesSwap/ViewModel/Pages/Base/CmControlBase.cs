@@ -92,7 +92,7 @@ namespace VibesSwap.ViewModel.Pages.Base
 
                     foreach (XElement node in xProperties.Descendants("parameter"))
                     {
-                        if (node.Value.ToLower().Contains("http:"))
+                        if (node.Value.ToLower().Contains("http:") || node.FirstAttribute.Value == "useVibes")
                         {
                             string propertyKey = node.Attribute("name").Value;
                             string propertyVal = node.Value;
@@ -172,7 +172,6 @@ namespace VibesSwap.ViewModel.Pages.Base
                             foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
                             {
                                 var newCm = cm.DeepCopy();
-                                // newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                                 foreach(DeploymentProperty prop in newCm.DeploymentProperties)
                                 {
                                     prop.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
@@ -313,6 +312,25 @@ namespace VibesSwap.ViewModel.Pages.Base
                 Log.Error($"Unable to get deployment properties, Error: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
                 MessageBox.Show($"Unable to Update Properties", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Gets current hosts file from selected host
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
+        internal void GetHosts(object parameter)
+        {
+            try
+            {
+                var targets = SetTargets(parameter);
+                Task.Run(() => CmSshHelper.GetHostsFile(targets.Item1, GetHashCode()));
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Unable get hosts, Error: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+                MessageBox.Show($"Unable to set Production Hosts", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

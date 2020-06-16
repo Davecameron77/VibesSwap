@@ -70,6 +70,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
+                <Button Content="Get Hosts"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetHostsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.EXEC}" />
                 <Button Content="Set Prod Hosts"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SetProdHostsCommand}"
@@ -356,6 +360,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
+                <Button Content="Get Hosts"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetHostsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.OPERAPP1}" />
                 <Button Content="Set Prod Hosts"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SetProdHostsCommand}"
@@ -503,6 +511,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
+                <Button Content="Get Hosts"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetHostsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.OPERAPP2}" />
                 <Button Content="Set Prod Hosts"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SetProdHostsCommand}"
