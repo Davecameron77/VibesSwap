@@ -410,23 +410,14 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="collectionToStart">The collection of CM's to start</param>
         internal void StartCollection(ICollection<VibesCm> collectionToStart)
         {
-            try
+            foreach (VibesCm cm in collectionToStart)
             {
-                foreach (VibesCm cm in collectionToStart)
+                using (DataContext context = new DataContext())
                 {
-                    using (DataContext context = new DataContext())
-                    {
-                        VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                        Task.Run(() => CmSshHelper.StartCm(host, cm, GetHashCode()));
-                        cm.CmStatus = CmStates.Polling;
-                    }
+                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
+                    Task.Run(() => CmSshHelper.StartCm(host, cm, GetHashCode()));
+                    cm.CmStatus = CmStates.Polling;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error starting all CM's in collection: {ex.Message}");
-                Log.Error($"Stack Trace {ex.StackTrace}");
-                throw;
             }
         }
 
@@ -436,23 +427,14 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="collectionToStop">The collection of CM's to stop</param>
         internal void StopCollection(ICollection<VibesCm> collectionToStop)
         {
-            try
+            foreach (VibesCm cm in collectionToStop)
             {
-                foreach (VibesCm cm in collectionToStop)
+                using (DataContext context = new DataContext())
                 {
-                    using (DataContext context = new DataContext())
-                    {
-                        VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                        Task.Run(() => CmSshHelper.StopCm(host, cm, GetHashCode()));
-                        cm.CmStatus = CmStates.Polling;
-                    }
+                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
+                    Task.Run(() => CmSshHelper.StopCm(host, cm, GetHashCode()));
+                    cm.CmStatus = CmStates.Polling;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error starting all CM's in collection: {ex.Message}");
-                Log.Error($"Stack Trace {ex.StackTrace}");
-                throw;
             }
         }
 
@@ -462,31 +444,22 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="collectionToPoll">The collection of CM's to swap</param>
         internal void SwapCollection(ICollection<VibesCm> collectionToPoll)
         {
-            try
+            foreach (VibesCm cm in collectionToPoll)
             {
-                foreach (VibesCm cm in collectionToPoll)
+                using (DataContext context = new DataContext())
                 {
-                    using (DataContext context = new DataContext())
-                    {
-                        VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                        
-                        foreach (DeploymentProperty propertyToChange in cm.DeploymentProperties)
-                        {
-                            if (string.IsNullOrEmpty(propertyToChange.SearchPattern) || string.IsNullOrEmpty(propertyToChange.ReplacePattern))
-                            {
-                                continue;
-                            }
-                            Task.Run(() => CmSshHelper.AlterCm(host, cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
-                        }
-                    }
+                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
 
+                    foreach (DeploymentProperty propertyToChange in cm.DeploymentProperties)
+                    {
+                        if (string.IsNullOrEmpty(propertyToChange.SearchPattern) || string.IsNullOrEmpty(propertyToChange.ReplacePattern))
+                        {
+                            continue;
+                        }
+                        Task.Run(() => CmSshHelper.AlterCm(host, cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error starting all CM's in collection: {ex.Message}");
-                Log.Error($"Stack Trace {ex.StackTrace}");
-                throw;
+
             }
         }
 
@@ -496,23 +469,14 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="collectionToPoll">The collection of CM's to poll</param>
         internal void PollCollection(ICollection<VibesCm> collectionToPoll)
         {
-            try
+            foreach (VibesCm cm in collectionToPoll)
             {
-                foreach (VibesCm cm in collectionToPoll)
+                using (DataContext context = new DataContext())
                 {
-                    using (DataContext context = new DataContext())
-                    {
-                        VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                        Task.Run(() => CmHttpHelper.CheckCmStatus(host, cm, GetHashCode()));
-                        cm.CmStatus = CmStates.Polling;
-                    }
+                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
+                    Task.Run(() => CmHttpHelper.CheckCmStatus(host, cm, GetHashCode()));
+                    cm.CmStatus = CmStates.Polling;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error starting all CM's in collection: {ex.Message}");
-                Log.Error($"Stack Trace {ex.StackTrace}");
-                throw;
             }
         }
 
