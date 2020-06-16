@@ -5,8 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VibesSwap.View.Dialogs"
         mc:Ignorable="d"
-        Title="HostsFileDisplayView" Height="450" Width="800">
+        Title="Hosts File" 
+        Height="450" 
+        Width="800"
+        WindowStartupLocation="CenterScreen">
     <Grid>
-        
+        <ScrollViewer>
+            <TextBox x:Name="HostFileTextBox"/>
+        </ScrollViewer>        
     </Grid>
 </Window>

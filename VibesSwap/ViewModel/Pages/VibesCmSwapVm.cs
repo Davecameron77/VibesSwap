@@ -202,52 +202,6 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
-                // Called from GUI binding
-                if (Enum.IsDefined(typeof(HostTypes), parameter))
-                {
-                    switch (parameter)
-                    {
-                        case HostTypes.EXEC:
-                            CmsDisplayExec.Clear();
-                            LoadCmForSwap(CmsDisplayExec, HostTypes.EXEC);
-                            SelectedCmExec = CmsDisplayExec.FirstOrDefault();
-                            break;
-                        case HostTypes.OPERDB:
-                            CmsDisplayOperDb.Clear();
-                            LoadCmForSwap(CmsDisplayOperDb, HostTypes.OPERDB);
-                            SelectedCmOperDb = CmsDisplayOperDb.FirstOrDefault();
-                            break;
-                        case HostTypes.OPERAPP1:
-                            CmsDisplayOperAppOne.Clear();
-                            LoadCmForSwap(CmsDisplayOperAppOne, HostTypes.OPERAPP1);
-                            SelectedCmOperAppOne = CmsDisplayOperAppOne.FirstOrDefault();
-                            break;
-                        case HostTypes.OPERAPP2:
-                            CmsDisplayOperAppTwo.Clear();
-                            LoadCmForSwap(CmsDisplayOperAppTwo, HostTypes.OPERAPP2);
-                            SelectedCmOperAppTwo = CmsDisplayOperAppTwo.FirstOrDefault();
-                            break;
-                        case HostTypes.ENS:
-                            CmsDisplayEns.Clear();
-                            LoadCmForSwap(CmsDisplayEns, HostTypes.ENS);
-                            SelectedCmEns = CmsDisplayEns.FirstOrDefault();
-                            break;
-                        case HostTypes.MS:
-                            CmsDisplayMs.Clear();
-                            LoadCmForSwap(CmsDisplayMs, HostTypes.MS);
-                            SelectedCmMs = CmsDisplayMs.FirstOrDefault();
-                            break;
-                    }   
-
-                    if (CmsDisplayExec.Count == 0 || CmsDisplayOperDb.Count == 0 || CmsDisplayOperAppOne.Count == 0 || CmsDisplayOperAppTwo.Count == 0 || CmsDisplayEns.Count == 0 || CmsDisplayMs.Count == 0)
-                    {
-                        LoadBoilerPlate();
-                    }
-
-                    return;
-                }
-
-
                 // Exec
                 CmsDisplayExec.Clear();
                 LoadCmForSwap(CmsDisplayExec, HostTypes.EXEC);
@@ -597,7 +551,7 @@ namespace VibesSwap.ViewModel.Pages
                 }
 
                 // Popup hosts
-                if (e.Host != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERDB || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2 || e.Host.HostType == HostTypes.ENS || e.Host.HostType == HostTypes.MS))
+                if (e.Host != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2))
                 {
                     PopupHostsFile(e);
                 }

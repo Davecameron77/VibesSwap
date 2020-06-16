@@ -23,7 +23,6 @@ namespace VibesSwap.ViewModel.Pages
 
             RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
-            GetHostsCommand = new RelayCommand(GetHosts);
             SetProdHostsCommand = new RelayCommand(SetProdHosts);
             SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
             StartCmCommand = new RelayCommand(StartCm);
@@ -88,7 +87,6 @@ namespace VibesSwap.ViewModel.Pages
 
         public RelayCommand RefreshCommand { get; set; }
         public RelayCommand UpdatePropertiesCommand { get; set; }
-        public RelayCommand GetHostsCommand { get; set; }
         public RelayCommand SetProdHostsCommand { get; set; }
         public RelayCommand SetHlcHostsCommand { get; set; }
 
@@ -114,32 +112,6 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
-                // Called from GUI binding
-                if (Enum.IsDefined(typeof(HostTypes), parameter))
-                {
-                    switch (parameter)
-                    {
-                        case HostTypes.COMM1:
-                            CmsDisplayCommOne.Clear();
-                            LoadCmForSwap(CmsDisplayCommOne, HostTypes.COMM1);
-                            SelectedCmCommOne = CmsDisplayCommOne.FirstOrDefault();
-                            break; ;
-                        case HostTypes.COMM2:
-                            CmsDisplayCommTwo.Clear();
-                            LoadCmForSwap(CmsDisplayCommTwo, HostTypes.COMM2);
-                            SelectedCmCommTwo = CmsDisplayCommTwo.FirstOrDefault();
-                            break;
-                    }
-                    
-                    if (CmsDisplayCommOne.Count == 0 || CmsDisplayCommTwo.Count == 0)
-                    {
-                        LoadBoilerPlate();
-                    }
-
-                    return;
-                }
-
-                // Called from window loader
                 // Comm1
                 CmsDisplayCommOne.Clear();
                 LoadCmForSwap(CmsDisplayCommOne, HostTypes.COMM1);

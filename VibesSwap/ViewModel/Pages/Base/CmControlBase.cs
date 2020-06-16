@@ -324,10 +324,6 @@ namespace VibesSwap.ViewModel.Pages.Base
             try
             {
                 var targets = SetTargets(parameter);
-                if (targets.Item1.HostType != HostTypes.COMM1 || targets.Item1.HostType != HostTypes.COMM2 || targets.Item1.HostType != HostTypes.EXEC || targets.Item1.HostType == HostTypes.OPERAPP1 || targets.Item1.HostType == HostTypes.OPERAPP2)
-                {
-                    return;
-                }
                 Task.Run(() => CmSshHelper.GetHostsFile(targets.Item1, GetHashCode()));
             }
             catch (Exception ex)

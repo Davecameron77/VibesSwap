@@ -10,6 +10,7 @@ namespace VibesSwap.View.Dialogs
         public HostsFileDisplayView(string fileToDisplay)
         {
             InitializeComponent();
+            HostFileTextBox.Text = fileToDisplay;
         }
     }
 }
