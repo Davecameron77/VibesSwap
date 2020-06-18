@@ -18,28 +18,35 @@ namespace VibesSwap.ViewModel.Pages
 
         public VibesCmSwapVm()
         {
-            CmsDisplayExec = new ObservableCollection<VibesCm>();
-            CmsDisplayOperDb = new ObservableCollection<VibesCm>();
+            HostsDisplayExec       = new ObservableCollection<VibesHost>();
+            HostsDisplayOperDb     = new ObservableCollection<VibesHost>();
+            HostsDisplayOperAppOne = new ObservableCollection<VibesHost>();
+            HostsDisplayOperAppTwo = new ObservableCollection<VibesHost>();
+            HostsDisplayMs         = new ObservableCollection<VibesHost>();
+            HostsDisplayEns        = new ObservableCollection<VibesHost>();
+
+            CmsDisplayExec       = new ObservableCollection<VibesCm>();
+            CmsDisplayOperDb     = new ObservableCollection<VibesCm>();
             CmsDisplayOperAppOne = new ObservableCollection<VibesCm>();
             CmsDisplayOperAppTwo = new ObservableCollection<VibesCm>();
-            CmsDisplayMs = new ObservableCollection<VibesCm>();
-            CmsDisplayEns = new ObservableCollection<VibesCm>();
+            CmsDisplayMs         = new ObservableCollection<VibesCm>();
+            CmsDisplayEns        = new ObservableCollection<VibesCm>();
 
-            RefreshCommand = new RelayCommand(LoadData);
+            RefreshCommand          = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
-            GetHostsCommand = new RelayCommand(GetHosts);
-            SetProdHostsCommand = new RelayCommand(SetProdHosts);
-            SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
+            GetHostsCommand         = new RelayCommand(GetHosts);
+            SetProdHostsCommand     = new RelayCommand(SetProdHosts);
+            SetHlcHostsCommand      = new RelayCommand(SetHlcHosts);
 
             StartCmCommand = new RelayCommand(StartCm);
-            StopCmCommand = new RelayCommand(StopCm);
-            PollCmCommand = new RelayCommand(PollCm);
-            SwapCmCommand = new RelayCommand(SwapCm);
+            StopCmCommand  = new RelayCommand(StopCm);
+            PollCmCommand  = new RelayCommand(PollCm);
+            SwapCmCommand  = new RelayCommand(SwapCm);
             
             StartAllCommand = new RelayCommand(StartAll);
-            StopAllCommand = new RelayCommand(StopAll);
-            SwapAllCommand = new RelayCommand(SwapAll);
-            PollAllCommand = new RelayCommand(PollAll);
+            StopAllCommand  = new RelayCommand(StopAll);
+            SwapAllCommand  = new RelayCommand(SwapAll);
+            PollAllCommand  = new RelayCommand(PollAll);
 
             CmHttpHelper.PollComplete += OnPollComplete;
             CmSshHelper.CmCommandComplete += OnCmCommandComplete;
@@ -51,6 +58,13 @@ namespace VibesSwap.ViewModel.Pages
 
         #region Members
 
+        public ObservableCollection<VibesHost> HostsDisplayExec { get; set; }
+        public ObservableCollection<VibesHost> HostsDisplayOperDb { get; set; }
+        public ObservableCollection<VibesHost> HostsDisplayOperAppOne { get; set; }
+        public ObservableCollection<VibesHost> HostsDisplayOperAppTwo { get; set; }
+        public ObservableCollection<VibesHost> HostsDisplayMs { get; set; }
+        public ObservableCollection<VibesHost> HostsDisplayEns { get; set; }
+
         public ObservableCollection<VibesCm> CmsDisplayExec { get; set; }
         public ObservableCollection<VibesCm> CmsDisplayOperDb { get; set; }
         public ObservableCollection<VibesCm> CmsDisplayOperAppOne { get; set; }
@@ -58,119 +72,121 @@ namespace VibesSwap.ViewModel.Pages
         public ObservableCollection<VibesCm> CmsDisplayMs { get; set; }
         public ObservableCollection<VibesCm> CmsDisplayEns { get; set; }
 
-        public VibesHost SelectedHostExec { get; set; }
-        public VibesCm SelectedCmExec
-        {
-            get { return _selectedCmExec; }
-            set
-            {
-                _selectedCmExec = value;
-                if (value != null)
-                {
-                    PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    using (DataContext context = new DataContext())
-                    {
-                        SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == value.VibesHostId);
-                    }
-                }
-            }
-        }
-        private VibesCm _selectedCmExec;
+        private VibesHost _selectedHostExec;
+        private VibesHost _selectedHostOperDb;
+        private VibesHost _selectedHostOperAppOne;
+        private VibesHost _selectedHostOperAppTwo;
+        private VibesHost _selectedHostMs;
+        private VibesHost _selectedHostEns;
 
-        public VibesHost SelectedHostOperDb { get; set; }
-        public VibesCm SelectedCmOperDb
+        public VibesHost SelectedHostExec
         {
-            get { return _selectedCmOperDb; }
-            set
+            get { return _selectedHostExec; }
+            set 
             {
-                _selectedCmOperDb = value;
                 if (value != null)
                 {
-                    PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    using (DataContext context = new DataContext())
+                    foreach (VibesCm cm in value.VibesCms)
                     {
-                        SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == value.VibesHostId);
+                        CmsDisplayExec.Add(cm);
+                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                     }
+                    SelectedCmExec = CmsDisplayExec.FirstOrDefault();
                 }
+                _selectedHostExec = value; 
             }
         }
-        private VibesCm _selectedCmOperDb;
-
-        public VibesHost SelectedHostOperAppOne { get; set; }
-        public VibesCm SelectedCmOperAppOne
+        public VibesCm SelectedCmExec { get; set; }
+        public VibesHost SelectedHostOperDb
         {
-            get { return _selectedCmOperAppOne; }
+            get { return _selectedHostOperDb; }
             set
             {
-                _selectedCmOperAppOne = value;
                 if (value != null)
                 {
-                    PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    using (DataContext context = new DataContext())
+                    foreach (VibesCm cm in value.VibesCms)
                     {
-                        SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == value.VibesHostId);
+                        CmsDisplayOperDb.Add(cm);
+                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                     }
+                    SelectedCmOperDb = CmsDisplayOperDb.FirstOrDefault();
                 }
+                _selectedHostOperDb = value;
             }
         }
-        private VibesCm _selectedCmOperAppOne;
-
-        public VibesHost SelectedHostOperAppTwo { get; set; }
-        public VibesCm SelectedCmOperAppTwo
+        public VibesCm SelectedCmOperDb { get; set; }
+        public VibesHost SelectedHostOperAppOne
         {
-            get { return _selectedCmOperAppTwo; }
+            get { return _selectedHostOperAppOne; }
             set
             {
-                _selectedCmOperAppTwo = value;
                 if (value != null)
                 {
-                    PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    using (DataContext context = new DataContext())
+                    foreach (VibesCm cm in value.VibesCms)
                     {
-                        SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == value.VibesHostId);
+                        CmsDisplayOperAppOne.Add(cm);
+                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                     }
+                    SelectedCmOperAppOne = CmsDisplayOperAppOne.FirstOrDefault();
                 }
+                _selectedHostOperAppOne = value;
             }
         }
-        private VibesCm _selectedCmOperAppTwo;
-
-        public VibesHost SelectedHostMs { get; set; }
-        public VibesCm SelectedCmMs
+        public VibesCm SelectedCmOperAppOne { get; set; }
+        public VibesHost SelectedHostOperAppTwo
         {
-            get { return _selectedCmMs; }
+            get { return _selectedHostOperAppTwo; }
             set
             {
-                _selectedCmMs = value;
                 if (value != null)
                 {
-                    PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    using (DataContext context = new DataContext())
+                    foreach (VibesCm cm in value.VibesCms)
                     {
-                        SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == value.VibesHostId);
+                        CmsDisplayOperAppTwo.Add(cm);
+                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                     }
+                    SelectedCmOperAppTwo = CmsDisplayOperAppTwo.FirstOrDefault();
                 }
+                _selectedHostOperAppTwo = value;
             }
         }
-        private VibesCm _selectedCmMs;
-
-        public VibesHost SelectedHostEns { get; set; }
-        public VibesCm SelectedCmEns
+        public VibesCm SelectedCmOperAppTwo { get; set; }
+        public VibesHost SelectedHostMs
         {
-            get { return _selectedCmEns; }
+            get { return _selectedHostMs; }
             set
             {
-                _selectedCmEns = value;
                 if (value != null)
                 {
-                    PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    using (DataContext context = new DataContext())
+                    foreach (VibesCm cm in value.VibesCms)
                     {
-                        SelectedHostExec = context.EnvironmentHosts.SingleOrDefault(h => h.Id == value.VibesHostId);
+                        CmsDisplayMs.Add(cm);
+                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                     }
+                    SelectedCmMs = CmsDisplayMs.FirstOrDefault();
                 }
+                _selectedHostMs = value;
             }
         }
-        private VibesCm _selectedCmEns;
+        public VibesCm SelectedCmMs { get; set; }
+        public VibesHost SelectedHostEns
+        {
+            get { return _selectedHostEns; }
+            set
+            {
+                if (value != null)
+                {
+                    foreach (VibesCm cm in value.VibesCms)
+                    {
+                        CmsDisplayEns.Add(cm);
+                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                    }
+                    SelectedCmEns = CmsDisplayEns.FirstOrDefault();
+                }
+                _selectedHostEns = value;
+            }
+        }
+        public VibesCm SelectedCmEns { get; set; }
 
         public RelayCommand RefreshCommand { get; set; }
         public RelayCommand UpdatePropertiesCommand { get; set; }
@@ -202,39 +218,75 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
-                // Exec
-                CmsDisplayExec.Clear();
-                LoadCmForSwap(CmsDisplayExec, HostTypes.EXEC);
-                SelectedCmExec = CmsDisplayExec.FirstOrDefault();
-                // Operdb
-                CmsDisplayOperDb.Clear();
-                LoadCmForSwap(CmsDisplayOperDb, HostTypes.OPERDB);
-                SelectedCmOperDb = CmsDisplayOperDb.FirstOrDefault();
-                // OperAppOne
-                CmsDisplayOperAppOne.Clear();
-                LoadCmForSwap(CmsDisplayOperAppOne, HostTypes.OPERAPP1);
-                SelectedCmOperAppOne = CmsDisplayOperAppOne.FirstOrDefault();
-                // OperAppTwo
-                CmsDisplayOperAppTwo.Clear();
-                LoadCmForSwap(CmsDisplayOperAppTwo, HostTypes.OPERAPP2);
-                SelectedCmOperAppTwo = CmsDisplayOperAppTwo.FirstOrDefault();
-                // Ens
-                CmsDisplayEns.Clear();
-                LoadCmForSwap(CmsDisplayEns, HostTypes.ENS);
-                SelectedCmEns = CmsDisplayEns.FirstOrDefault();
-                // MS
-                CmsDisplayMs.Clear();
-                LoadCmForSwap(CmsDisplayMs, HostTypes.MS);
-                SelectedCmMs = CmsDisplayMs.FirstOrDefault();
-
-                if (CmsDisplayExec.Count == 0 || CmsDisplayOperDb.Count == 0 || CmsDisplayOperAppOne.Count == 0 || CmsDisplayOperAppTwo.Count == 0 || CmsDisplayEns.Count == 0 || CmsDisplayMs.Count == 0)
+                using (DataContext context = new DataContext())
+                {
+                    HostsDisplayExec.Clear();
+                    CmsDisplayExec.Clear();
+                    if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.EXEC))
+                    {
+                        foreach(VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.EXEC))
+                        {
+                            VibesHost newHost = host.DeepCopy();
+                            HostsDisplayExec.Add(newHost);
+                        }
+                        SelectedHostExec = HostsDisplayExec.FirstOrDefault();
+                    }
+                    if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERDB))
+                    {
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERDB))
+                        {
+                            VibesHost newHost = host.DeepCopy();
+                            HostsDisplayOperDb.Add(newHost);
+                        }
+                        SelectedHostOperDb = HostsDisplayOperDb.FirstOrDefault();
+                    }
+                    if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERAPP1))
+                    {
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERAPP1))
+                        {
+                            VibesHost newHost = host.DeepCopy();
+                            HostsDisplayOperAppOne.Add(newHost);
+                        }
+                        SelectedHostOperAppOne = HostsDisplayOperAppOne.FirstOrDefault();
+                    }
+                    if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERAPP2))
+                    {
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERAPP2))
+                        {
+                            VibesHost newHost = host.DeepCopy();
+                            HostsDisplayOperAppTwo.Add(newHost);
+                        }
+                        SelectedHostOperAppTwo = HostsDisplayOperAppTwo.FirstOrDefault();
+                    }
+                    if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.ENS))
+                    {
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.ENS))
+                        {
+                            VibesHost newHost = host.DeepCopy();
+                            HostsDisplayEns.Add(newHost);
+                        }
+                        SelectedHostEns = HostsDisplayEns.FirstOrDefault();
+                    }
+                    if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.MS))
+                    {
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.MS))
+                        {
+                            VibesHost newHost = host.DeepCopy();
+                            HostsDisplayMs.Add(newHost);
+                        }
+                        SelectedHostMs = HostsDisplayMs.FirstOrDefault();
+                    }
+                }
+                /*
+                if (HostsDisplayExec.Count == 0 || HostsDisplayOperDb.Count == 0 || HostsDisplayOperAppOne.Count == 0 || HostsDisplayOperAppTwo.Count == 0 || HostsDisplayEns.Count == 0 || HostsDisplayMs.Count == 0)
                 {
                     LoadBoilerPlate();
                 }
+                */
             }
             catch (Exception ex)
             {
-                Log.Error($"Error loading VIBES CM's from DB: {ex.Message}");
+                Log.Error($"Error loading VIBES host's from DB: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
                 MessageBox.Show("Error loading data to GUI", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -249,35 +301,35 @@ namespace VibesSwap.ViewModel.Pages
             {
                 using (DataContext context = new DataContext())
                 {
-                    if (!CmsDisplayExec.Any())
+                    if (!HostsDisplayExec.Any())
                     {
-                        CmsDisplayExec.Clear();
-                        CmsDisplayExec.Add(new VibesCm { CmResourceName = "No CM's Loaded", Id = 0 });
+                        HostsDisplayExec.Clear();
+                        HostsDisplayExec.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
                     }
-                    if (!CmsDisplayOperDb.Any())
+                    if (!HostsDisplayOperDb.Any())
                     {
-                        CmsDisplayOperDb.Clear();
-                        CmsDisplayOperDb.Add(new VibesCm { CmResourceName = "No CM's Loaded", Id = 0 });
+                        HostsDisplayOperDb.Clear();
+                        HostsDisplayOperDb.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
                     }
-                    if (!CmsDisplayOperAppOne.Any())
+                    if (!HostsDisplayOperAppOne.Any())
                     {
-                        CmsDisplayOperAppOne.Clear();
-                        CmsDisplayOperAppOne.Add(new VibesCm { CmResourceName = "No CM's Loaded", Id = 0 });
+                        HostsDisplayOperAppOne.Clear();
+                        HostsDisplayOperAppOne.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
                     }
-                    if (!CmsDisplayOperAppTwo.Any())
+                    if (!HostsDisplayOperAppTwo.Any())
                     {
-                        CmsDisplayOperAppTwo.Clear();
-                        CmsDisplayOperAppTwo.Add(new VibesCm { CmResourceName = "No CM's Loaded", Id = 0 });
+                        HostsDisplayOperAppTwo.Clear();
+                        HostsDisplayOperAppTwo.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
                     }
-                    if (!CmsDisplayEns.Any())
+                    if (!HostsDisplayEns.Any())
                     {
-                        CmsDisplayEns.Clear();
-                        CmsDisplayEns.Add(new VibesCm { CmResourceName = "No CM's Loaded", Id = 0 });
+                        HostsDisplayEns.Clear();
+                        HostsDisplayEns.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
                     }
-                    if (!CmsDisplayMs.Any())
+                    if (!HostsDisplayMs.Any())
                     {
-                        CmsDisplayMs.Clear();
-                        CmsDisplayMs.Add(new VibesCm { CmResourceName = "No CM's Loaded", Id = 0 });
+                        HostsDisplayMs.Clear();
+                        HostsDisplayMs.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
                     }
                 }
             }

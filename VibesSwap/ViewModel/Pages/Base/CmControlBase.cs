@@ -330,7 +330,7 @@ namespace VibesSwap.ViewModel.Pages.Base
             {
                 Log.Error($"Unable get hosts, Error: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to set Production Hosts", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Unable to get Hosts", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

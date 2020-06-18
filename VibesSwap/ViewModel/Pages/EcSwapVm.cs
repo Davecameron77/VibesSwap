@@ -23,8 +23,6 @@ namespace VibesSwap.ViewModel.Pages
 
             RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
-            SetProdHostsCommand = new RelayCommand(SetProdHosts);
-            SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
             StartCmCommand = new RelayCommand(StartCm);
             StopCmCommand = new RelayCommand(StopCm);
             PollCmCommand = new RelayCommand(PollCm);
@@ -87,8 +85,6 @@ namespace VibesSwap.ViewModel.Pages
 
         public RelayCommand RefreshCommand { get; set; }
         public RelayCommand UpdatePropertiesCommand { get; set; }
-        public RelayCommand SetProdHostsCommand { get; set; }
-        public RelayCommand SetHlcHostsCommand { get; set; }
 
         public RelayCommand StartCmCommand { get; set; }
         public RelayCommand StopCmCommand { get; set; }

@@ -103,3 +103,4 @@ C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Release\VibesSwap.csproj.Fo
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Release\VibesSwap.csproj.CopyComplete
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Release\VibesSwap.exe
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Release\VibesSwap.pdb
+C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Release\VibesSwap.csprojAssemblyReference.cache

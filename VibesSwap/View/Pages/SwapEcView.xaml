@@ -16,15 +16,22 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0"
                    Grid.Column="0"
                    Text="Swap CM EC's"
                    Style="{StaticResource PageHeader}"/>
+        <Button Grid.Row="0" 
+                Grid.Column="1"
+                Content="Refresh CM Data"
+                Style="{StaticResource FormButton}"
+                Command="{Binding RefreshCommand}"/>
 
         <Grid Grid.Row="1"
-              Grid.Column="0">
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -46,10 +53,6 @@
             <StackPanel Grid.Row="1"
                         Grid.Column="0"
                         Orientation="Horizontal">
-                <Button Content="Refresh CM Data"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
@@ -66,14 +69,6 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static model:HostTypes.COMM1}"/>
-                <Button Content="Set Prod Hosts"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding SetProdHostsCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}" />
-                <Button Content="Set Hlc Hosts"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding SetHlcHostsCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM1}" />
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -169,7 +164,8 @@
         
 
         <Grid Grid.Row="2"
-              Grid.Column="0">
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -191,10 +187,6 @@
             <StackPanel Grid.Row="1"
                         Grid.Column="0"
                         Orientation="Horizontal">
-                <Button Content="Refresh CM Data"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.COMM2}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
@@ -211,14 +203,6 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.COMM2}"/>
-                <Button Content="Set Prod Hosts"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding SetProdHostsCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM2}" />
-                <Button Content="Set Hlc Hosts"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding SetHlcHostsCommand}"
-                        CommandParameter="{x:Static model:HostTypes.COMM2}" />
             </StackPanel>
 
             <DataGrid Grid.Row="2"

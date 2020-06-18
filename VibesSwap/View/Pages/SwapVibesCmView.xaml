@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:model="clr-namespace:VibesSwap.Model.Dimensional"
              mc:Ignorable="d" 
-             d:DesignHeight="1650" 
-             d:DesignWidth="1080">
+             d:DesignHeight="1500" 
+             d:DesignWidth="1920">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -15,9 +15,11 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -25,20 +27,29 @@
                    Text="Swap VIBES CM's"
                    Style="{StaticResource PageHeader}"/>
 
+        <Button Grid.Row="0"
+                Grid.Column="1"
+                Content="Refresh CM Data"
+                Style="{StaticResource FormButton}"
+                Command="{Binding RefreshCommand}"/>
+
         <!--#region Exec-->
         
         <Grid Grid.Row="1"
-              Grid.Column="0">
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"
-                                  MinWidth="400 "/>
+                                  MinWidth="200 "/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*"
+                <ColumnDefinition Width="2*"
+                                  MinWidth="400"/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="2*"
                                   MinWidth="400"/>
             </Grid.ColumnDefinitions>
 
@@ -47,13 +58,28 @@
                        Style="{StaticResource PageSubHeader}"
                        Text="EXEC" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="0"
+            <ListBox Grid.Row="1"
+                     Grid.Column="0"
+                     ItemsSource="{Binding HostsDisplayExec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedItem="{Binding SelectedHostExec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="0"
+                        Grid.Column="2"
                         Orientation="Horizontal">
-                <Button Content="Refresh CM Data"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.EXEC}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
@@ -83,9 +109,9 @@
                         Command="{Binding SetHlcHostsCommand}"
                         CommandParameter="{x:Static model:HostTypes.EXEC}" />
             </StackPanel>
-
-            <DataGrid Grid.Row="2"
-                      Grid.Column="0"
+            
+            <DataGrid Grid.Row="1"
+                      Grid.Column="2"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -108,15 +134,15 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <GridSplitter Grid.Row="1"
-                          Grid.Column="1"
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="3"
                           Grid.RowSpan="2"
                           Width="3"
                           HorizontalAlignment="Center"
                           Background="LightGray" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="2"
+            <StackPanel Grid.Row="0"
+                        Grid.Column="4"
                         Orientation="Horizontal">
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
@@ -140,8 +166,8 @@
                         CommandParameter="{x:Static model:HostTypes.EXEC}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="2"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="4"
                       ItemsSource="{Binding SelectedCmExec.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -179,17 +205,20 @@
         <!--#region OperDb-->
         
         <Grid Grid.Row="2"
-              Grid.Column="0">
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"
+                                  MinWidth="200 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="2*"
                                   MinWidth="400 "/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*"
+                <ColumnDefinition Width="2*"
                                   MinWidth="400"/>
             </Grid.ColumnDefinitions>
 
@@ -198,13 +227,28 @@
                        Style="{StaticResource PageSubHeader}"
                        Text="OPERDB" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="0"
+            <ListBox Grid.Row="1"
+                     Grid.Column="0"
+                     ItemsSource="{Binding HostsDisplayOperDb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedItem="{Binding SelectedHostOperDb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="0"
+                        Grid.Column="2"
                         Orientation="Horizontal">
-                <Button Content="Refresh CM Data"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.OPERDB}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
@@ -223,8 +267,8 @@
                         CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="0"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="2"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -247,15 +291,15 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <GridSplitter Grid.Row="1"
-                          Grid.Column="1"
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="3"
                           Grid.RowSpan="2"
                           Width="3"
                           HorizontalAlignment="Center"
                           Background="LightGray" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="2"
+            <StackPanel Grid.Row="0"
+                        Grid.Column="4"
                         Orientation="Horizontal">
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
@@ -279,8 +323,8 @@
                         CommandParameter="{x:Static model:HostTypes.OPERDB}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="2"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="4"
                       ItemsSource="{Binding SelectedCmOperDb.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -318,17 +362,20 @@
         <!--#region OperAppOne-->
         
         <Grid Grid.Row="3"
-              Grid.Column="0">
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"
+                                  MinWidth="200 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="2*"
                                   MinWidth="400 "/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*"
+                <ColumnDefinition Width="2*"
                                   MinWidth="400"/>
             </Grid.ColumnDefinitions>
 
@@ -337,13 +384,28 @@
                        Style="{StaticResource PageSubHeader}"
                        Text="OPERAPP ONE" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="0"
+            <ListBox Grid.Row="1"
+                     Grid.Column="0"
+                     ItemsSource="{Binding HostsDisplayOperAppOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedItem="{Binding SelectedHostOperAppOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="0"
+                        Grid.Column="2"
                         Orientation="Horizontal">
-                <Button Content="Refresh CM Data"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.OPERAPP1}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
@@ -373,9 +435,9 @@
                         Command="{Binding SetHlcHostsCommand}"
                         CommandParameter="{x:Static model:HostTypes.OPERAPP1}" />
             </StackPanel>
-
-            <DataGrid Grid.Row="2"
-                      Grid.Column="0"
+            
+            <DataGrid Grid.Row="1"
+                      Grid.Column="2"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -398,15 +460,15 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <GridSplitter Grid.Row="1"
-                          Grid.Column="1"
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="3"
                           Grid.RowSpan="2"
                           Width="3"
                           HorizontalAlignment="Center"
                           Background="LightGray" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="2"
+            <StackPanel Grid.Row="0"
+                        Grid.Column="4"
                         Orientation="Horizontal">
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
@@ -430,8 +492,8 @@
                         CommandParameter="{x:Static model:HostTypes.OPERAPP1}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="2"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="4"
                       ItemsSource="{Binding SelectedCmOperAppOne.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -469,17 +531,20 @@
         <!--#region OperAppTwo-->
         
         <Grid Grid.Row="4"
-              Grid.Column="0">
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"
+                                  MinWidth="200 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="2*"
                                   MinWidth="400 "/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*"
+                <ColumnDefinition Width="2*"
                                   MinWidth="400"/>
             </Grid.ColumnDefinitions>
 
@@ -488,13 +553,28 @@
                        Style="{StaticResource PageSubHeader}"
                        Text="OPERAPP TWO" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="0"
+            <ListBox Grid.Row="1"
+                     Grid.Column="0"
+                     ItemsSource="{Binding HostsDisplayOperAppTwo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedItem="{Binding SelectedHostOperAppTwo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="0"
+                        Grid.Column="2"
                         Orientation="Horizontal">
-                <Button Content="Refresh CM Data"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.OPERAPP2}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
@@ -525,8 +605,8 @@
                         CommandParameter="{x:Static model:HostTypes.OPERAPP2}" />
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="0"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="2"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -549,15 +629,15 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <GridSplitter Grid.Row="1"
-                          Grid.Column="1"
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="3"
                           Grid.RowSpan="2"
                           Width="3"
                           HorizontalAlignment="Center"
                           Background="LightGray" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="2"
+            <StackPanel Grid.Row="0"
+                        Grid.Column="5"
                         Orientation="Horizontal">
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
@@ -581,8 +661,8 @@
                         CommandParameter="{x:Static model:HostTypes.OPERAPP2}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="2"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="5"
                       ItemsSource="{Binding SelectedCmOperAppTwo.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -620,32 +700,50 @@
         <!--#region ENS-->
 
         <Grid Grid.Row="5"
-              Grid.Column="0">
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"
+                                  MinWidth="200 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="2*"
                                   MinWidth="400 "/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*"
+                <ColumnDefinition Width="2*"
                                   MinWidth="400"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
                        Style="{StaticResource PageSubHeader}"
-                       Text="MS" />
+                       Text="ENS" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="0"
+            <ListBox Grid.Row="1"
+                     Grid.Column="0"
+                     ItemsSource="{Binding HostsDisplayEns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedItem="{Binding SelectedHostEns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="0"
+                        Grid.Column="2"
                         Orientation="Horizontal">
-                <Button Content="Refresh CM Data"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.ENS}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
@@ -664,8 +762,8 @@
                         CommandParameter="{x:Static  model:HostTypes.ENS}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="0"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="2"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -688,15 +786,15 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <GridSplitter Grid.Row="1"
-                          Grid.Column="1"
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="3"
                           Grid.RowSpan="2"
                           Width="3"
                           HorizontalAlignment="Center"
                           Background="LightGray" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="2"
+            <StackPanel Grid.Row="0"
+                        Grid.Column="4"
                         Orientation="Horizontal">
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
@@ -714,14 +812,14 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapCmCommand}"
                         CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-                <Button Content="Update Properties"
+                <Button Content="Get Properties"
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.ENS}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="2"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="4"
                       ItemsSource="{Binding SelectedCmEns.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -759,32 +857,50 @@
         <!--#region MS-->
 
         <Grid Grid.Row="6"
-              Grid.Column="0">
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"
+                                  MinWidth="200 "/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="2*"
                                   MinWidth="400 "/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*"
+                <ColumnDefinition Width="2*"
                                   MinWidth="400"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
                        Style="{StaticResource PageSubHeader}"
-                       Text="ENS" />
+                       Text="MS" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="0"
+            <ListBox Grid.Row="1"
+                     Grid.Column="0"
+                     ItemsSource="{Binding HostsDisplayMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectedItem="{Binding SelectedHostMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource FormListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="1"
+                          Grid.RowSpan="2"
+                          Width="3"
+                          HorizontalAlignment="Center"
+                          Background="LightGray" />
+
+            <StackPanel Grid.Row="0"
+                        Grid.Column="2"
                         Orientation="Horizontal">
-                <Button Content="Refresh CM Data"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding RefreshCommand}"
-                        CommandParameter="{x:Static model:HostTypes.MS}"/>
                 <Button Content="Poll All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding PollAllCommand}"
@@ -803,8 +919,8 @@
                         CommandParameter="{x:Static  model:HostTypes.MS}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="0"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="2"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
@@ -827,15 +943,15 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <GridSplitter Grid.Row="1"
-                          Grid.Column="1"
+            <GridSplitter Grid.Row="0"
+                          Grid.Column="3"
                           Grid.RowSpan="2"
                           Width="3"
                           HorizontalAlignment="Center"
                           Background="LightGray" />
 
-            <StackPanel Grid.Row="1"
-                        Grid.Column="2"
+            <StackPanel Grid.Row="0"
+                        Grid.Column="4"
                         Orientation="Horizontal">
                 <Button Content="Poll CM"
                         Style="{StaticResource FormButton}"
@@ -859,8 +975,8 @@
                         CommandParameter="{x:Static model:HostTypes.MS}"/>
             </StackPanel>
 
-            <DataGrid Grid.Row="2"
-                      Grid.Column="2"
+            <DataGrid Grid.Row="1"
+                      Grid.Column="4"
                       ItemsSource="{Binding SelectedCmMs.DeploymentProperties}"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
