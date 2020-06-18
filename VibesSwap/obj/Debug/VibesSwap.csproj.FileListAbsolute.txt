@@ -104,3 +104,16 @@ C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Pages\SwapEcView
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Pages\SwapEcView.baml
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\View\Pages\SwapVibesCmView.baml
 C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.csprojAssemblyReference.cache
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.csprojAssemblyReference.cache
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\View\Dialogs\HostsFileDisplayView.g.cs
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\View\MainWindow.g.cs
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\View\Pages\SetupView.g.cs
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\View\Pages\SwapEcView.g.cs
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\View\Pages\SwapVibesCmView.g.cs
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\App.g.cs
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap_Content.g.cs
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap_MarkupCompile.cache
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap_MarkupCompile.lref
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.exe
+C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.pdb

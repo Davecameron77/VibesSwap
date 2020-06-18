@@ -277,7 +277,7 @@ namespace VibesSwap.ViewModel.Pages
                         SelectedHostMs = HostsDisplayMs.FirstOrDefault();
                     }
                 }
-                /*
+                /*a
                 if (HostsDisplayExec.Count == 0 || HostsDisplayOperDb.Count == 0 || HostsDisplayOperAppOne.Count == 0 || HostsDisplayOperAppTwo.Count == 0 || HostsDisplayEns.Count == 0 || HostsDisplayMs.Count == 0)
                 {
                     LoadBoilerPlate();
