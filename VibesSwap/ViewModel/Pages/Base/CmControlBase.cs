@@ -148,6 +148,8 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="host">The host param to test</param>
         internal void CheckHostParameters(VibesHost host)
         {
+            if (host == null) throw new ArgumentNullException("Unknown");
+
             if (string.IsNullOrEmpty(host.Url)) throw new ArgumentException("Host URL");
             if (string.IsNullOrEmpty(host.SshUsername)) throw new ArgumentNullException("SSH username");
             if (string.IsNullOrEmpty(host.SshPassword)) throw new ArgumentNullException("SSH password");
