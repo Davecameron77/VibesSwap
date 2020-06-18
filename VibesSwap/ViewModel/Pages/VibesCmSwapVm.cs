@@ -85,7 +85,8 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    LoadCmForSwap(CmsDisplayExec, HostTypes.EXEC);
+                    CmsDisplayExec.Clear();
+                    LoadCmForSwap(CmsDisplayExec, HostTypes.EXEC, value.Id);
                     SelectedCmExec = CmsDisplayExec.FirstOrDefault();
                 }
                 _selectedHostExec = value; 
@@ -99,7 +100,8 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    LoadCmForSwap(CmsDisplayOperDb, HostTypes.OPERDB);
+                    CmsDisplayOperDb.Clear();
+                    LoadCmForSwap(CmsDisplayOperDb, HostTypes.OPERDB, value.Id);
                     SelectedCmOperDb = CmsDisplayOperDb.FirstOrDefault();
                 }
                 _selectedHostOperDb = value;
@@ -113,7 +115,8 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    LoadCmForSwap(CmsDisplayOperAppOne, HostTypes.OPERAPP1);
+                    CmsDisplayOperAppOne.Clear();
+                    LoadCmForSwap(CmsDisplayOperAppOne, HostTypes.OPERAPP1, value.Id);
                     SelectedCmOperAppOne = CmsDisplayOperAppOne.FirstOrDefault();
                 }
                 _selectedHostOperAppOne = value;
@@ -127,7 +130,8 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    LoadCmForSwap(CmsDisplayOperAppTwo, HostTypes.OPERAPP2);
+                    CmsDisplayOperAppTwo.Clear();
+                    LoadCmForSwap(CmsDisplayOperAppTwo, HostTypes.OPERAPP2, value.Id);
                     SelectedCmOperAppTwo = CmsDisplayOperAppTwo.FirstOrDefault();
                 }
                 _selectedHostOperAppTwo = value;
@@ -141,7 +145,8 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    LoadCmForSwap(CmsDisplayMs, HostTypes.MS);
+                    CmsDisplayMs.Clear();
+                    LoadCmForSwap(CmsDisplayMs, HostTypes.MS, value.Id);
                     SelectedCmMs = CmsDisplayMs.FirstOrDefault();
                 }
                 _selectedHostMs = value;
@@ -155,7 +160,8 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    LoadCmForSwap(CmsDisplayEns, HostTypes.ENS);
+                    CmsDisplayEns.Clear();
+                    LoadCmForSwap(CmsDisplayEns, HostTypes.ENS, value.Id);
                     SelectedCmEns = CmsDisplayEns.FirstOrDefault();
                 }
                 _selectedHostEns = value;
@@ -206,6 +212,8 @@ namespace VibesSwap.ViewModel.Pages
                         }
                         SelectedHostExec = HostsDisplayExec.FirstOrDefault();
                     }
+                    HostsDisplayOperDb.Clear();
+                    CmsDisplayOperDb.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERDB))
                     {
                         foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERDB))
@@ -215,6 +223,8 @@ namespace VibesSwap.ViewModel.Pages
                         }
                         SelectedHostOperDb = HostsDisplayOperDb.FirstOrDefault();
                     }
+                    HostsDisplayOperAppOne.Clear();
+                    CmsDisplayOperAppOne.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERAPP1))
                     {
                         foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERAPP1))
@@ -224,6 +234,8 @@ namespace VibesSwap.ViewModel.Pages
                         }
                         SelectedHostOperAppOne = HostsDisplayOperAppOne.FirstOrDefault();
                     }
+                    HostsDisplayOperAppTwo.Clear();
+                    CmsDisplayOperAppTwo.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERAPP2))
                     {
                         foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERAPP2))
@@ -233,6 +245,8 @@ namespace VibesSwap.ViewModel.Pages
                         }
                         SelectedHostOperAppTwo = HostsDisplayOperAppTwo.FirstOrDefault();
                     }
+                    HostsDisplayEns.Clear();
+                    CmsDisplayEns.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.ENS))
                     {
                         foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.ENS))
@@ -242,6 +256,8 @@ namespace VibesSwap.ViewModel.Pages
                         }
                         SelectedHostEns = HostsDisplayEns.FirstOrDefault();
                     }
+                    HostsDisplayMs.Clear();
+                    CmsDisplayMs.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.MS))
                     {
                         foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.MS))

@@ -34,15 +34,19 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// </summary>
         /// <param name="cmCollection">The collection to load</param>
         /// <param name="hostType">The type of host from which to fetch CM's</param>
-        internal void LoadCmForSwap(ICollection<VibesCm> cmCollection, HostTypes hostType) 
+        internal void LoadCmForSwap(ICollection<VibesCm> cmCollection, HostTypes hostType, int hostId = 0) 
         {
+            cmCollection.Clear();
             using (DataContext context = new DataContext())
             {
                 if (context.EnvironmentHosts.Any(h => h.HostType == hostType))
                 {
-                    foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == hostType))
+                    if (hostId != 0 && !context.EnvironmentHosts.Any(h => h.Id == hostId)) return;
+                    var hosts = hostId != 0 ? context.EnvironmentHosts.Where(h => h.Id == hostId).OrderBy(h => h.Name) : context.EnvironmentHosts.Where(h => h.HostType == hostType).OrderBy(h => h.Name);
+
+                    foreach (VibesHost host in hosts)
                     {
-                        foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
+                        foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties).OrderBy(c => c.CmResourceName))
                         {
                             var newCm = cm.DeepCopy();
                             foreach (DeploymentProperty prop in newCm.DeploymentProperties)
