@@ -1,7 +1,6 @@
 ﻿using Serilog;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Windows;
@@ -18,35 +17,35 @@ namespace VibesSwap.ViewModel.Pages
 
         public VibesCmSwapVm()
         {
-            HostsDisplayExec       = new ObservableCollection<VibesHost>();
-            HostsDisplayOperDb     = new ObservableCollection<VibesHost>();
+            HostsDisplayExec = new ObservableCollection<VibesHost>();
+            HostsDisplayOperDb = new ObservableCollection<VibesHost>();
             HostsDisplayOperAppOne = new ObservableCollection<VibesHost>();
             HostsDisplayOperAppTwo = new ObservableCollection<VibesHost>();
-            HostsDisplayMs         = new ObservableCollection<VibesHost>();
-            HostsDisplayEns        = new ObservableCollection<VibesHost>();
+            HostsDisplayMs = new ObservableCollection<VibesHost>();
+            HostsDisplayEns = new ObservableCollection<VibesHost>();
 
-            CmsDisplayExec       = new ObservableCollection<VibesCm>();
-            CmsDisplayOperDb     = new ObservableCollection<VibesCm>();
+            CmsDisplayExec = new ObservableCollection<VibesCm>();
+            CmsDisplayOperDb = new ObservableCollection<VibesCm>();
             CmsDisplayOperAppOne = new ObservableCollection<VibesCm>();
             CmsDisplayOperAppTwo = new ObservableCollection<VibesCm>();
-            CmsDisplayMs         = new ObservableCollection<VibesCm>();
-            CmsDisplayEns        = new ObservableCollection<VibesCm>();
+            CmsDisplayMs = new ObservableCollection<VibesCm>();
+            CmsDisplayEns = new ObservableCollection<VibesCm>();
 
-            RefreshCommand          = new RelayCommand(LoadData);
+            RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
-            GetHostsCommand         = new RelayCommand(GetHosts);
-            SetProdHostsCommand     = new RelayCommand(SetProdHosts);
-            SetHlcHostsCommand      = new RelayCommand(SetHlcHosts);
+            GetHostsCommand = new RelayCommand(GetHosts);
+            SetProdHostsCommand = new RelayCommand(SetProdHosts);
+            SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
 
             StartCmCommand = new RelayCommand(StartCm);
-            StopCmCommand  = new RelayCommand(StopCm);
-            PollCmCommand  = new RelayCommand(PollCm);
-            SwapCmCommand  = new RelayCommand(SwapCm);
+            StopCmCommand = new RelayCommand(StopCm);
+            PollCmCommand = new RelayCommand(PollCm);
+            SwapCmCommand = new RelayCommand(SwapCm);
             
             StartAllCommand = new RelayCommand(StartAll);
-            StopAllCommand  = new RelayCommand(StopAll);
-            SwapAllCommand  = new RelayCommand(SwapAll);
-            PollAllCommand  = new RelayCommand(PollAll);
+            StopAllCommand = new RelayCommand(StopAll);
+            SwapAllCommand = new RelayCommand(SwapAll);
+            PollAllCommand = new RelayCommand(PollAll);
 
             CmHttpHelper.PollComplete += OnPollComplete;
             CmSshHelper.CmCommandComplete += OnCmCommandComplete;
@@ -86,11 +85,7 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    foreach (VibesCm cm in value.VibesCms)
-                    {
-                        CmsDisplayExec.Add(cm);
-                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    }
+                    LoadCmForSwap(CmsDisplayExec, HostTypes.EXEC);
                     SelectedCmExec = CmsDisplayExec.FirstOrDefault();
                 }
                 _selectedHostExec = value; 
@@ -104,11 +99,7 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    foreach (VibesCm cm in value.VibesCms)
-                    {
-                        CmsDisplayOperDb.Add(cm);
-                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    }
+                    LoadCmForSwap(CmsDisplayOperDb, HostTypes.OPERDB);
                     SelectedCmOperDb = CmsDisplayOperDb.FirstOrDefault();
                 }
                 _selectedHostOperDb = value;
@@ -122,11 +113,7 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    foreach (VibesCm cm in value.VibesCms)
-                    {
-                        CmsDisplayOperAppOne.Add(cm);
-                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    }
+                    LoadCmForSwap(CmsDisplayOperAppOne, HostTypes.OPERAPP1);
                     SelectedCmOperAppOne = CmsDisplayOperAppOne.FirstOrDefault();
                 }
                 _selectedHostOperAppOne = value;
@@ -140,11 +127,7 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    foreach (VibesCm cm in value.VibesCms)
-                    {
-                        CmsDisplayOperAppTwo.Add(cm);
-                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    }
+                    LoadCmForSwap(CmsDisplayOperAppTwo, HostTypes.OPERAPP2);
                     SelectedCmOperAppTwo = CmsDisplayOperAppTwo.FirstOrDefault();
                 }
                 _selectedHostOperAppTwo = value;
@@ -158,11 +141,7 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    foreach (VibesCm cm in value.VibesCms)
-                    {
-                        CmsDisplayMs.Add(cm);
-                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    }
+                    LoadCmForSwap(CmsDisplayMs, HostTypes.MS);
                     SelectedCmMs = CmsDisplayMs.FirstOrDefault();
                 }
                 _selectedHostMs = value;
@@ -176,11 +155,7 @@ namespace VibesSwap.ViewModel.Pages
             {
                 if (value != null)
                 {
-                    foreach (VibesCm cm in value.VibesCms)
-                    {
-                        CmsDisplayEns.Add(cm);
-                        cm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                    }
+                    LoadCmForSwap(CmsDisplayEns, HostTypes.ENS);
                     SelectedCmEns = CmsDisplayEns.FirstOrDefault();
                 }
                 _selectedHostEns = value;
@@ -277,12 +252,6 @@ namespace VibesSwap.ViewModel.Pages
                         SelectedHostMs = HostsDisplayMs.FirstOrDefault();
                     }
                 }
-                /*a
-                if (HostsDisplayExec.Count == 0 || HostsDisplayOperDb.Count == 0 || HostsDisplayOperAppOne.Count == 0 || HostsDisplayOperAppTwo.Count == 0 || HostsDisplayEns.Count == 0 || HostsDisplayMs.Count == 0)
-                {
-                    LoadBoilerPlate();
-                }
-                */
             }
             catch (Exception ex)
             {
@@ -292,57 +261,9 @@ namespace VibesSwap.ViewModel.Pages
             }
         }
 
-        /// <summary>
-        /// Load boilerplate data only when no data is configured locally
-        /// </summary>
-        private void LoadBoilerPlate()
-        {
-            try
-            {
-                using (DataContext context = new DataContext())
-                {
-                    if (!HostsDisplayExec.Any())
-                    {
-                        HostsDisplayExec.Clear();
-                        HostsDisplayExec.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
-                    }
-                    if (!HostsDisplayOperDb.Any())
-                    {
-                        HostsDisplayOperDb.Clear();
-                        HostsDisplayOperDb.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
-                    }
-                    if (!HostsDisplayOperAppOne.Any())
-                    {
-                        HostsDisplayOperAppOne.Clear();
-                        HostsDisplayOperAppOne.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
-                    }
-                    if (!HostsDisplayOperAppTwo.Any())
-                    {
-                        HostsDisplayOperAppTwo.Clear();
-                        HostsDisplayOperAppTwo.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
-                    }
-                    if (!HostsDisplayEns.Any())
-                    {
-                        HostsDisplayEns.Clear();
-                        HostsDisplayEns.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
-                    }
-                    if (!HostsDisplayMs.Any())
-                    {
-                        HostsDisplayMs.Clear();
-                        HostsDisplayMs.Add(new VibesHost { Name = "No Host's Loaded", Id = 0 });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error loading boilerplate for Vibes CM Swap: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
-        }
-
         #endregion
 
-        #region Bulk Transaction
+        #region Bulk Transaction/GUI Bound
 
         /// <summary>
         /// Starts all CM's asyncronously from GUI via command binding
@@ -356,30 +277,28 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.EXEC:
-                        StartCollection(CmsDisplayExec);
+                        StartCollection(CmsDisplayExec, SelectedHostExec);
                         break;
                     case HostTypes.OPERDB:
-                        StartCollection(CmsDisplayOperDb);
+                        StartCollection(CmsDisplayOperDb, SelectedHostOperDb);
                         break;
                     case HostTypes.OPERAPP1:
-                        StartCollection(CmsDisplayOperAppOne);
+                        StartCollection(CmsDisplayOperAppOne, SelectedHostOperAppOne);
                         break;
                     case HostTypes.OPERAPP2:
-                        StartCollection(CmsDisplayOperAppTwo);
+                        StartCollection(CmsDisplayOperAppTwo, SelectedHostOperAppTwo);
                         break;
                     case HostTypes.ENS:
-                        StartCollection(CmsDisplayEns);
+                        StartCollection(CmsDisplayEns, SelectedHostEns);
                         break;
                     case HostTypes.MS:
-                        StartCollection(CmsDisplayMs);
+                        StartCollection(CmsDisplayMs, SelectedHostMs);
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to start all CM's, Error: {ex.Message}");
-                Log.Error($"Stack Trace {ex.Message}");
-                MessageBox.Show("Error starting all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to start all CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -395,30 +314,28 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.EXEC:
-                        StopCollection(CmsDisplayExec);
+                        StopCollection(CmsDisplayExec, SelectedHostExec);
                         break;
                     case HostTypes.OPERDB:
-                        StopCollection(CmsDisplayOperDb);
+                        StopCollection(CmsDisplayOperDb, SelectedHostOperDb);
                         break;
                     case HostTypes.OPERAPP1:
-                        StopCollection(CmsDisplayOperAppOne);
+                        StopCollection(CmsDisplayOperAppOne, SelectedHostOperAppOne);
                         break;
                     case HostTypes.OPERAPP2:
-                        StopCollection(CmsDisplayOperAppTwo);
+                        StopCollection(CmsDisplayOperAppTwo, SelectedHostOperAppTwo);
                         break;
                     case HostTypes.ENS:
-                        StopCollection(CmsDisplayEns);
+                        StopCollection(CmsDisplayEns, SelectedHostEns);
                         break;
                     case HostTypes.MS:
-                        StopCollection(CmsDisplayMs);
+                        StopCollection(CmsDisplayMs, SelectedHostMs);
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to stop all CM's, Error: {ex.Message}");
-                Log.Error($"Stack Trace {ex.Message}");
-                MessageBox.Show("Error stopping all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to stop all CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -433,30 +350,28 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.EXEC:
-                        PollCollection(CmsDisplayExec);
+                        PollCollection(CmsDisplayExec, SelectedHostExec);
                         break;
                     case HostTypes.OPERDB:
-                        PollCollection(CmsDisplayOperDb);
+                        PollCollection(CmsDisplayOperDb, SelectedHostOperDb);
                         break;
                     case HostTypes.OPERAPP1:
-                        PollCollection(CmsDisplayOperAppOne);
+                        PollCollection(CmsDisplayOperAppOne, SelectedHostOperAppOne);
                         break;
                     case HostTypes.OPERAPP2:
-                        PollCollection(CmsDisplayOperAppTwo);
+                        PollCollection(CmsDisplayOperAppTwo, SelectedHostOperAppTwo);
                         break;
                     case HostTypes.ENS:
-                        PollCollection(CmsDisplayEns);
+                        PollCollection(CmsDisplayEns, SelectedHostEns);
                         break;
                     case HostTypes.MS:
-                        PollCollection(CmsDisplayMs);
+                        PollCollection(CmsDisplayMs, SelectedHostMs);
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to poll all CM's, Error: {ex.Message}");
-                Log.Error($"Stack Trace {ex.Message}");
-                MessageBox.Show("Error polling all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to poll all CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -471,30 +386,28 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.EXEC:
-                        SwapCollection(CmsDisplayExec);
+                        SwapCollection(CmsDisplayExec, SelectedHostExec);
                         break;
                     case HostTypes.OPERDB:
-                        SwapCollection(CmsDisplayOperDb);
+                        SwapCollection(CmsDisplayOperDb, SelectedHostOperDb);
                         break;
                     case HostTypes.OPERAPP1:
-                        SwapCollection(CmsDisplayOperAppOne);
+                        SwapCollection(CmsDisplayOperAppOne, SelectedHostOperAppOne);
                         break;
                     case HostTypes.OPERAPP2:
-                        SwapCollection(CmsDisplayOperAppTwo);
+                        SwapCollection(CmsDisplayOperAppTwo, SelectedHostOperAppTwo);
                         break;
                     case HostTypes.ENS:
-                        SwapCollection(CmsDisplayEns);
+                        SwapCollection(CmsDisplayEns, SelectedHostEns);
                         break;
                     case HostTypes.MS:
-                        SwapCollection(CmsDisplayMs);
+                        SwapCollection(CmsDisplayMs, SelectedHostMs);
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to swap all CM's, Error: {ex.Message}");
-                Log.Error($"Stack Trace {ex.Message}");
-                MessageBox.Show("Error swapping all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to swap all CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -620,7 +533,7 @@ namespace VibesSwap.ViewModel.Pages
         #region Helpers
 
         /// <summary>
-        /// Setups up Host/CM target and checks for missing params
+        /// Sets up up Host/CM target and checks for missing params
         /// Common code used by all CM commands, but specific to this host
         /// </summary>
         /// <param name="target">The HostType to target</param>
@@ -635,50 +548,38 @@ namespace VibesSwap.ViewModel.Pages
                 switch (target)
                 {
                     case HostTypes.EXEC:
-                        if (!RequiredParametersProvided(SelectedHostExec, SelectedCmExec))
-                        {
-                            throw new ArgumentNullException($"Required parameters not provided");
-                        }
+                        CheckSingleParameters(SelectedHostExec, SelectedCmExec);
+
                         hostToPoll = SelectedHostExec;
                         cmToPoll = SelectedCmExec;
                         break;
                     case HostTypes.OPERDB:
-                        if (!RequiredParametersProvided(SelectedHostOperDb, SelectedCmOperDb))
-                        {
-                            throw new ArgumentNullException($"Required parameters not provided");
-                        }
+                        CheckSingleParameters(SelectedHostOperDb, SelectedCmOperDb);
+
                         hostToPoll = SelectedHostOperDb;
                         cmToPoll = SelectedCmOperDb;
                         break;
                     case HostTypes.OPERAPP1:
-                        if (!RequiredParametersProvided(SelectedHostOperAppOne, SelectedCmOperAppOne))
-                        {
-                            throw new ArgumentNullException($"Required parameters not provided");
-                        }
+                        CheckSingleParameters(SelectedHostOperAppOne, SelectedCmOperAppOne);
+
                         hostToPoll = SelectedHostOperAppOne;
                         cmToPoll = SelectedCmOperAppOne;
                         break;
                     case HostTypes.OPERAPP2:
-                        if (!RequiredParametersProvided(SelectedHostOperAppTwo, SelectedCmOperAppTwo))
-                        {
-                            throw new ArgumentNullException($"Required parameters not provided");
-                        }
+                        CheckSingleParameters(SelectedHostOperAppTwo, SelectedCmOperAppTwo);
+                        
                         hostToPoll = SelectedHostOperAppTwo;
                         cmToPoll = SelectedCmOperAppTwo;
                         break;
                     case HostTypes.ENS:
-                        if (!RequiredParametersProvided(SelectedHostEns, SelectedCmEns))
-                        {
-                            throw new ArgumentNullException($"Required parameters not provided");
-                        }
+                        CheckSingleParameters(SelectedHostEns, SelectedCmEns);
+                        
                         hostToPoll = SelectedHostEns;
                         cmToPoll = SelectedCmEns;
                         break;
                     case HostTypes.MS:
-                        if (!RequiredParametersProvided(SelectedHostMs, SelectedCmMs))
-                        {
-                            throw new ArgumentNullException($"Required parameters not provided");
-                        }
+                        CheckSingleParameters(SelectedHostMs, SelectedCmMs);
+                        
                         hostToPoll = SelectedHostMs;
                         cmToPoll = SelectedCmMs;
                         break;
@@ -688,7 +589,63 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch(Exception ex)
             {
-                Log.Error($"Error setting parameters for CM command");
+                Log.Error($"Error setting parameters for CM command, {ex.Message}");
+                Log.Error($"StackTrace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets up up Host target and checks for missing params
+        /// Common code used by all CM commands, but specific to this host
+        /// </summary>
+        /// <param name="target">The HostType to target</param>
+        /// <returns>The target Host/Cm, validated</returns>
+        internal override sealed VibesHost SetTargetHost(object target)
+        {
+            try
+            {
+                VibesHost hostToPoll = null;
+
+                switch (target)
+                {
+                    case HostTypes.EXEC:
+                        CheckHostParameters(SelectedHostExec);
+
+                        hostToPoll = SelectedHostExec;
+                        break;
+                    case HostTypes.OPERDB:
+                        CheckHostParameters(SelectedHostOperDb);
+
+                        hostToPoll = SelectedHostOperDb;
+                        break;
+                    case HostTypes.OPERAPP1:
+                        CheckHostParameters(SelectedHostOperAppOne);
+
+                        hostToPoll = SelectedHostOperAppOne;
+                        break;
+                    case HostTypes.OPERAPP2:
+                        CheckHostParameters(SelectedHostOperAppTwo);
+
+                        hostToPoll = SelectedHostOperAppTwo;
+                        break;
+                    case HostTypes.ENS:
+                        CheckHostParameters(SelectedHostEns);
+
+                        hostToPoll = SelectedHostEns;
+                        break;
+                    case HostTypes.MS:
+                        CheckHostParameters(SelectedHostMs);
+
+                        hostToPoll = SelectedHostMs;
+                        break;
+                }
+
+                return hostToPoll;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error setting parameters for Host command, {ex.Message}");
                 Log.Error($"StackTrace: {ex.StackTrace}");
                 throw;
             }

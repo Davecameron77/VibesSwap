@@ -14,7 +14,7 @@ using VibesSwap.ViewModel.Helpers;
 
 namespace VibesSwap.ViewModel.Pages.Base
 {
-    internal abstract class CmControlBase : VmBase
+    internal abstract partial class CmControlBase : VmBase
     {
         #region Members
 
@@ -26,54 +26,55 @@ namespace VibesSwap.ViewModel.Pages.Base
 
         #region Utility Methods
 
+        #region Called on setup
+
         /// <summary>
-        /// Helper method to check for null Host or CM
+        /// Loads stored CM's into provided collection
+        /// Called by LoadData() during GUI setup
         /// </summary>
-        /// <param name="host">The host param to test</param>
-        /// <param name="cm">The CM param to test</param>
-        /// <returns>Bool, false if parameter is missing otherwise true</returns>
-        internal bool RequiredParametersProvided(VibesHost host, VibesCm cm)
+        /// <param name="cmCollection">The collection to load</param>
+        /// <param name="hostType">The type of host from which to fetch CM's</param>
+        internal void LoadCmForSwap(ICollection<VibesCm> cmCollection, HostTypes hostType) 
         {
-            try
+            using (DataContext context = new DataContext())
             {
-                bool parametersProvided = true;
-
-                if (host == null || cm == null)
+                if (context.EnvironmentHosts.Any(h => h.HostType == hostType))
                 {
-                    string missingParameter = host == null ? "Selected Host" : "Selected CM";
-
-                    Log.Error($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
-                    parametersProvided = false;
+                    foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == hostType))
+                    {
+                        foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
+                        {
+                            var newCm = cm.DeepCopy();
+                            foreach (DeploymentProperty prop in newCm.DeploymentProperties)
+                            {
+                                prop.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+                            }
+                            cmCollection.Add(newCm);
+                            PollCmAsync(newCm);
+                        }
+                    }
                 }
-                if (string.IsNullOrEmpty(host.SshUsername) || string.IsNullOrEmpty(host.SshPassword))
-                {
-                    string missingParameter = string.IsNullOrEmpty(host.SshUsername) ? "SSH Username" : "SSH Password";
-
-                    Log.Error($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
-                    parametersProvided = false;
-                }
-                if (string.IsNullOrEmpty(cm.CmResourceName))
-                {
-                    Log.Error($"Error starting/stopping/editing CM, Missing parameter CM Resource Name");
-                    parametersProvided = false;
-                }
-                if (string.IsNullOrEmpty(cm.CmCorePath) || string.IsNullOrEmpty(cm.CmPath))
-                {
-                    string missingParameter = string.IsNullOrEmpty(cm.CmCorePath) ? "CM Core Path" : "CM Path";
-
-                    Log.Error($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
-                    parametersProvided = false;
-                }
-
-                return parametersProvided;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error starting/stopping/editing CM: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                throw;
             }
         }
+
+        /// <summary>
+        /// Polls CM asyncronously from code
+        /// An event is expected back on poll complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
+        /// </summary>
+        /// <param name="cmToPoll">Reference to CM to be polled</param>
+        internal void PollCmAsync(VibesCm cmToPoll)
+        {
+            using (DataContext context = new DataContext())
+            {
+                VibesHost hostToPoll = context.EnvironmentHosts.Single(h => h.Id == cmToPoll.VibesHostId);
+                Task.Run(() => CmHttpHelper.CheckCmStatus(hostToPoll, cmToPoll, GetHashCode()));
+                cmToPoll.CmStatus = CmStates.Polling;
+            }
+        }
+
+        #endregion
+
+        #region Called on event
 
         /// <summary>
         /// Stores deployment properties if returned by SSH command
@@ -83,123 +84,221 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="deploymentProperties">The deployment properties file fetched</param>
         internal void StoreDeploymentProperties(VibesCm cmChanged, string deploymentProperties)
         {
-            try
+            using (DataContext context = new DataContext())
             {
-                using (DataContext context = new DataContext())
+                VibesCm cmToUpdate = context.HostCms.SingleOrDefault(c => c.Id == cmChanged.Id);
+                XDocument xProperties = XDocument.Parse(deploymentProperties);
+
+                foreach (XElement node in xProperties.Descendants("parameter"))
                 {
-                    VibesCm cmToUpdate = context.HostCms.SingleOrDefault(c => c.Id == cmChanged.Id);
-                    XDocument xProperties = XDocument.Parse(deploymentProperties);
-
-                    foreach (XElement node in xProperties.Descendants("parameter"))
+                    if (node.Value.ToLower().Contains("http:") || node.FirstAttribute.Value == "useVibes")
                     {
-                        if (node.Value.ToLower().Contains("http:") || node.FirstAttribute.Value == "useVibes")
-                        {
-                            string propertyKey = node.Attribute("name").Value;
-                            string propertyVal = node.Value;
+                        string propertyKey = node.Attribute("name").Value;
+                        string propertyVal = node.Value;
 
-                            // Property Exists
-                            if (context.DeploymentProperties.Any(p => p.CmId == cmChanged.Id && p.PropertyKey == propertyKey))
+                        // Property Exists
+                        if (context.DeploymentProperties.Any(p => p.CmId == cmChanged.Id && p.PropertyKey == propertyKey))
+                        {
+                            DeploymentProperty propToUpdate = context.DeploymentProperties.SingleOrDefault(p => p.CmId == cmChanged.Id && p.PropertyKey == propertyKey);
+                            propToUpdate.PropertyValue = propertyVal;
+                            context.Update(propToUpdate);
+                            continue;
+                        }
+                        else
+                        {
+                            // Property does not exist
+                            context.DeploymentProperties.Add(new DeploymentProperty
                             {
-                                DeploymentProperty propToUpdate = context.DeploymentProperties.SingleOrDefault(p => p.CmId == cmChanged.Id && p.PropertyKey == propertyKey);
-                                propToUpdate.PropertyValue = propertyVal;
-                                context.Update(propToUpdate);
-                                continue;
-                            }
-                            else
-                            {
-                                // Property does not exist
-                                context.DeploymentProperties.Add(new DeploymentProperty
-                                {
-                                    PropertyKey = propertyKey,
-                                    PropertyValue = propertyVal,
-                                    Cm = context.HostCms.Single(c => c.Id == cmChanged.Id),
-                                    CmId = context.HostCms.Single(c => c.Id == cmChanged.Id).Id
-                                });
-                            }
+                                PropertyKey = propertyKey,
+                                PropertyValue = propertyVal,
+                                Cm = context.HostCms.Single(c => c.Id == cmChanged.Id),
+                                CmId = context.HostCms.Single(c => c.Id == cmChanged.Id).Id
+                            });
                         }
                     }
-                    context.SaveChanges();
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error storing deployment properties: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                throw;
+                context.SaveChanges();
             }
         }
 
         /// <summary>
         /// Raises popup for hosts file if attached
+        /// Called by OnCmCommandComplete
         /// </summary>
         /// <param name="args">CmHelperEvenArgs</param>
         internal void PopupHostsFile(CmHelperEventArgs args)
         {
-            try
+            if (!string.IsNullOrEmpty(args.HostsFile))
             {
-                if (!string.IsNullOrEmpty(args.HostsFile))
+                Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        HostsFileDisplayView popup = new HostsFileDisplayView(args.HostsFile);
-                        popup.Show();
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error creating hosts file popup: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                throw;
+                    HostsFileDisplayView popup = new HostsFileDisplayView(args.HostsFile);
+                    popup.Show();
+                });
             }
         }
 
+        #endregion
+
+        #region Validators
+
         /// <summary>
-        /// Loads stored CM's into provided collection
+        /// Checks for necessary params for host transaction and throws ArgumentNullException if not found
         /// </summary>
-        /// <param name="cmCollection">The collection to load</param>
-        /// <param name="hostType">The type of host from which to fetch CM's</param>
-        internal void LoadCmForSwap(ICollection<VibesCm> cmCollection, HostTypes hostType)
+        /// <param name="host">The host param to test</param>
+        internal void CheckHostParameters(VibesHost host)
         {
-            try
-            {
-                using (DataContext context = new DataContext())
-                {
-                    if (context.EnvironmentHosts.Any(h => h.HostType == hostType))
-                    {
-                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == hostType))
-                        {
-                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties))
-                            {
-                                var newCm = cm.DeepCopy();
-                                foreach(DeploymentProperty prop in newCm.DeploymentProperties)
-                                {
-                                    prop.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
-                                }
-                                cmCollection.Add(newCm);
-                                PollCmAsync(newCm);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error loading CM's to GUI: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                throw;
-            }
+            if (string.IsNullOrEmpty(host.Url)) throw new ArgumentException("Host URL");
+            if (string.IsNullOrEmpty(host.SshUsername)) throw new ArgumentNullException("SSH username");
+            if (string.IsNullOrEmpty(host.SshPassword)) throw new ArgumentNullException("SSH password");
         }
 
         /// <summary>
-        /// Method to be extended by child classes, to set targets prior to other method calls
+        /// Checks for necessary params for single transaction and throws ArgumentNullException if not found
+        /// </summary>
+        /// <param name="host">The host param to test</param>
+        /// <param name="cm">The CM param to test</param>
+        internal void CheckSingleParameters(VibesHost host, VibesCm cm)
+        {
+            if (host == null || cm == null) throw new ArgumentNullException("Unknown");
+
+            CheckHostParameters(host);
+
+            if (string.IsNullOrEmpty(cm.CmResourceName)) throw new ArgumentNullException("CM Resource Name");
+            if (string.IsNullOrEmpty(cm.CmCorePath)) throw new ArgumentNullException("CM Core Path");
+            if (string.IsNullOrEmpty(cm.CmPath)) throw new ArgumentNullException("CM Path");
+        }
+
+        /// <summary>
+        /// Checks for necessary params for bulk transaction and throws ArgumentNullException if not found
+        /// </summary>
+        /// <param name="collectionToCheck">The collection to be started</param>
+        /// <param name="hostToCheck">The host to which the colleciton belongs</param>
+        internal void CheckBulkParameters(ICollection<VibesCm> collectionToCheck, VibesHost hostToCheck)
+        {
+            if (!collectionToCheck.Any()) throw new ArgumentNullException("Unknown");
+            if (string.IsNullOrEmpty(hostToCheck.Url)) throw new ArgumentNullException("Host URL");
+            if (string.IsNullOrEmpty(hostToCheck.SshUsername)) throw new ArgumentNullException("SSH username");
+            if (string.IsNullOrEmpty(hostToCheck.SshPassword)) throw new ArgumentNullException("SSH password");
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Common code for logging and reporting exceptions
+        /// </summary>
+        /// <param name="exceptionToReport">The exception thrown</param>
+        /// <param name="customMessage">Specific message about error</param>
+        /// <param name="indDisplayInGui">True if a MessageBox is to be shown</param>
+        internal void LogAndReportException(Exception exceptionToReport, string customMessage, bool indDisplayInGui = false)
+        {
+            Log.Error(customMessage);
+            Log.Error(exceptionToReport.StackTrace);
+            if (indDisplayInGui) MessageBox.Show(customMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        #region Abstract definitions
+
+        /// <summary>
+        /// Method to be extended by child classes, to set host/cm targets prior to other method calls
         /// </summary>
         /// <param name="target">The HostType to target</param>
         /// <returns>Tuple containing the currently selected Host/CM</returns>
         internal abstract (VibesHost, VibesCm) SetTargets(object target);
 
+        /// <summary>
+        /// Method to be extended by child classes, to set host target prior to other method calls
+        /// </summary>
+        /// <param name="target">The HostType to target</param>
+        internal abstract VibesHost SetTargetHost(object target);
+
         #endregion
 
+        #endregion
+
+        #region Bulk Transactions
+
+        /// <summary>
+        /// Starts entire collection of CM's
+        /// </summary>
+        /// <param name="collectionToStart">The collection of CM's to start</param>
+        /// <param name="hostCredentials">The host to which the CM's belong</param>
+        internal void StartCollection(ICollection<VibesCm> collectionToStart, VibesHost hostCredentials)
+        {
+            CheckBulkParameters(collectionToStart, hostCredentials);
+
+            foreach (VibesCm cm in collectionToStart)
+            {
+                Task.Run(() => CmSshHelper.StartCm(hostCredentials, cm, GetHashCode()));
+                cm.CmStatus = CmStates.Polling;
+            }
+        }
+
+        /// <summary>
+        /// Stops entire collection of CM's
+        /// </summary>
+        /// <param name="collectionToStop">The collection of CM's to stop</param>
+        /// <param name="hostCredentials">The host to which the CM's belong</param>
+        internal void StopCollection(ICollection<VibesCm> collectionToStop, VibesHost hostCredentials)
+        {
+            CheckBulkParameters(collectionToStop, hostCredentials);
+
+            foreach (VibesCm cm in collectionToStop)
+            {
+                Task.Run(() => CmSshHelper.StopCm(hostCredentials, cm, GetHashCode()));
+                cm.CmStatus = CmStates.Polling;
+            }
+        }
+
+        /// <summary>
+        /// Swaps entire collection of CM's
+        /// </summary>
+        /// <param name="collectionToSwap">The collection of CM's to swap</param>
+        /// <param name="hostCredentials">The host to which the CM's belong</param>
+        internal void SwapCollection(ICollection<VibesCm> collectionToSwap, VibesHost hostCredentials)
+        {
+            CheckBulkParameters(collectionToSwap, hostCredentials);
+
+            foreach (VibesCm cm in collectionToSwap)
+            {
+                foreach (DeploymentProperty propertyToChange in cm.DeploymentProperties)
+                {
+                    if (string.IsNullOrEmpty(propertyToChange.SearchPattern) || string.IsNullOrEmpty(propertyToChange.ReplacePattern))
+                    {
+                        continue;
+                    }
+                    Task.Run(() => CmSshHelper.AlterCm(hostCredentials, cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Polls entire collection of CM's
+        /// </summary>
+        /// <param name="collectionToPoll">The collection of CM's to poll</param>
+        /// <param name="hostCredentials">The host to which the CM's belong</param>
+        internal void PollCollection(ICollection<VibesCm> collectionToPoll, VibesHost hostCredentials)
+        {
+            CheckBulkParameters(collectionToPoll, hostCredentials);
+
+            foreach (VibesCm cm in collectionToPoll)
+            {
+                using (DataContext context = new DataContext())
+                {
+                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
+                    Task.Run(() => CmHttpHelper.CheckCmStatus(host, cm, GetHashCode()));
+                    cm.CmStatus = CmStates.Polling;
+                }
+            }
+        }
+
+        #endregion
+
+        #endregion
+    }
+
+    internal abstract partial class CmControlBase : VmBase
+    {
         #region GUI Bound Methods
 
         /// <summary>
@@ -215,11 +314,9 @@ namespace VibesSwap.ViewModel.Pages.Base
                 Task.Run(() => CmSshHelper.StartCm(targets.Item1, targets.Item2, GetHashCode()));
                 targets.Item2.CmStatus = CmStates.Polling;
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to start CM, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to start CM", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to start CM, Error: {ex.Message}", true);
             }
         }
 
@@ -236,11 +333,9 @@ namespace VibesSwap.ViewModel.Pages.Base
                 Task.Run(() => CmSshHelper.StopCm(targets.Item1, targets.Item2, GetHashCode()));
                 targets.Item2.CmStatus = CmStates.Polling;
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to stop CM, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to stop CM", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to stop CM, Error: {ex.Message}", true);
             }
         }
 
@@ -257,14 +352,12 @@ namespace VibesSwap.ViewModel.Pages.Base
                 Task.Run(() => CmHttpHelper.CheckCmStatus(targets.Item1, targets.Item2, GetHashCode()));
                 targets.Item2.CmStatus = CmStates.Polling;
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to poll CM, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to poll CM", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to poll CM, Error: {ex.Message}", true);
             }
-        }
-        
+        }      
+
         /// <summary>
         /// Modifies a remote CM based on provided search/replace parameters
         /// </summary>
@@ -288,13 +381,11 @@ namespace VibesSwap.ViewModel.Pages.Base
                     Task.Run(() => CmSshHelper.AlterCm(targets.Item1, targets.Item2, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to modify CM, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to swap CM", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to modify CM, Error: {ex.Message}", true);
             }
-        }     
+        }
 
         /// <summary>
         /// Gets deployment.properties from a remote CM
@@ -307,11 +398,9 @@ namespace VibesSwap.ViewModel.Pages.Base
                 var targets = SetTargets(parameter);
                 Task.Run(() => CmSshHelper.GetCmParams(targets.Item1, targets.Item2, GetHashCode()));
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to get deployment properties, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to Update Properties", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to get deployment properties, Error: {ex.Message}", true);
             }
         }
 
@@ -323,14 +412,12 @@ namespace VibesSwap.ViewModel.Pages.Base
         {
             try
             {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.GetHostsFile(targets.Item1, GetHashCode()));
+                VibesHost target = SetTargetHost(parameter);
+                Task.Run(() => CmSshHelper.GetHostsFile(target, GetHashCode()));
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable get hosts, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to get Hosts", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable get hosts, Error: {ex.Message}", true);
             }
         }
 
@@ -342,14 +429,12 @@ namespace VibesSwap.ViewModel.Pages.Base
         {
             try
             {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.SwitchHostsFile(targets.Item1, true, GetHashCode()));
+                VibesHost target = SetTargetHost(parameter);
+                Task.Run(() => CmSshHelper.SwitchHostsFile(target, true, GetHashCode()));
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to set production hosts, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to set Production Hosts", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to set production hosts, Error: {ex.Message}", true);
             }
         }
 
@@ -361,123 +446,17 @@ namespace VibesSwap.ViewModel.Pages.Base
         {
             try
             {
-                var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.SwitchHostsFile(targets.Item1, false, GetHashCode()));
+                VibesHost target = SetTargetHost(parameter);
+                Task.Run(() => CmSshHelper.SwitchHostsFile(target, false, GetHashCode()));
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to set production hosts, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Unable to set HLC hosts", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to set production hosts, Error: {ex.Message}", true);
             }
         }
 
         #endregion
 
-        #region Bulk Transactions
-
-        /// <summary>
-        /// Polls CM asyncronously from code
-        /// An event is expected back on poll complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
-        /// </summary>
-        /// <param name="cmToPoll">Reference to CM to be polled</param>
-        internal void PollCmAsync(VibesCm cmToPoll)
-        {
-            try
-            {
-                using (DataContext context = new DataContext())
-                {
-                    VibesHost hostToPoll = context.EnvironmentHosts.Single(h => h.Id == cmToPoll.VibesHostId);
-                    Task.Run(() => CmHttpHelper.CheckCmStatus(hostToPoll, cmToPoll, GetHashCode()));
-                    cmToPoll.CmStatus = CmStates.Polling;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Unable to poll CM, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                throw;
-            }
-        }
         
-        /// <summary>
-        /// Starts entire collection of CM's
-        /// </summary>
-        /// <param name="collectionToStart">The collection of CM's to start</param>
-        internal void StartCollection(ICollection<VibesCm> collectionToStart)
-        {
-            foreach (VibesCm cm in collectionToStart)
-            {
-                using (DataContext context = new DataContext())
-                {
-                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                    Task.Run(() => CmSshHelper.StartCm(host, cm, GetHashCode()));
-                    cm.CmStatus = CmStates.Polling;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Stops entire collection of CM's
-        /// </summary>
-        /// <param name="collectionToStop">The collection of CM's to stop</param>
-        internal void StopCollection(ICollection<VibesCm> collectionToStop)
-        {
-            foreach (VibesCm cm in collectionToStop)
-            {
-                using (DataContext context = new DataContext())
-                {
-                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                    Task.Run(() => CmSshHelper.StopCm(host, cm, GetHashCode()));
-                    cm.CmStatus = CmStates.Polling;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Swaps entire collection of CM's
-        /// </summary>
-        /// <param name="collectionToPoll">The collection of CM's to swap</param>
-        internal void SwapCollection(ICollection<VibesCm> collectionToPoll)
-        {
-            foreach (VibesCm cm in collectionToPoll)
-            {
-                using (DataContext context = new DataContext())
-                {
-                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-
-                    foreach (DeploymentProperty propertyToChange in cm.DeploymentProperties)
-                    {
-                        if (string.IsNullOrEmpty(propertyToChange.SearchPattern) || string.IsNullOrEmpty(propertyToChange.ReplacePattern))
-                        {
-                            continue;
-                        }
-                        Task.Run(() => CmSshHelper.AlterCm(host, cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
-                    }
-                }
-
-            }
-        }
-
-        /// <summary>
-        /// Polls entire collection of CM's
-        /// </summary>
-        /// <param name="collectionToPoll">The collection of CM's to poll</param>
-        internal void PollCollection(ICollection<VibesCm> collectionToPoll)
-        {
-            foreach (VibesCm cm in collectionToPoll)
-            {
-                using (DataContext context = new DataContext())
-                {
-                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                    Task.Run(() => CmHttpHelper.CheckCmStatus(host, cm, GetHashCode()));
-                    cm.CmStatus = CmStates.Polling;
-                }
-            }
-        }
-
-        #endregion
-
-        #endregion
     }
 }

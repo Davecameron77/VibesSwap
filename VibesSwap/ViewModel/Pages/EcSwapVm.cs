@@ -100,6 +100,8 @@ namespace VibesSwap.ViewModel.Pages
 
         #region Methods
 
+        #region Setup
+
         /// <summary>
         /// Load data from database
         /// </summary>
@@ -116,11 +118,6 @@ namespace VibesSwap.ViewModel.Pages
                 CmsDisplayCommTwo.Clear();
                 LoadCmForSwap(CmsDisplayCommTwo, HostTypes.COMM2);
                 SelectedCmCommTwo = CmsDisplayCommTwo.FirstOrDefault();
-
-                if (CmsDisplayCommOne.Count == 0 || CmsDisplayCommTwo.Count == 0)
-                {
-                    LoadBoilerPlate();
-                }
             }
             catch (Exception ex)
             {
@@ -130,35 +127,9 @@ namespace VibesSwap.ViewModel.Pages
             }
         }
 
-        /// <summary>
-        /// Load boilerplate data only when no data is configured locally
-        /// </summary>
-        private void LoadBoilerPlate()
-        {
-            try
-            {
-                using (DataContext context = new DataContext())
-                {
-                    if (!CmsDisplayCommOne.Any())
-                    {
-                        CmsDisplayCommOne.Clear();
-                        CmsDisplayCommOne.Add(new VibesCm { CmResourceName = "No CM's Loaded", Id = 0 });
-                    }
-                    if (!CmsDisplayCommTwo.Any())
-                    {
-                        CmsDisplayCommTwo.Clear();
-                        CmsDisplayCommTwo.Add(new VibesCm { CmResourceName = "No CM's Loaded", Id = 0 });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error loading boilerplate for EC Swap: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
-        }
+        #endregion
 
-        #region GUI Bound Handlers
+        #region Bulk Transaction/GUI Bound
 
         /// <summary>
         /// Starts all CM's asyncronously from GUI via command binding
@@ -172,18 +143,16 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.COMM1:
-                        StartCollection(CmsDisplayCommOne);
+                        StartCollection(CmsDisplayCommOne, SelectedHostCommOne);
                         break;
                     case HostTypes.COMM2:
-                        StartCollection(CmsDisplayCommTwo);
+                        StartCollection(CmsDisplayCommTwo, SelectedHostCommTwo);
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to start all CM's, Error: {ex.Message}");
-                Log.Error($"Stack Trace {ex.Message}");
-                MessageBox.Show("Error starting all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to start all CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -199,18 +168,16 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.COMM1:
-                        StopCollection(CmsDisplayCommOne);
+                        StopCollection(CmsDisplayCommOne, SelectedHostCommOne);
                         break;
                     case HostTypes.COMM2:
-                        StopCollection(CmsDisplayCommTwo);
+                        StopCollection(CmsDisplayCommTwo, SelectedHostCommTwo);
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to stop all CM's, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Error stopping all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to stop all CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -225,18 +192,16 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.COMM1:
-                        PollCollection(CmsDisplayCommOne);
+                        PollCollection(CmsDisplayCommOne, SelectedHostCommOne);
                         break;
                     case HostTypes.COMM2:
-                        PollCollection(CmsDisplayCommTwo);
+                        PollCollection(CmsDisplayCommTwo, SelectedHostCommTwo);
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to poll all CM's, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Error polling all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to poll all CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -251,18 +216,16 @@ namespace VibesSwap.ViewModel.Pages
                 switch (parameter)
                 {
                     case HostTypes.COMM1:
-                        SwapCollection(CmsDisplayCommOne);
+                        SwapCollection(CmsDisplayCommOne, SelectedHostCommOne);
                         break;
                     case HostTypes.COMM2:
-                        SwapCollection(CmsDisplayCommTwo);
+                        SwapCollection(CmsDisplayCommTwo, SelectedHostCommTwo);
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-                Log.Error($"Unable to swap all CM's, Error: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Error swapping all CM's", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, $"Unable to swap all CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -363,30 +326,71 @@ namespace VibesSwap.ViewModel.Pages
         /// <returns>Tuple containing the target Host/Cm, validated</returns>
         internal override sealed (VibesHost, VibesCm) SetTargets(object target)
         {
-            VibesHost hostToPoll = null;
-            VibesCm cmToPoll = null;
-
-            switch (target)
+            try
             {
-                case HostTypes.COMM1:
-                    if (!RequiredParametersProvided(SelectedHostCommOne, SelectedCmCommOne))
-                    {
-                        throw new ArgumentNullException($"Required parameters not provided");
-                    }
-                    hostToPoll = SelectedHostCommOne;
-                    cmToPoll = SelectedCmCommOne;
-                    break;
-                case HostTypes.COMM2:
-                    if (!RequiredParametersProvided(SelectedHostCommTwo, SelectedCmCommTwo))
-                    {
-                        throw new ArgumentNullException($"Required parameters not provided");
-                    }
-                    hostToPoll = SelectedHostCommTwo;
-                    cmToPoll = SelectedCmCommTwo;
-                    break;
-            }
+                VibesHost hostToPoll = null;
+                VibesCm cmToPoll = null;
 
-            return (hostToPoll, cmToPoll);
+                switch (target)
+                {
+                    case HostTypes.COMM1:
+                        CheckSingleParameters(SelectedHostCommOne, SelectedCmCommOne);
+                        
+                        hostToPoll = SelectedHostCommOne;
+                        cmToPoll = SelectedCmCommOne;
+                        break;
+                    case HostTypes.COMM2:
+                        CheckSingleParameters(SelectedHostCommTwo, SelectedCmCommTwo);
+                        
+                        hostToPoll = SelectedHostCommTwo;
+                        cmToPoll = SelectedCmCommTwo;
+                        break;
+                }
+
+                return (hostToPoll, cmToPoll);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error setting parameters for CM command, {ex.Message}");
+                Log.Error($"StackTrace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets up up Host target and checks for missing params
+        /// Common code used by all CM commands, but specific to this host
+        /// </summary>
+        /// <param name="target">The HostType to target</param>
+        /// <returns>The target Host/Cm, validated</returns>
+        internal override sealed VibesHost SetTargetHost(object target)
+        {
+            try
+            {
+                VibesHost hostToPoll = null;
+
+                switch (target)
+                {
+                    case HostTypes.COMM1:
+                        CheckHostParameters(SelectedHostCommOne);
+
+                        hostToPoll = SelectedHostCommOne;
+                        break;
+                    case HostTypes.COMM2:
+                        CheckHostParameters(SelectedHostCommTwo);
+
+                        hostToPoll = SelectedHostCommTwo;
+                        break;
+                }
+
+                return hostToPoll;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error setting parameters for Host command, {ex.Message}");
+                Log.Error($"StackTrace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         #endregion
