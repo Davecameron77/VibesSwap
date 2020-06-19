@@ -461,8 +461,6 @@ namespace VibesSwap.ViewModel.Pages.Base
             }
         }
 
-        #endregion
-
-        
+        #endregion       
     }
 }

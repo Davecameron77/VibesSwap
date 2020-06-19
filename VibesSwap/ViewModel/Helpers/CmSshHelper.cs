@@ -136,6 +136,7 @@ namespace VibesSwap.ViewModel.Helpers
                 }
 
                 string sshCommand = $"echo '{ host.SshPassword }\n' | sudo -S sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
+                Log.Information($"Altering CM {cm.CmResourceName} on {cm.VibesHost.Name} with command {sshCommand} using SSH username {host.SshUsername} and SSH password {host.SshPassword}");
                 _ = await ExecuteSshCommand(host, sshCommand);
 
                 OnCmCommandComplete(cm, HttpStatusCode.NoContent, hashCode: hashCode);

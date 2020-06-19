@@ -110,6 +110,27 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
+                if (parameter != null && parameter is VibesCm)
+                {
+                    switch (((VibesCm)parameter).VibesHost.HostType)
+                    {
+                        case HostTypes.COMM1:
+                            CmsDisplayCommOne.Remove(CmsDisplayCommOne.Single(c => c.Id == ((VibesCm)parameter).Id));
+                            CmsDisplayCommOne.Add((VibesCm)parameter);
+                            CmsDisplayCommOne.OrderBy(c => c.CmResourceName);
+                            PollCmAsync((VibesCm)parameter);
+                            break;
+                        case HostTypes.COMM2:
+                            CmsDisplayCommTwo.Remove(CmsDisplayCommTwo.Single(c => c.Id == ((VibesCm)parameter).Id));
+                            CmsDisplayCommTwo.Add((VibesCm)parameter);
+                            CmsDisplayCommTwo.OrderBy(c => c.CmResourceName);
+                            PollCmAsync((VibesCm)parameter);
+                            break;
+                    }
+
+                    return;
+                }
+
                 // Comm1
                 CmsDisplayCommOne.Clear();
                 LoadCmForSwap(CmsDisplayCommOne, HostTypes.COMM1);
@@ -297,7 +318,7 @@ namespace VibesSwap.ViewModel.Pages
                     StoreDeploymentProperties(e.CmChanged, e.DeploymentProperties);
                     Application.Current.Dispatcher.Invoke(delegate
                     {
-                        LoadData(null);
+                        LoadData(e.CmChanged);
                     });
                 }
                 

@@ -41,7 +41,7 @@
                 <ColumnDefinition Width="*"
                                   MinWidth="400 "/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*"
+                <ColumnDefinition Width="2*"
                                   MinWidth="400"/>
             </Grid.ColumnDefinitions>
             
@@ -138,24 +138,18 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        MaxWidth="500"
                                         Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        MaxWidth="500"
                                         Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
-                                        MinWidth="100"
-                                        MaxWidth="500"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
-                                        MinWidth="100"
-                                        MaxWidth="500"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -175,7 +169,7 @@
                 <ColumnDefinition Width="*"
                                   MinWidth="400"/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*"
+                <ColumnDefinition Width="2*"
                                   MinWidth="400"/>
             </Grid.ColumnDefinitions>
             
@@ -272,22 +266,18 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        MaxWidth="500"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        MaxWidth="500"
                                         Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
-                                        MaxWidth="500"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
-                                        MaxWidth="500"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataGrid.Columns>
             </DataGrid>

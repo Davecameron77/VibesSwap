@@ -201,11 +201,55 @@ namespace VibesSwap.ViewModel.Pages
             {
                 using (DataContext context = new DataContext())
                 {
+                    if (parameter != null && parameter is VibesCm)
+                    {
+                        switch (((VibesCm)parameter).VibesHost.HostType)
+                        {
+                            case HostTypes.EXEC:
+                                CmsDisplayExec.Remove(CmsDisplayExec.Single(c => c.Id == ((VibesCm)parameter).Id));
+                                CmsDisplayExec.Add((VibesCm)parameter);
+                                CmsDisplayExec.OrderBy(c => c.CmResourceName);
+                                PollCmAsync((VibesCm)parameter);
+                                break;
+                            case HostTypes.OPERDB:
+                                CmsDisplayOperDb.Remove(CmsDisplayOperDb.Single(c => c.Id == ((VibesCm)parameter).Id));
+                                CmsDisplayOperDb.Add((VibesCm)parameter);
+                                CmsDisplayOperDb.OrderBy(c => c.CmResourceName);
+                                PollCmAsync((VibesCm)parameter);
+                                break;
+                            case HostTypes.OPERAPP1:
+                                CmsDisplayOperAppOne.Remove(CmsDisplayOperAppOne.Single(c => c.Id == ((VibesCm)parameter).Id));
+                                CmsDisplayOperAppOne.Add((VibesCm)parameter);
+                                CmsDisplayOperAppOne.OrderBy(c => c.CmResourceName);
+                                PollCmAsync((VibesCm)parameter);
+                                break;
+                            case HostTypes.OPERAPP2:
+                                CmsDisplayOperAppTwo.Remove(CmsDisplayOperAppTwo.Single(c => c.Id == ((VibesCm)parameter).Id));
+                                CmsDisplayOperAppTwo.Add((VibesCm)parameter);
+                                CmsDisplayOperAppTwo.OrderBy(c => c.CmResourceName);
+                                PollCmAsync((VibesCm)parameter);
+                                break;
+                            case HostTypes.MS:
+                                CmsDisplayMs.Remove(CmsDisplayMs.Single(c => c.Id == ((VibesCm)parameter).Id));
+                                CmsDisplayMs.Add((VibesCm)parameter);
+                                CmsDisplayMs.OrderBy(c => c.CmResourceName);
+                                PollCmAsync((VibesCm)parameter);
+                                break;
+                            case HostTypes.ENS:
+                                CmsDisplayEns.Remove(CmsDisplayEns.Single(c => c.Id == ((VibesCm)parameter).Id));
+                                CmsDisplayEns.Add((VibesCm)parameter);
+                                CmsDisplayEns.OrderBy(c => c.CmResourceName);
+                                PollCmAsync((VibesCm)parameter);
+                                break;
+                        }
+                        return;
+                    }
+
                     HostsDisplayExec.Clear();
                     CmsDisplayExec.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.EXEC))
                     {
-                        foreach(VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.EXEC))
+                        foreach(VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.EXEC).OrderBy(h => h.Name))
                         {
                             VibesHost newHost = host.DeepCopy();
                             HostsDisplayExec.Add(newHost);
@@ -216,7 +260,7 @@ namespace VibesSwap.ViewModel.Pages
                     CmsDisplayOperDb.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERDB))
                     {
-                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERDB))
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERDB).OrderBy(h => h.Name))
                         {
                             VibesHost newHost = host.DeepCopy();
                             HostsDisplayOperDb.Add(newHost);
@@ -227,7 +271,7 @@ namespace VibesSwap.ViewModel.Pages
                     CmsDisplayOperAppOne.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERAPP1))
                     {
-                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERAPP1))
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERAPP1).OrderBy(h => h.Name))
                         {
                             VibesHost newHost = host.DeepCopy();
                             HostsDisplayOperAppOne.Add(newHost);
@@ -238,7 +282,7 @@ namespace VibesSwap.ViewModel.Pages
                     CmsDisplayOperAppTwo.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.OPERAPP2))
                     {
-                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERAPP2))
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.OPERAPP2).OrderBy(h => h.Name))
                         {
                             VibesHost newHost = host.DeepCopy();
                             HostsDisplayOperAppTwo.Add(newHost);
@@ -249,7 +293,7 @@ namespace VibesSwap.ViewModel.Pages
                     CmsDisplayEns.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.ENS))
                     {
-                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.ENS))
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.ENS).OrderBy(h => h.Name))
                         {
                             VibesHost newHost = host.DeepCopy();
                             HostsDisplayEns.Add(newHost);
@@ -260,7 +304,7 @@ namespace VibesSwap.ViewModel.Pages
                     CmsDisplayMs.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.MS))
                     {
-                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.MS))
+                        foreach (VibesHost host in context.EnvironmentHosts.Where(h => h.HostType == HostTypes.MS).OrderBy(h => h.Name))
                         {
                             VibesHost newHost = host.DeepCopy();
                             HostsDisplayMs.Add(newHost);
@@ -527,7 +571,7 @@ namespace VibesSwap.ViewModel.Pages
                     StoreDeploymentProperties(e.CmChanged, e.DeploymentProperties);
                     Application.Current.Dispatcher.Invoke(delegate
                     {
-                        LoadData(null);
+                        LoadData(e.CmChanged);
                     });
                 }
 

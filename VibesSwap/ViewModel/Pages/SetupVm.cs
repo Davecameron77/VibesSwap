@@ -170,7 +170,7 @@ namespace VibesSwap.ViewModel.Pages
                                 return;
                             }
                             // Load Hosts from DB
-                            foreach (VibesHost host in context.EnvironmentHosts)
+                            foreach (VibesHost host in context.EnvironmentHosts.OrderBy(h => h.Name))
                             {
                                 VibesHost newHost = host.DeepCopy();
                                 newHost.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
@@ -194,7 +194,7 @@ namespace VibesSwap.ViewModel.Pages
                             }
                             // Load CMs from DB
                             DisplayCms.Clear();
-                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == SelectedHost.Id))
+                            foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == SelectedHost.Id).OrderBy(c => c.CmResourceName))
                             {
                                 VibesCm newCm = cm.DeepCopy();
                                 newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);

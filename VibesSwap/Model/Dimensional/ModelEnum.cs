@@ -26,7 +26,8 @@
         CM_ENS,
         CM_MDS,
         CM_PSS,
-        CM_BSIS
+        CM_BSIS,
+        CM_AIMS
     }
 
     public enum CmStates
