@@ -26,6 +26,19 @@ namespace VibesSwap.ViewModel.Pages.Base
 
         #region Utility Methods
 
+        /// <summary>
+        /// Common code for logging and reporting exceptions
+        /// </summary>
+        /// <param name="exceptionToReport">The exception thrown</param>
+        /// <param name="customMessage">Specific message about error</param>
+        /// <param name="indDisplayInGui">True if a MessageBox is to be shown</param>
+        internal void LogAndReportException(Exception exceptionToReport, string customMessage, bool indDisplayInGui = false)
+        {
+            Log.Error(customMessage);
+            Log.Error(exceptionToReport.StackTrace);
+            if (indDisplayInGui) MessageBox.Show(customMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
         #region Called on setup
 
         /// <summary>
@@ -41,6 +54,7 @@ namespace VibesSwap.ViewModel.Pages.Base
             {
                 if (context.EnvironmentHosts.Any(h => h.HostType == hostType))
                 {
+                    // HostId sent but not found, return
                     if (hostId != 0 && !context.EnvironmentHosts.Any(h => h.Id == hostId)) return;
                     var hosts = hostId != 0 ? context.EnvironmentHosts.Where(h => h.Id == hostId).OrderBy(h => h.Name) : context.EnvironmentHosts.Where(h => h.HostType == hostType).OrderBy(h => h.Name);
 
@@ -190,19 +204,6 @@ namespace VibesSwap.ViewModel.Pages.Base
 
         #endregion
 
-        /// <summary>
-        /// Common code for logging and reporting exceptions
-        /// </summary>
-        /// <param name="exceptionToReport">The exception thrown</param>
-        /// <param name="customMessage">Specific message about error</param>
-        /// <param name="indDisplayInGui">True if a MessageBox is to be shown</param>
-        internal void LogAndReportException(Exception exceptionToReport, string customMessage, bool indDisplayInGui = false)
-        {
-            Log.Error(customMessage);
-            Log.Error(exceptionToReport.StackTrace);
-            if (indDisplayInGui) MessageBox.Show(customMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-
         #region Abstract definitions
 
         /// <summary>
@@ -217,8 +218,6 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// </summary>
         /// <param name="target">The HostType to target</param>
         internal abstract VibesHost SetTargetHost(object target);
-
-        #endregion
 
         #endregion
 
@@ -297,6 +296,8 @@ namespace VibesSwap.ViewModel.Pages.Base
                 }
             }
         }
+
+        #endregion
 
         #endregion
 
@@ -397,7 +398,7 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// Gets deployment.properties from a remote CM
         /// </summary>
         /// <param name="parameter">The cluster the CM is on</param>
-        internal void UpdateProperties(object parameter)
+        internal void GetProperties(object parameter)
         {
             try
             {

@@ -22,7 +22,7 @@ namespace VibesSwap.ViewModel.Pages
             CmsDisplayCommTwo = new ObservableCollection<VibesCm>();
 
             RefreshCommand = new RelayCommand(LoadData);
-            UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
+            UpdatePropertiesCommand = new RelayCommand(GetProperties);
             StartCmCommand = new RelayCommand(StartCm);
             StopCmCommand = new RelayCommand(StopCm);
             PollCmCommand = new RelayCommand(PollCm);
@@ -110,6 +110,7 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
+                
                 if (parameter != null && parameter is VibesCm)
                 {
                     switch (((VibesCm)parameter).VibesHost.HostType)

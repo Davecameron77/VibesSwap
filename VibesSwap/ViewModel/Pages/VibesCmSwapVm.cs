@@ -32,7 +32,7 @@ namespace VibesSwap.ViewModel.Pages
             CmsDisplayEns = new ObservableCollection<VibesCm>();
 
             RefreshCommand = new RelayCommand(LoadData);
-            UpdatePropertiesCommand = new RelayCommand(UpdateProperties);
+            UpdatePropertiesCommand = new RelayCommand(GetProperties);
             GetHostsCommand = new RelayCommand(GetHosts);
             SetProdHostsCommand = new RelayCommand(SetProdHosts);
             SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
@@ -201,50 +201,6 @@ namespace VibesSwap.ViewModel.Pages
             {
                 using (DataContext context = new DataContext())
                 {
-                    if (parameter != null && parameter is VibesCm)
-                    {
-                        switch (((VibesCm)parameter).VibesHost.HostType)
-                        {
-                            case HostTypes.EXEC:
-                                CmsDisplayExec.Remove(CmsDisplayExec.Single(c => c.Id == ((VibesCm)parameter).Id));
-                                CmsDisplayExec.Add((VibesCm)parameter);
-                                CmsDisplayExec.OrderBy(c => c.CmResourceName);
-                                PollCmAsync((VibesCm)parameter);
-                                break;
-                            case HostTypes.OPERDB:
-                                CmsDisplayOperDb.Remove(CmsDisplayOperDb.Single(c => c.Id == ((VibesCm)parameter).Id));
-                                CmsDisplayOperDb.Add((VibesCm)parameter);
-                                CmsDisplayOperDb.OrderBy(c => c.CmResourceName);
-                                PollCmAsync((VibesCm)parameter);
-                                break;
-                            case HostTypes.OPERAPP1:
-                                CmsDisplayOperAppOne.Remove(CmsDisplayOperAppOne.Single(c => c.Id == ((VibesCm)parameter).Id));
-                                CmsDisplayOperAppOne.Add((VibesCm)parameter);
-                                CmsDisplayOperAppOne.OrderBy(c => c.CmResourceName);
-                                PollCmAsync((VibesCm)parameter);
-                                break;
-                            case HostTypes.OPERAPP2:
-                                CmsDisplayOperAppTwo.Remove(CmsDisplayOperAppTwo.Single(c => c.Id == ((VibesCm)parameter).Id));
-                                CmsDisplayOperAppTwo.Add((VibesCm)parameter);
-                                CmsDisplayOperAppTwo.OrderBy(c => c.CmResourceName);
-                                PollCmAsync((VibesCm)parameter);
-                                break;
-                            case HostTypes.MS:
-                                CmsDisplayMs.Remove(CmsDisplayMs.Single(c => c.Id == ((VibesCm)parameter).Id));
-                                CmsDisplayMs.Add((VibesCm)parameter);
-                                CmsDisplayMs.OrderBy(c => c.CmResourceName);
-                                PollCmAsync((VibesCm)parameter);
-                                break;
-                            case HostTypes.ENS:
-                                CmsDisplayEns.Remove(CmsDisplayEns.Single(c => c.Id == ((VibesCm)parameter).Id));
-                                CmsDisplayEns.Add((VibesCm)parameter);
-                                CmsDisplayEns.OrderBy(c => c.CmResourceName);
-                                PollCmAsync((VibesCm)parameter);
-                                break;
-                        }
-                        return;
-                    }
-
                     HostsDisplayExec.Clear();
                     CmsDisplayExec.Clear();
                     if (context.EnvironmentHosts.Any(h => h.HostType == HostTypes.EXEC))
@@ -671,32 +627,26 @@ namespace VibesSwap.ViewModel.Pages
                 {
                     case HostTypes.EXEC:
                         CheckHostParameters(SelectedHostExec);
-
                         hostToPoll = SelectedHostExec;
                         break;
                     case HostTypes.OPERDB:
                         CheckHostParameters(SelectedHostOperDb);
-
                         hostToPoll = SelectedHostOperDb;
                         break;
                     case HostTypes.OPERAPP1:
                         CheckHostParameters(SelectedHostOperAppOne);
-
                         hostToPoll = SelectedHostOperAppOne;
                         break;
                     case HostTypes.OPERAPP2:
                         CheckHostParameters(SelectedHostOperAppTwo);
-
                         hostToPoll = SelectedHostOperAppTwo;
                         break;
                     case HostTypes.ENS:
                         CheckHostParameters(SelectedHostEns);
-
                         hostToPoll = SelectedHostEns;
                         break;
                     case HostTypes.MS:
                         CheckHostParameters(SelectedHostMs);
-
                         hostToPoll = SelectedHostMs;
                         break;
                 }

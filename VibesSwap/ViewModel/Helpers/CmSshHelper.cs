@@ -160,8 +160,8 @@ namespace VibesSwap.ViewModel.Helpers
 
             try
             {
+                ValidateParameters(host, cm);
                 string sshCommand = $"cat {cm.CmPath}/conf/deployment.properties";
-                ValidateParameters(host, cm);              
                 sshResult = await ExecuteSshCommand(host, sshCommand);               
             }
             catch (Exception ex)
