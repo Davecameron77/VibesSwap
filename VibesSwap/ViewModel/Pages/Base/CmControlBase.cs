@@ -60,7 +60,7 @@ namespace VibesSwap.ViewModel.Pages.Base
 
                     foreach (VibesHost host in hosts)
                     {
-                        foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties).OrderBy(c => c.CmResourceName))
+                        foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties).Include(c => c.VibesHost).OrderBy(c => c.CmResourceName))
                         {
                             var newCm = cm.DeepCopy();
                             foreach (DeploymentProperty prop in newCm.DeploymentProperties)

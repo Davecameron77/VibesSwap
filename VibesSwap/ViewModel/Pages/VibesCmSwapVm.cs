@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -76,7 +77,7 @@ namespace VibesSwap.ViewModel.Pages
         private VibesHost _selectedHostOperAppOne;
         private VibesHost _selectedHostOperAppTwo;
         private VibesHost _selectedHostMs;
-        private VibesHost _selectedHostEns;
+        private VibesHost _selectedHostEns; 
 
         public VibesHost SelectedHostExec
         {
@@ -199,6 +200,60 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
+                // Only one CM changed
+                using (DataContext context = new DataContext())
+                {
+                    if (parameter is VibesCm cmChanged)
+                    {
+                        VibesCm newCm = context.HostCms.Where(c => c.Id == cmChanged.Id).Include(c => c.DeploymentProperties).Include(c => c.VibesHost).FirstOrDefault().DeepCopy();
+
+                        if (CmsDisplayExec.Contains(cmChanged))
+                        {
+                            CmsDisplayExec.Remove(CmsDisplayExec.Single(c => c.Id == cmChanged.Id));    
+                            CmsDisplayExec.Add(newCm);
+                            SelectedCmExec = newCm;
+                            SelectedHostExec = HostsDisplayExec.SingleOrDefault(h => h.Id == newCm.VibesHost.Id);
+                        }
+                        if (CmsDisplayOperDb.Contains(cmChanged))
+                        {
+                            CmsDisplayOperDb.Remove(CmsDisplayOperDb.Single(c => c.Id == cmChanged.Id));
+                            CmsDisplayOperDb.Add(newCm);
+                            SelectedCmOperDb = newCm;
+                            SelectedHostOperDb = HostsDisplayOperDb.SingleOrDefault(h => h.Id == newCm.VibesHost.Id);
+                        }
+                        if (CmsDisplayOperAppOne.Contains(cmChanged))
+                        {
+                            CmsDisplayOperAppOne.Remove(CmsDisplayOperAppOne.Single(c => c.Id == cmChanged.Id));
+                            CmsDisplayOperAppOne.Add(newCm);
+                            SelectedCmOperAppOne = newCm;
+                            SelectedHostOperAppOne = HostsDisplayOperAppOne.SingleOrDefault(h => h.Id == newCm.VibesHost.Id);
+                        }
+                        if (CmsDisplayOperAppTwo.Contains(cmChanged))
+                        {
+                            CmsDisplayOperAppTwo.Remove(CmsDisplayOperAppTwo.Single(c => c.Id == cmChanged.Id));
+                            CmsDisplayOperAppTwo.Add(newCm);
+                            SelectedCmOperAppTwo = newCm;
+                            SelectedHostOperAppTwo = HostsDisplayOperAppTwo.SingleOrDefault(h => h.Id == newCm.VibesHost.Id);
+                        }
+                        if (CmsDisplayEns.Contains(cmChanged))
+                        {
+                            CmsDisplayEns.Remove(CmsDisplayEns.Single(c => c.Id == cmChanged.Id));
+                            CmsDisplayEns.Add(newCm);
+                            SelectedCmEns = newCm;
+                            SelectedHostEns = HostsDisplayEns.SingleOrDefault(h => h.Id == newCm.VibesHost.Id);
+                        }
+                        if (CmsDisplayMs.Contains(cmChanged))
+                        {
+                            CmsDisplayMs.Remove(CmsDisplayMs.Single(c => c.Id == cmChanged.Id));
+                            CmsDisplayMs.Add(newCm);
+                            SelectedCmMs = newCm;
+                            SelectedHostMs = HostsDisplayMs.SingleOrDefault(h => h.Id == newCm.VibesHost.Id);
+                        }
+                        return;
+                    }
+                }
+
+                // Initial Load
                 using (DataContext context = new DataContext())
                 {
                     HostsDisplayExec.Clear();

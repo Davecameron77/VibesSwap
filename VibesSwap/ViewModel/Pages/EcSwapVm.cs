@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -110,26 +111,27 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
-                
-                if (parameter != null && parameter is VibesCm)
+                if (parameter is VibesCm cmChanged)
                 {
-                    switch (((VibesCm)parameter).VibesHost.HostType)
+                    using (DataContext context = new DataContext())
                     {
-                        case HostTypes.COMM1:
-                            CmsDisplayCommOne.Remove(CmsDisplayCommOne.Single(c => c.Id == ((VibesCm)parameter).Id));
-                            CmsDisplayCommOne.Add((VibesCm)parameter);
-                            CmsDisplayCommOne.OrderBy(c => c.CmResourceName);
-                            PollCmAsync((VibesCm)parameter);
-                            break;
-                        case HostTypes.COMM2:
-                            CmsDisplayCommTwo.Remove(CmsDisplayCommTwo.Single(c => c.Id == ((VibesCm)parameter).Id));
-                            CmsDisplayCommTwo.Add((VibesCm)parameter);
-                            CmsDisplayCommTwo.OrderBy(c => c.CmResourceName);
-                            PollCmAsync((VibesCm)parameter);
-                            break;
-                    }
+                        VibesCm newCm = context.HostCms.Where(c => c.Id == cmChanged.Id).Include(c => c.DeploymentProperties).Include(c => c.VibesHost).FirstOrDefault().DeepCopy();
 
-                    return;
+                        if (CmsDisplayCommOne.Contains(cmChanged))
+                        {
+                            CmsDisplayCommOne.Remove(CmsDisplayCommOne.Single(c => c.Id == cmChanged.Id));   
+                            CmsDisplayCommOne.Add(newCm);
+                            SelectedCmCommOne = newCm;
+                            
+                        }
+                        if (CmsDisplayCommTwo.Contains(cmChanged))
+                        {
+                            CmsDisplayCommTwo.Remove(CmsDisplayCommTwo.Single(c => c.Id == cmChanged.Id));
+                            CmsDisplayCommTwo.Add(newCm);
+                            SelectedCmCommTwo = newCm;
+                        }
+                        return;
+                    }  
                 }
 
                 // Comm1

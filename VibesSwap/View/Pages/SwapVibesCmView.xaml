@@ -185,10 +185,12 @@
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -336,10 +338,12 @@
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -499,10 +503,12 @@
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -662,10 +668,12 @@
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -813,10 +821,12 @@
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -964,10 +974,12 @@
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
+                                        MinWidth="200"
                                         Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataGrid.Columns>
             </DataGrid>
