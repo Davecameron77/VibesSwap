@@ -209,3 +209,4 @@ C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.cspro
 C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.csproj.CoreCompileInputs.cache
 C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.csproj.Fody.CopyLocal.cache
 C:\Users\Dave Cameron\Source\Repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.csproj.CopyComplete
+C:\Users\cadcam\source\repos\VibesSwap\VibesSwap\obj\Debug\VibesSwap.csprojAssemblyReference.cache

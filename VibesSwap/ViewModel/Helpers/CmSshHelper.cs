@@ -136,7 +136,6 @@ namespace VibesSwap.ViewModel.Helpers
                 }
 
                 string sshCommand = $"echo '{ host.SshPassword }\n' | sudo -S sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
-                Log.Information($"Altering CM {cm.CmResourceName} on {cm.VibesHost.Name} with command {sshCommand} using SSH username {host.SshUsername} and SSH password {host.SshPassword}");
                 _ = await ExecuteSshCommand(host, sshCommand);
 
                 OnCmCommandComplete(cm, HttpStatusCode.NoContent, hashCode: hashCode);
@@ -208,8 +207,10 @@ namespace VibesSwap.ViewModel.Helpers
             try
             {
                 ValidateParameters(host, null);
-                string sshCommand = indMoveToProd ? $"echo '{ host.SshPassword }\n' | sudo -S cp /etc/hosts.prod /etc/hosts" : "echo '{ host.SshPassword }\n' | sudo -s cp /etc/hosts.hlcint /etc/hosts";
+                string sshCommand = indMoveToProd ? $"echo '{ host.SshPassword }\n' | sudo -s cp /etc/hosts.prod /etc/hosts" : "echo '{ host.SshPassword }\n' | sudo -s cp /etc/hosts.hlcint /etc/hosts";
                 string sshResult = await ExecuteSshCommand(host, sshCommand);
+                Log.Information($"Executed SSH command {sshCommand}");
+                Log.Information($"SSH response: {sshResult}");
                 // Get hostsfile after switch
                 await GetHostsFile(host, hashCode);
             }

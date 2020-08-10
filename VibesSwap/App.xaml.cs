@@ -44,6 +44,10 @@ namespace VibesSwap
                 Log.Error($"Stack Trace: {Ex.StackTrace}");
                 Log.Error($"Inner Exception: {Ex.InnerException}");
             }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         #endregion
