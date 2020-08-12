@@ -29,6 +29,8 @@ namespace VibesSwap.ViewModel.Pages
 
         #region Members
 
+        private ILogger _logger { get; }
+
         public ObservableCollection<VibesHost> DisplayHosts { get; set; }
         public ObservableCollection<VibesCm> DisplayCms { get; set; }
         public List<string> HostTypes { get; set; }

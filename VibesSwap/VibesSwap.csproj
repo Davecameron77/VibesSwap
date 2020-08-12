@@ -210,6 +210,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Model\Dimensional\SshCommand.cs" />
     <Compile Include="ViewModel\Pages\Base\CmControlBase.cs" />
     <Compile Include="ViewModel\Helpers\CmHelperEventArgs.cs" />
     <Compile Include="Model\DataContext.cs" />

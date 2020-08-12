@@ -15,12 +15,16 @@ namespace VibesSwap.ViewModel.Helpers
     {
         #region Constructors
 
-        // Nil
+        static CmHttpHelper()
+        {
+            StaticHttpClient = new HttpClient { Timeout = TimeSpan.FromMilliseconds(3000) };
+        }
 
         #endregion
 
         #region Properties
 
+        private static HttpClient StaticHttpClient { get; }
         /// <summary>
         /// Delegate for PollComplete event
         /// </summary>
@@ -54,27 +58,25 @@ namespace VibesSwap.ViewModel.Helpers
                 }
 
                 int.TryParse(cmToCheck.CmPort, out int port);
-                using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(3000) })
-                {
-                    var builder = new UriBuilder("http", hostToCheck.Url, port)
-                    {
-                        Path = "status"
-                    };
-                    Uri uri = builder.Uri;
 
-                    var response = await client.GetAsync(uri);
-                    if (response.IsSuccessStatusCode)
+                var builder = new UriBuilder("http", hostToCheck.Url, port)
+                {
+                    Path = "status"
+                };
+                Uri uri = builder.Uri;
+
+                var response = await StaticHttpClient.GetAsync(uri);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (!string.IsNullOrEmpty(responseBody) && responseBody.Contains("CM = Alive!"))
                     {
-                        var responseBody = await response.Content.ReadAsStringAsync();
-                        if (!string.IsNullOrEmpty(responseBody) && responseBody.Contains("CM = Alive!"))
-                        {
-                            statusCode = HttpStatusCode.OK;
-                        }
+                        statusCode = HttpStatusCode.OK;
                     }
-                    else
-                    {
-                        statusCode = HttpStatusCode.ServiceUnavailable;
-                    }
+                }
+                else
+                {
+                    statusCode = HttpStatusCode.ServiceUnavailable;
                 }
             }
             catch (Exception ex)

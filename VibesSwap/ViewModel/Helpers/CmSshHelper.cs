@@ -2,8 +2,11 @@
 using Renci.SshNet.Common;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using VibesSwap.Model;
 
 namespace VibesSwap.ViewModel.Helpers
@@ -135,8 +138,9 @@ namespace VibesSwap.ViewModel.Helpers
                     throw new ArgumentNullException($"Attempted to alter CM {cm.CmResourceName} without parameters to add/remove");
                 }
 
-                string sshCommand = $"echo '{ host.SshPassword }\n' | sudo -S sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
+                string sshCommand = $"sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
                 _ = await ExecuteSshCommand(host, sshCommand);
+                Log.Information($"Executed Command {sshCommand}");
 
                 OnCmCommandComplete(cm, HttpStatusCode.NoContent, hashCode: hashCode);
             }
@@ -207,10 +211,8 @@ namespace VibesSwap.ViewModel.Helpers
             try
             {
                 ValidateParameters(host, null);
-                string sshCommand = indMoveToProd ? $"echo '{ host.SshPassword }\n' | sudo -s cp /etc/hosts.prod /etc/hosts" : "echo '{ host.SshPassword }\n' | sudo -s cp /etc/hosts.hlcint /etc/hosts";
+                string sshCommand = indMoveToProd ? $"echo '{ host.SshPassword }\n' | sudo -S cp /etc/hosts.prod /etc/hosts" : $"echo '{ host.SshPassword }\n' | sudo -S cp /etc/hosts.hlcint /etc/hosts";
                 string sshResult = await ExecuteSshCommand(host, sshCommand);
-                Log.Information($"Executed SSH command {sshCommand}");
-                Log.Information($"SSH response: {sshResult}");
                 // Get hostsfile after switch
                 await GetHostsFile(host, hashCode);
             }
@@ -231,7 +233,6 @@ namespace VibesSwap.ViewModel.Helpers
         private static void OnCmCommandComplete(VibesCm cmChanged, HttpStatusCode cmStatus, int hashCode)
         {
             CmCommandComplete?.Invoke(null, new CmHelperEventArgs { CmChanged = cmChanged, CmStatus = cmStatus, SubscriberHashCode = hashCode });
-
         }
 
         /// <summary>
@@ -312,6 +313,7 @@ namespace VibesSwap.ViewModel.Helpers
 
             // Connection Info
             ConnectionInfo connInfo = new ConnectionInfo(host.Url, 22, host.SshUsername, keybAuth);
+
             using (SshClient client = new SshClient(connInfo))
             {
                 client.Connect();
@@ -323,8 +325,9 @@ namespace VibesSwap.ViewModel.Helpers
 
                 return result;
             }
-
         }
+
+
 
         #endregion
 
