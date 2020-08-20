@@ -2,11 +2,8 @@
 using Renci.SshNet.Common;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using VibesSwap.Model;
 
 namespace VibesSwap.ViewModel.Helpers
