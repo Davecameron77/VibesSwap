@@ -554,26 +554,32 @@ namespace VibesSwap.ViewModel.Pages
                 if (CmsDisplayExec.Contains(e.CmChanged))
                 {
                     CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
                 }
                 else if (CmsDisplayOperDb.Contains(e.CmChanged))
                 {
                     CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
                 }
                 else if (CmsDisplayOperAppOne.Contains(e.CmChanged))
                 {
                     CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
                 }
                 else if (CmsDisplayOperAppTwo.Contains(e.CmChanged))
                 {
                     CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
                 }
                 else if (CmsDisplayEns.Contains(e.CmChanged))
                 {
                     CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
                 }
                 else if (CmsDisplayMs.Contains(e.CmChanged))
                 {
                     CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
                 }
 
                 // Update properties

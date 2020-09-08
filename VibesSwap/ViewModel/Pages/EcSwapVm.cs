@@ -309,10 +309,12 @@ namespace VibesSwap.ViewModel.Pages
                 if (CmsDisplayCommOne.Contains(e.CmChanged))
                 {
                     CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
                 }
                 else if (CmsDisplayCommTwo.Contains(e.CmChanged))
                 {
                     CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                    CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
                 }
 
                 // Update properties

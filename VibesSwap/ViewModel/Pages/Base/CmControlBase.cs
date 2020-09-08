@@ -39,6 +39,8 @@ namespace VibesSwap.ViewModel.Pages.Base
             if (indDisplayInGui) MessageBox.Show(customMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
+        #endregion
+
         #region Called on setup
 
         /// <summary>
@@ -230,13 +232,15 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="hostCredentials">The host to which the CM's belong</param>
         internal void StartCollection(ICollection<VibesCm> collectionToStart, VibesHost hostCredentials)
         {
+            List<VibesCm> cmsToStart = new List<VibesCm>();
             CheckBulkParameters(collectionToStart, hostCredentials);
 
             foreach (VibesCm cm in collectionToStart)
             {
-                Task.Run(() => CmSshHelper.StartCm(hostCredentials, cm, GetHashCode()));
                 cm.CmStatus = CmStates.Polling;
+                cmsToStart.Add(cm);
             }
+            Task.Run(() => CmSshHelper.StartAllCms(hostCredentials, cmsToStart, GetHashCode()));
         }
 
         /// <summary>
@@ -246,13 +250,15 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="hostCredentials">The host to which the CM's belong</param>
         internal void StopCollection(ICollection<VibesCm> collectionToStop, VibesHost hostCredentials)
         {
+            List<VibesCm> cmsToStop = new List<VibesCm>();
             CheckBulkParameters(collectionToStop, hostCredentials);
-
+            
             foreach (VibesCm cm in collectionToStop)
             {
-                Task.Run(() => CmSshHelper.StopCm(hostCredentials, cm, GetHashCode()));
                 cm.CmStatus = CmStates.Polling;
+                cmsToStop.Add(cm);
             }
+            Task.Run(() => CmSshHelper.StopAllCms(hostCredentials, cmsToStop, GetHashCode()));
         }
 
         /// <summary>
@@ -263,6 +269,7 @@ namespace VibesSwap.ViewModel.Pages.Base
         internal void SwapCollection(ICollection<VibesCm> collectionToSwap, VibesHost hostCredentials)
         {
             CheckBulkParameters(collectionToSwap, hostCredentials);
+            List <(VibesHost hostToEdit, VibesCm cmToEdit, string paramToEdit, string paramToChange)> editsToMake = new List<(VibesHost, VibesCm, string, string)>();
 
             foreach (VibesCm cm in collectionToSwap)
             {
@@ -272,9 +279,15 @@ namespace VibesSwap.ViewModel.Pages.Base
                     {
                         continue;
                     }
-                    Task.Run(() => CmSshHelper.AlterCm(hostCredentials, cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
+                    else
+                    {
+                        editsToMake.Add((hostCredentials, cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern));
+                    }
+                    
                 }
             }
+
+            Task.Run(() => CmSshHelper.AlterAllCms(hostCredentials, editsToMake, GetHashCode()));
         }
 
         /// <summary>
@@ -296,8 +309,6 @@ namespace VibesSwap.ViewModel.Pages.Base
                 }
             }
         }
-
-        #endregion
 
         #endregion
 

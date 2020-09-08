@@ -2,8 +2,10 @@
 using Renci.SshNet.Common;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using VibesSwap.Model;
 
 namespace VibesSwap.ViewModel.Helpers
@@ -71,6 +73,7 @@ namespace VibesSwap.ViewModel.Helpers
         /// </summary>
         /// <param name="host">The VibesHost to connect to</param>
         /// <param name="cm">The VibesCm to stop</param>
+        /// <param name="hashCode">The hascode of the sender</param>
         /// <returns>Task<bool>, True if CM is running, otherwise false, though this is backup functionality, expected use is the event CmCommandComplete</returns>        
         public static async Task<bool> StopCm(VibesHost host, VibesCm cm, int hashCode)
         {
@@ -90,6 +93,36 @@ namespace VibesSwap.ViewModel.Helpers
 
             OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.BadRequest, hashCode: hashCode);
             return sshResult.Contains("running") ? true : false;
+        }
+
+        /// <summary>
+        /// Uses SSH commands to stop group of remote CM's on the same host in a single SSH session
+        /// </summary>
+        /// <param name="host">The VibesHost to connect to</param>
+        /// <param name="cms">The list of CM's to stop</param>
+        /// <param name="hashCode">The hascode of the sender</param>
+        /// <returns>True if more than one command was executed</returns>
+        public static async Task<bool> StopAllCms(VibesHost host, List<VibesCm> cms, int hashCode)
+        {
+            List<string> commandsToSend = new List<string>();
+            int commandsExecuted = 0;
+            foreach (VibesCm cm in cms)
+            {
+                ValidateParameters(host, cm);
+                commandsToSend.Add(host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource stop {cm.CmResourceName}" : $"echo '{host.SshPassword}' | sudo -iu vibes sh {cm.CmCorePath}/bin/cm_stop -i {cm.CmResourceName}");
+            }
+            try
+            {
+                commandsExecuted = await ExecuteSshCommandBulk(host, commandsToSend);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"SSH error: Error Stopping all CM's: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
+
+            OnCmCommandComplete(host, hashCode);
+            return commandsExecuted > 0 ? true : false;
         }
 
         /// <summary>
@@ -119,6 +152,36 @@ namespace VibesSwap.ViewModel.Helpers
         }
 
         /// <summary>
+        /// Uses SSH commands to start group of remote CM's on the same host in a single SSH session
+        /// </summary>
+        /// <param name="host">The VibesHost to connect to</param>
+        /// <param name="cms">The list of CM's to start</param>
+        /// <param name="hashCode">The hascode of the sender</param>
+        /// <returns>True if more than one command was executed</returns>
+        public static async Task<bool> StartAllCms(VibesHost host, List<VibesCm> cms, int hashCode)
+        {
+            List<string> commandsToSend = new List<string>();
+            int commandsExecuted = 0;
+            foreach (VibesCm cm in cms)
+            {
+                ValidateParameters(host, cm);
+                commandsToSend.Add(host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}" : $"echo '{host.SshPassword}' | sudo -iu vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}");
+            }
+            try
+            {
+                commandsExecuted = await ExecuteSshCommandBulk(host, commandsToSend);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"SSH error: Error Starting all CM's: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
+
+            OnCmCommandComplete(host, hashCode);
+            return commandsExecuted > 0 ? true : false;
+        }
+
+        /// <summary>
         /// Uses bash sed command to edit deployment properties file
         /// </summary>
         /// <param name="host">The VibesHost to conenct to</param>
@@ -135,7 +198,7 @@ namespace VibesSwap.ViewModel.Helpers
                     throw new ArgumentNullException($"Attempted to alter CM {cm.CmResourceName} without parameters to add/remove");
                 }
 
-                string sshCommand = $"sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
+                string sshCommand = $"echo '{host.SshPassword}\n' | sudo -S sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
                 _ = await ExecuteSshCommand(host, sshCommand);
                 Log.Information($"Executed Command {sshCommand}");
 
@@ -146,6 +209,47 @@ namespace VibesSwap.ViewModel.Helpers
                 Log.Error($"SSH error: Error altering CM: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
             }
+        }
+
+        /// <summary>
+        /// Uses SSH commands to alter group of remote CM's on the same host in a single SSH session
+        /// </summary>
+        /// <param name="host">The VibesHost to connect to</param>
+        /// <param name="cms">The list of CM's to alter</param>
+        /// <param name="hashCode">The hascode of the sender</param>
+        /// <returns>True if more than one command was executed</returns>
+        public static async Task<bool> AlterAllCms(VibesHost host, List<(VibesHost, VibesCm, string, string)> edits, int hashCode)
+        {
+            List<string> commandsToSend = new List<string>();
+            int commandsExecuted = 0;
+            foreach (var edit in edits)
+            {
+                VibesHost targetHost = edit.Item1;
+                VibesCm targetCm = edit.Item2;
+                string paramToEdit = edit.Item3;
+                string paramToReplace = edit.Item4;
+                    
+                ValidateParameters(targetHost, targetCm);
+
+                if (string.IsNullOrEmpty(paramToEdit) || string.IsNullOrEmpty(paramToReplace))
+                {
+                    throw new ArgumentNullException($"Attempted to alter CM {targetCm.CmResourceName} without parameters to add/remove");
+                }
+
+                commandsToSend.Add($"echo '{targetHost.SshPassword}\n' | sudo -S sed -i 's${paramToEdit}${paramToReplace}$' {targetCm.CmPath}/conf/deployment.properties");
+            }
+            try
+            {
+                commandsExecuted = await ExecuteSshCommandBulk(host, commandsToSend);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"SSH error: Error altering all CM's: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
+
+            OnCmCommandComplete(host, hashCode);
+            return commandsExecuted > 0 ? true : false;
         }
 
         /// <summary>
@@ -227,9 +331,20 @@ namespace VibesSwap.ViewModel.Helpers
         /// </summary>
         /// <param name="cmChanged">The CM which was changed</param>
         /// <param name="cmStatus">The status of the CM changed</param>
+        /// /// <param name="hashCode">The hashcode of the sender</param>
         private static void OnCmCommandComplete(VibesCm cmChanged, HttpStatusCode cmStatus, int hashCode)
         {
             CmCommandComplete?.Invoke(null, new CmHelperEventArgs { CmChanged = cmChanged, CmStatus = cmStatus, SubscriberHashCode = hashCode });
+        }
+
+        /// <summary>
+        /// Raises CmCOmmandComplete event for command resulting from a bulk SSH command, CM status is not sent
+        /// </summary>
+        /// <param name="hostChanged">The host which received the commands</param>
+        /// <param name="hashCode">The hashcode of the sender</param>
+        private static void OnCmCommandComplete(VibesHost hostChanged, int hashCode)
+        {
+            CmCommandComplete?.Invoke(null, new CmHelperEventArgs { Host = hostChanged, SubscriberHashCode = hashCode });
         }
 
         /// <summary>
@@ -237,6 +352,7 @@ namespace VibesSwap.ViewModel.Helpers
         /// </summary>
         /// <param name="cmChanged">The CM which was changed</param>
         /// <param name="deploymentProperties">The deployment.properties fetched</param>
+        /// /// <param name="hashCode">The hashcode of the sender</param>
         private static void OnCmCommandComplete(VibesHost targetHost, VibesCm targetCm, string deploymentProperties, int hashCode)
         {
             CmCommandComplete?.Invoke(null, new CmHelperEventArgs { Host = targetHost, CmChanged = targetCm, DeploymentProperties = deploymentProperties, SubscriberHashCode = hashCode });
@@ -247,6 +363,7 @@ namespace VibesSwap.ViewModel.Helpers
         /// </summary>
         /// <param name="hostFetched">The host that was queried</param>
         /// <param name="hostsFile">The hosts file fetched</param>
+        /// /// <param name="hashCode">The hashcode of the sender</param>
         private static void OnCmCommandComplete(VibesHost hostFetched, string hostsFile, int hashCode)
         {
             CmCommandComplete?.Invoke(null, new CmHelperEventArgs { Host = hostFetched, HostsFile = hostsFile, SubscriberHashCode = hashCode });
@@ -324,7 +441,39 @@ namespace VibesSwap.ViewModel.Helpers
             }
         }
 
+        /// <summary>
+        /// Executes supplied list of SSH commands on the supplied host
+        /// </summary>
+        /// <param name="host">The host to send the commands</param>
+        /// <param name="commands">List of commands to execute</param>
+        /// <returns>Number of commands executed</returns>
+        private async static Task<int> ExecuteSshCommandBulk(VibesHost host, List<string> commands)
+        {
+            string result = string.Empty;
 
+            // Authentication
+            instance.sshPassword = host.SshPassword;
+            KeyboardInteractiveAuthenticationMethod keybAuth = new KeyboardInteractiveAuthenticationMethod(host.SshUsername);
+            keybAuth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
+
+            // Connection Info
+            ConnectionInfo connInfo = new ConnectionInfo(host.Url, 22, host.SshUsername, keybAuth);
+
+            using (SshClient client = new SshClient(connInfo))
+            {
+                client.Connect();
+
+                int commandsExecuted = 0;
+                foreach (string command in commands)
+                {
+                    _ = await Task.Run(() => client.RunCommand(command));
+                    commandsExecuted++;
+                }
+
+                client.Disconnect();
+                return commandsExecuted;
+            }
+        }
 
         #endregion
 
