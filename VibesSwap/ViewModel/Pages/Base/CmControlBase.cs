@@ -91,7 +91,13 @@ namespace VibesSwap.ViewModel.Pages.Base
 
                 foreach (XElement node in xProperties.Descendants("parameter"))
                 {
-                    if (node.Value.ToLower().Contains("http:") || node.FirstAttribute.Value == "useVibes")
+                    if (
+                        node.Value.ToLower().Contains("http:") || 
+                        node.FirstAttribute.Value == "useVibes" ||
+                        node.FirstAttribute.Value.Contains("smart_suite_server_name") ||
+                        node.FirstAttribute.Value.Contains("smart_suite_username") ||
+                        node.FirstAttribute.Value.Contains("smart_suite_password")
+                        )
                     {
                         string propertyKey = node.Attribute("name").Value;
                         string propertyVal = node.Value;
