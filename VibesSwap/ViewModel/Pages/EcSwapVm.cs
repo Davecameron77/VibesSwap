@@ -32,6 +32,8 @@ namespace VibesSwap.ViewModel.Pages
             StopAllCommand = new RelayCommand(StopAll);
             SwapAllCommand = new RelayCommand(SwapAll);
             PollAllCommand = new RelayCommand(PollAll);
+            SwitchTermsCommand = new RelayCommand(SwapPropertyTargets);
+            PrePopulateTermsCommand = new RelayCommand(PrePopulateTargets);
 
             CmHttpHelper.PollComplete += OnPollComplete;
             CmSshHelper.CmCommandComplete += OnCmCommandComplete;
@@ -86,6 +88,8 @@ namespace VibesSwap.ViewModel.Pages
 
         public RelayCommand RefreshCommand { get; set; }
         public RelayCommand UpdatePropertiesCommand { get; set; }
+        public RelayCommand SwitchTermsCommand { get; set; }
+        public RelayCommand PrePopulateTermsCommand { get; set; }
 
         public RelayCommand StartCmCommand { get; set; }
         public RelayCommand StopCmCommand { get; set; }
@@ -308,13 +312,33 @@ namespace VibesSwap.ViewModel.Pages
                 // Set CM Status
                 if (CmsDisplayCommOne.Contains(e.CmChanged))
                 {
-                    CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
+                    switch (e.CmStatus)
+                    {
+                        case HttpStatusCode.OK:
+                            CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Alive;
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Offline;
+                            break;
+                        default:
+                            CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
+                            break;
+                    }
                 }
                 else if (CmsDisplayCommTwo.Contains(e.CmChanged))
                 {
-                    CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
+                    switch (e.CmStatus)
+                    {
+                        case HttpStatusCode.OK:
+                            CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Alive;
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Offline;
+                            break;
+                        default:
+                            CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
+                            break;
+                    }
                 }
 
                 // Update properties
@@ -416,6 +440,92 @@ namespace VibesSwap.ViewModel.Pages
                 Log.Error($"Error setting parameters for Host command, {ex.Message}");
                 Log.Error($"StackTrace: {ex.StackTrace}");
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Swaps configured search/replace terms for all applicable properties of all CM's for the selected host
+        /// </summary>
+        /// <param name="target">The host to swap CM's on</param>
+        internal sealed override void SwapPropertyTargets(object target)
+        {
+            try
+            {
+                switch (target)
+                {
+                    case HostTypes.COMM1:
+                        foreach (VibesCm cm in CmsDisplayCommOne)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                string temp = property.SearchPattern;
+                                property.SearchPattern = property.ReplacePattern;
+                                property.ReplacePattern = temp;
+                            }
+                        }
+                        break;
+                    case HostTypes.COMM2:
+                        foreach (VibesCm cm in CmsDisplayCommTwo)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                string temp = property.SearchPattern;
+                                property.SearchPattern = property.ReplacePattern;
+                                property.ReplacePattern = temp;
+                            }
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error swapping property terms, {ex.Message}");
+                Log.Error($"StackTrace: {ex.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// Pre-populated search/replace terms for all applicable properties of all CM's for the selected host
+        /// </summary>
+        /// <param name="target">The host to pre-populate CM's on</param>
+        internal sealed override void PrePopulateTargets(object target)
+        {
+            try
+            {
+                switch (target)
+                {
+                    case HostTypes.COMM1:
+                        foreach (VibesCm cm in CmsDisplayCommOne)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                if (property.PropertyValue.Contains("cm-lm11"))
+                                {
+                                    property.SearchPattern = "cm-lm11";
+                                    property.ReplacePattern = "cm-lm11.hlcvibes.yvr.com";
+                                }
+                            }
+                        }
+                        break;
+                    case HostTypes.COMM2:
+                        foreach (VibesCm cm in CmsDisplayCommTwo)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                if (property.PropertyValue.Contains("cm-lm11"))
+                                {
+                                    property.SearchPattern = "cm-lm11";
+                                    property.ReplacePattern = "cm-lm11.hlcvibes.yvr.com";
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error swapping property terms, {ex.Message}");
+                Log.Error($"StackTrace: {ex.StackTrace}");
             }
         }
 

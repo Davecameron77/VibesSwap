@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using VibesSwap.Model;
 using VibesSwap.Model.Dimensional;
 
@@ -18,7 +19,7 @@ namespace VibesSwap.ViewModel.Pages.Base
         #region Methods
 
         /// <summary>
-        /// Autosave CM changes when PropertyChanged fires, used to live save objects on keypress
+        /// Autosave CM changes when PropertyChanged fires, used to save objects on keypress
         /// </summary>
         /// <param name="sender">The object changed</param>
         /// <param name="args">Propertychanged args</param>
@@ -67,7 +68,7 @@ namespace VibesSwap.ViewModel.Pages.Base
                         if (context.HostCms.Any(p => p.Id == property.CmId))
                         {
                             DeploymentProperty propToUpdate = context.DeploymentProperties.SingleOrDefault(p => p.Id == property.Id);
-
+                            Log.Information($"Called on {property.Cm.CmResourceName} with value {property.SearchPattern} and {property.ReplacePattern}");
                             propToUpdate.SearchPattern = property.SearchPattern;
                             propToUpdate.ReplacePattern = property.ReplacePattern;
 
@@ -89,6 +90,19 @@ namespace VibesSwap.ViewModel.Pages.Base
                 Log.Error($"Unable to persist target changes on {sender.GetType()}, Error: {ex.Message}");
                 Log.Error($"Stack Trace: {ex.StackTrace}");
             }
+        }
+
+        /// <summary>
+        /// Common code for logging and reporting exceptions
+        /// </summary>
+        /// <param name="exceptionToReport">The exception thrown</param>
+        /// <param name="customMessage">Specific message about error</param>
+        /// <param name="indDisplayInGui">True if a MessageBox is to be shown</param>
+        internal void LogAndReportException(Exception exceptionToReport, string customMessage, bool indDisplayInGui = false)
+        {
+            Log.Error(customMessage);
+            Log.Error(exceptionToReport.StackTrace);
+            if (indDisplayInGui) MessageBox.Show(customMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         #endregion

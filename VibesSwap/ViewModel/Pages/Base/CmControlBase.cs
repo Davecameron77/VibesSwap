@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,24 +21,7 @@ namespace VibesSwap.ViewModel.Pages.Base
 
         #endregion
 
-        #region Methods
-
-        #region Utility Methods
-
-        /// <summary>
-        /// Common code for logging and reporting exceptions
-        /// </summary>
-        /// <param name="exceptionToReport">The exception thrown</param>
-        /// <param name="customMessage">Specific message about error</param>
-        /// <param name="indDisplayInGui">True if a MessageBox is to be shown</param>
-        internal void LogAndReportException(Exception exceptionToReport, string customMessage, bool indDisplayInGui = false)
-        {
-            Log.Error(customMessage);
-            Log.Error(exceptionToReport.StackTrace);
-            if (indDisplayInGui) MessageBox.Show(customMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-
-        #endregion
+        #region Methods    
 
         #region Called on setup
 
@@ -160,52 +142,6 @@ namespace VibesSwap.ViewModel.Pages.Base
 
         #endregion
 
-        #region Validators
-
-        /// <summary>
-        /// Checks for necessary params for host transaction and throws ArgumentNullException if not found
-        /// </summary>
-        /// <param name="host">The host param to test</param>
-        internal void CheckHostParameters(VibesHost host)
-        {
-            if (host == null) throw new ArgumentNullException("Unknown");
-
-            if (string.IsNullOrEmpty(host.Url)) throw new ArgumentException("Host URL");
-            if (string.IsNullOrEmpty(host.SshUsername)) throw new ArgumentNullException("SSH username");
-            if (string.IsNullOrEmpty(host.SshPassword)) throw new ArgumentNullException("SSH password");
-        }
-
-        /// <summary>
-        /// Checks for necessary params for single transaction and throws ArgumentNullException if not found
-        /// </summary>
-        /// <param name="host">The host param to test</param>
-        /// <param name="cm">The CM param to test</param>
-        internal void CheckSingleParameters(VibesHost host, VibesCm cm)
-        {
-            if (host == null || cm == null) throw new ArgumentNullException("Unknown");
-
-            CheckHostParameters(host);
-
-            if (string.IsNullOrEmpty(cm.CmResourceName)) throw new ArgumentNullException("CM Resource Name");
-            if (string.IsNullOrEmpty(cm.CmCorePath)) throw new ArgumentNullException("CM Core Path");
-            if (string.IsNullOrEmpty(cm.CmPath)) throw new ArgumentNullException("CM Path");
-        }
-
-        /// <summary>
-        /// Checks for necessary params for bulk transaction and throws ArgumentNullException if not found
-        /// </summary>
-        /// <param name="collectionToCheck">The collection to be started</param>
-        /// <param name="hostToCheck">The host to which the colleciton belongs</param>
-        internal void CheckBulkParameters(ICollection<VibesCm> collectionToCheck, VibesHost hostToCheck)
-        {
-            if (!collectionToCheck.Any()) throw new ArgumentNullException("Unknown");
-            if (string.IsNullOrEmpty(hostToCheck.Url)) throw new ArgumentNullException("Host URL");
-            if (string.IsNullOrEmpty(hostToCheck.SshUsername)) throw new ArgumentNullException("SSH username");
-            if (string.IsNullOrEmpty(hostToCheck.SshPassword)) throw new ArgumentNullException("SSH password");
-        }
-
-        #endregion
-
         #region Abstract definitions
 
         /// <summary>
@@ -220,6 +156,18 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// </summary>
         /// <param name="target">The HostType to target</param>
         internal abstract VibesHost SetTargetHost(object target);
+
+        /// <summary>
+        /// Method to be extended by child classes, to swap all find/replace properties after swap
+        /// </summary>
+        /// <param name="target">The host to target</param>
+        internal abstract void SwapPropertyTargets(object target);
+
+        /// <summary>
+        /// Method to be extended by child classes, pre-populate find/replace properties
+        /// </summary>
+        /// <param name="target">The host to target</param>
+        internal abstract void PrePopulateTargets(object target);
 
         #endregion
 
@@ -238,9 +186,8 @@ namespace VibesSwap.ViewModel.Pages.Base
             foreach (VibesCm cm in collectionToStart)
             {
                 cm.CmStatus = CmStates.Polling;
-                cmsToStart.Add(cm);
+                Task.Run(() => CmSshHelper.StartCm(hostCredentials, cm, GetHashCode()));
             }
-            Task.Run(() => CmSshHelper.StartAllCms(hostCredentials, cmsToStart, GetHashCode()));
         }
 
         /// <summary>
@@ -256,9 +203,8 @@ namespace VibesSwap.ViewModel.Pages.Base
             foreach (VibesCm cm in collectionToStop)
             {
                 cm.CmStatus = CmStates.Polling;
-                cmsToStop.Add(cm);
+                Task.Run(() => CmSshHelper.StopCm(hostCredentials, cm, GetHashCode()));
             }
-            Task.Run(() => CmSshHelper.StopAllCms(hostCredentials, cmsToStop, GetHashCode()));
         }
 
         /// <summary>
@@ -281,13 +227,11 @@ namespace VibesSwap.ViewModel.Pages.Base
                     }
                     else
                     {
-                        editsToMake.Add((hostCredentials, cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern));
+                        Task.Run(() => CmSshHelper.AlterCm(hostCredentials, cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
                     }
                     
                 }
             }
-
-            Task.Run(() => CmSshHelper.AlterAllCms(hostCredentials, editsToMake, GetHashCode()));
         }
 
         /// <summary>
@@ -301,12 +245,8 @@ namespace VibesSwap.ViewModel.Pages.Base
 
             foreach (VibesCm cm in collectionToPoll)
             {
-                using (DataContext context = new DataContext())
-                {
-                    VibesHost host = context.EnvironmentHosts.SingleOrDefault(h => h.Id == cm.VibesHostId);
-                    Task.Run(() => CmHttpHelper.CheckCmStatus(host, cm, GetHashCode()));
-                    cm.CmStatus = CmStates.Polling;
-                }
+                Task.Run(() => CmHttpHelper.CheckCmStatus(cm.VibesHost, cm, GetHashCode()));
+                cm.CmStatus = CmStates.Polling;
             }
         }
 
@@ -474,5 +414,54 @@ namespace VibesSwap.ViewModel.Pages.Base
         }
 
         #endregion       
+    }
+
+    internal abstract partial class CmControlBase : VmBase
+    {
+        #region Validators
+
+        /// <summary>
+        /// Checks for necessary params for host transaction and throws ArgumentNullException if not found
+        /// </summary>
+        /// <param name="host">The host param to test</param>
+        internal void CheckHostParameters(VibesHost host)
+        {
+            if (host == null) throw new ArgumentNullException("Unknown");
+
+            if (string.IsNullOrEmpty(host.Url)) throw new ArgumentException("Host URL");
+            if (string.IsNullOrEmpty(host.SshUsername)) throw new ArgumentNullException("SSH username");
+            if (string.IsNullOrEmpty(host.SshPassword)) throw new ArgumentNullException("SSH password");
+        }
+
+        /// <summary>
+        /// Checks for necessary params for single transaction and throws ArgumentNullException if not found
+        /// </summary>
+        /// <param name="host">The host param to test</param>
+        /// <param name="cm">The CM param to test</param>
+        internal void CheckSingleParameters(VibesHost host, VibesCm cm)
+        {
+            if (host == null || cm == null) throw new ArgumentNullException("Unknown");
+
+            CheckHostParameters(host);
+
+            if (string.IsNullOrEmpty(cm.CmResourceName)) throw new ArgumentNullException("CM Resource Name");
+            if (string.IsNullOrEmpty(cm.CmCorePath)) throw new ArgumentNullException("CM Core Path");
+            if (string.IsNullOrEmpty(cm.CmPath)) throw new ArgumentNullException("CM Path");
+        }
+
+        /// <summary>
+        /// Checks for necessary params for bulk transaction and throws ArgumentNullException if not found
+        /// </summary>
+        /// <param name="collectionToCheck">The collection to be started</param>
+        /// <param name="hostToCheck">The host to which the colleciton belongs</param>
+        internal void CheckBulkParameters(ICollection<VibesCm> collectionToCheck, VibesHost hostToCheck)
+        {
+            if (!collectionToCheck.Any()) throw new ArgumentNullException("Unknown");
+            if (string.IsNullOrEmpty(hostToCheck.Url)) throw new ArgumentNullException("Host URL");
+            if (string.IsNullOrEmpty(hostToCheck.SshUsername)) throw new ArgumentNullException("SSH username");
+            if (string.IsNullOrEmpty(hostToCheck.SshPassword)) throw new ArgumentNullException("SSH password");
+        }
+
+        #endregion
     }
 }

@@ -125,6 +125,15 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Separator Width="20"/>
+                <Button Content="Switch Terms"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwitchTermsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Prepopulate Terms"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PrePopulateTermsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
             </StackPanel>
             
             <DataGrid Grid.Row="2"
@@ -141,13 +150,14 @@
                                         Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
-                                        Width="Auto"
+                                        Width="500"
                                         Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
@@ -255,6 +265,15 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding UpdatePropertiesCommand}"
                         CommandParameter="{x:Static model:HostTypes.COMM2}"/>
+                <Separator Width="20" />
+                <Button Content="Switch Terms"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding SwitchTermsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM2}"/>
+                <Button Content="Prepopulate Terms"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding PrePopulateTermsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM2}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -271,7 +290,7 @@
                                         Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
-                                        Width="Auto"
+                                        Width="500"
                                         Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"

@@ -37,6 +37,8 @@ namespace VibesSwap.ViewModel.Pages
             GetHostsCommand = new RelayCommand(GetHosts);
             SetProdHostsCommand = new RelayCommand(SetProdHosts);
             SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
+            SwitchTermsCommand = new RelayCommand(SwapPropertyTargets);
+            PrePopulateTermsCommand = new RelayCommand(PrePopulateTargets);
 
             StartCmCommand = new RelayCommand(StartCm);
             StopCmCommand = new RelayCommand(StopCm);
@@ -175,7 +177,9 @@ namespace VibesSwap.ViewModel.Pages
         public RelayCommand GetHostsCommand { get; set; }
         public RelayCommand SetProdHostsCommand { get; set; }
         public RelayCommand SetHlcHostsCommand { get; set; }
-        
+        public RelayCommand SwitchTermsCommand { get; set; }
+        public RelayCommand PrePopulateTermsCommand { get; set; }
+
         public RelayCommand StartCmCommand { get; set; }
         public RelayCommand StopCmCommand { get; set; }
         public RelayCommand PollCmCommand { get; set; }
@@ -719,6 +723,188 @@ namespace VibesSwap.ViewModel.Pages
                 Log.Error($"Error setting parameters for Host command, {ex.Message}");
                 Log.Error($"StackTrace: {ex.StackTrace}");
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Swaps configured search/replace terms for all applicable properties of all CM's for the selected host
+        /// </summary>
+        /// <param name="target">The host to swap CM's on</param>
+        internal sealed override void SwapPropertyTargets(object target)
+        {
+            try
+            {
+                switch (target)
+                {
+                    case HostTypes.EXEC:
+                        foreach (VibesCm cm in CmsDisplayExec)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                string temp = property.SearchPattern;
+                                property.SearchPattern = property.ReplacePattern;
+                                property.ReplacePattern = temp;
+                            }
+                        }
+                        break;
+                    case HostTypes.OPERDB:
+                        foreach (VibesCm cm in CmsDisplayOperDb)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                string temp = property.SearchPattern;
+                                property.SearchPattern = property.ReplacePattern;
+                                property.ReplacePattern = temp;
+                            }
+                        }
+                        break;
+                    case HostTypes.OPERAPP1:
+                        foreach (VibesCm cm in CmsDisplayOperAppOne)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                string temp = property.SearchPattern;
+                                property.SearchPattern = property.ReplacePattern;
+                                property.ReplacePattern = temp;
+                            }
+                        }
+                        break;
+                    case HostTypes.OPERAPP2:
+                        foreach (VibesCm cm in CmsDisplayOperAppTwo)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                string temp = property.SearchPattern;
+                                property.SearchPattern = property.ReplacePattern;
+                                property.ReplacePattern = temp;
+                            }
+                        }
+                        break;
+                    case HostTypes.ENS:
+                        foreach (VibesCm cm in CmsDisplayEns)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                string temp = property.SearchPattern;
+                                property.SearchPattern = property.ReplacePattern;
+                                property.ReplacePattern = temp;
+                            }
+                        }
+                        break;
+                    case HostTypes.MS:
+                        foreach (VibesCm cm in CmsDisplayMs)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                string temp = property.SearchPattern;
+                                property.SearchPattern = property.ReplacePattern;
+                                property.ReplacePattern = temp;
+                            }
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error swapping property terms, {ex.Message}");
+                Log.Error($"StackTrace: {ex.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// Pre-populated search/replace terms for all applicable properties of all CM's for the selected host
+        /// </summary>
+        /// <param name="target">The host to pre-populate CM's on</param>
+        internal sealed override void PrePopulateTargets(object target)
+        {
+            try
+            {
+                switch (target)
+                {
+                    case HostTypes.EXEC:
+                        foreach (VibesCm cm in CmsDisplayExec)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                if (property.PropertyValue.Contains("cm-bpi11"))
+                                {
+                                    property.SearchPattern = "cm-bpi11";
+                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
+                                }
+                            }
+                        }
+                        break;
+                    case HostTypes.OPERDB:
+                        foreach (VibesCm cm in CmsDisplayOperDb)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                if (property.PropertyValue.Contains("cm-bpi11"))
+                                {
+                                    property.SearchPattern = "cm-bpi11";
+                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
+                                }
+                            }
+                        }
+                        break;
+                    case HostTypes.OPERAPP1:
+                        foreach (VibesCm cm in CmsDisplayOperAppOne)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                if (property.PropertyValue.Contains("cm-bpi11"))
+                                {
+                                    property.SearchPattern = "cm-bpi11";
+                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
+                                }
+                            }
+                        }
+                        break;
+                    case HostTypes.OPERAPP2:
+                        foreach (VibesCm cm in CmsDisplayOperAppTwo)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                if (property.PropertyValue.Contains("cm-bpi11"))
+                                {
+                                    property.SearchPattern = "cm-bpi11";
+                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
+                                }
+                            }
+                        }
+                        break;
+                    case HostTypes.MS:
+                        foreach (VibesCm cm in CmsDisplayMs)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                if (property.PropertyValue.Contains("cm-bpi11"))
+                                {
+                                    property.SearchPattern = "cm-bpi11";
+                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
+                                }
+                            }
+                        }
+                        break;
+                    case HostTypes.ENS:
+                        foreach (VibesCm cm in CmsDisplayEns)
+                        {
+                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            {
+                                if (property.PropertyValue.Contains("cm-bpi11"))
+                                {
+                                    property.SearchPattern = "cm-bpi11";
+                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error swapping property terms, {ex.Message}");
+                Log.Error($"StackTrace: {ex.StackTrace}");
             }
         }
 
