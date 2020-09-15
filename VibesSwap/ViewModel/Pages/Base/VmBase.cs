@@ -8,6 +8,12 @@ using VibesSwap.Model.Dimensional;
 
 namespace VibesSwap.ViewModel.Pages.Base
 {
+    /// <summary>
+    /// Base class for all VM's
+    /// Provides helper methods to all subclasses
+    /// PersistTargetChanges - GUI editable fields will send OnPropertyChanged so that changes can be persisted live
+    /// LogAndReportException - Common place to setup exception popups and logging
+    /// </summary>
     internal abstract class VmBase : INotifyPropertyChanged
     {
         #region Members
@@ -68,7 +74,6 @@ namespace VibesSwap.ViewModel.Pages.Base
                         if (context.HostCms.Any(p => p.Id == property.CmId))
                         {
                             DeploymentProperty propToUpdate = context.DeploymentProperties.SingleOrDefault(p => p.Id == property.Id);
-                            Log.Information($"Called on {property.Cm.CmResourceName} with value {property.SearchPattern} and {property.ReplacePattern}");
                             propToUpdate.SearchPattern = property.SearchPattern;
                             propToUpdate.ReplacePattern = property.ReplacePattern;
 
@@ -106,6 +111,5 @@ namespace VibesSwap.ViewModel.Pages.Base
         }
 
         #endregion
-
     }
 }

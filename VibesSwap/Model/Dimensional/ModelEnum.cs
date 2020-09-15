@@ -35,6 +35,8 @@
         Alive,
         Offline,
         Unchecked,
-        Polling
+        Polling,
+        CommandSent,
+        Altered
     }
 }

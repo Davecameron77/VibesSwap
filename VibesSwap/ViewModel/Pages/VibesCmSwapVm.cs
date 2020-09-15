@@ -486,246 +486,6 @@ namespace VibesSwap.ViewModel.Pages
             }
         }
 
-        #endregion
-
-        #region Handlers
-
-        /// <summary>
-        /// Event handler for a completed HTTP poll
-        /// Will update GUI for the CM modified
-        /// </summary>
-        /// <param name="sender">Sender of event, expected to be null</param>
-        /// <param name="e">CmHelperEventArgs with relevant details</param>
-        private void OnPollComplete(object sender, CmHelperEventArgs e)
-        {
-            try
-            {
-                // This VM is not the sender, return
-                if (GetHashCode() != e.SubscriberHashCode)
-                {
-                    return;
-                }
-                // Set CM Status
-                if (CmsDisplayExec.Contains(e.Cm))
-                {
-                    CmsDisplayExec.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                }
-                else if (CmsDisplayOperDb.Contains(e.Cm))
-                {
-                    CmsDisplayOperDb.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                }
-                else if (CmsDisplayOperAppOne.Contains(e.Cm))
-                {
-                    CmsDisplayOperAppOne.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                }
-                else if (CmsDisplayOperAppTwo.Contains(e.Cm))
-                {
-                    CmsDisplayOperAppTwo.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                }
-                else if (CmsDisplayEns.Contains(e.Cm))
-                {
-                    CmsDisplayEns.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                }
-                else if (CmsDisplayMs.Contains(e.Cm))
-                {
-                    CmsDisplayMs.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error updating GUI with CM changes: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
-        }
-
-        /// <summary>
-        /// Event handler for a completed SSH command
-        /// Will update GUI for the CM changed
-        /// </summary>
-        /// <param name="sender">Sender of event, expected to be null</param>
-        /// <param name="e">CmHelperEventArgs with relevant details</param>
-        private void OnCmCommandComplete(object sender, CmHelperEventArgs e)
-        {
-            try
-            {
-                // This VM is not the sender, return
-                if (e.SubscriberHashCode != GetHashCode())
-                {
-                    return;
-                }
-
-                // Set CM Status
-                if (CmsDisplayExec.Contains(e.CmChanged))
-                {
-                    CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
-                }
-                else if (CmsDisplayOperDb.Contains(e.CmChanged))
-                {
-                    CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
-                }
-                else if (CmsDisplayOperAppOne.Contains(e.CmChanged))
-                {
-                    CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
-                }
-                else if (CmsDisplayOperAppTwo.Contains(e.CmChanged))
-                {
-                    CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
-                }
-                else if (CmsDisplayEns.Contains(e.CmChanged))
-                {
-                    CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
-                }
-                else if (CmsDisplayMs.Contains(e.CmChanged))
-                {
-                    CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
-                    CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = e.CmStatus == HttpStatusCode.NoContent ? CmStates.Unchecked : CmStates.Offline;
-                }
-
-                // Update properties
-                if (e.DeploymentProperties != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERDB || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2 || e.Host.HostType == HostTypes.ENS || e.Host.HostType == HostTypes.MS))
-                {
-                    StoreDeploymentProperties(e.CmChanged, e.DeploymentProperties);
-                    Application.Current.Dispatcher.Invoke(delegate
-                    {
-                        LoadData(e.CmChanged);
-                    });
-                }
-
-                // Popup hosts
-                if (e.Host != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2))
-                {
-                    PopupHostsFile(e);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error updating GUI with CM changes: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
-        }
-
-        #endregion
-
-        #region Helpers
-
-        /// <summary>
-        /// Sets up up Host/CM target and checks for missing params
-        /// Common code used by all CM commands, but specific to this host
-        /// </summary>
-        /// <param name="target">The HostType to target</param>
-        /// <returns>Tuple containing the target Host/Cm, validated</returns>
-        internal override sealed (VibesHost, VibesCm) SetTargets(object target)
-        {
-            try
-            {
-                VibesHost hostToPoll = null;
-                VibesCm cmToPoll = null;
-
-                switch (target)
-                {
-                    case HostTypes.EXEC:
-                        CheckSingleParameters(SelectedHostExec, SelectedCmExec);
-
-                        hostToPoll = SelectedHostExec;
-                        cmToPoll = SelectedCmExec;
-                        break;
-                    case HostTypes.OPERDB:
-                        CheckSingleParameters(SelectedHostOperDb, SelectedCmOperDb);
-
-                        hostToPoll = SelectedHostOperDb;
-                        cmToPoll = SelectedCmOperDb;
-                        break;
-                    case HostTypes.OPERAPP1:
-                        CheckSingleParameters(SelectedHostOperAppOne, SelectedCmOperAppOne);
-
-                        hostToPoll = SelectedHostOperAppOne;
-                        cmToPoll = SelectedCmOperAppOne;
-                        break;
-                    case HostTypes.OPERAPP2:
-                        CheckSingleParameters(SelectedHostOperAppTwo, SelectedCmOperAppTwo);
-                        
-                        hostToPoll = SelectedHostOperAppTwo;
-                        cmToPoll = SelectedCmOperAppTwo;
-                        break;
-                    case HostTypes.ENS:
-                        CheckSingleParameters(SelectedHostEns, SelectedCmEns);
-                        
-                        hostToPoll = SelectedHostEns;
-                        cmToPoll = SelectedCmEns;
-                        break;
-                    case HostTypes.MS:
-                        CheckSingleParameters(SelectedHostMs, SelectedCmMs);
-                        
-                        hostToPoll = SelectedHostMs;
-                        cmToPoll = SelectedCmMs;
-                        break;
-                }
-
-                return (hostToPoll, cmToPoll);
-            }
-            catch(Exception ex)
-            {
-                Log.Error($"Error setting parameters for CM command, {ex.Message}");
-                Log.Error($"StackTrace: {ex.StackTrace}");
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Sets up up Host target and checks for missing params
-        /// Common code used by all CM commands, but specific to this host
-        /// </summary>
-        /// <param name="target">The HostType to target</param>
-        /// <returns>The target Host/Cm, validated</returns>
-        internal override sealed VibesHost SetTargetHost(object target)
-        {
-            try
-            {
-                VibesHost hostToPoll = null;
-
-                switch (target)
-                {
-                    case HostTypes.EXEC:
-                        CheckHostParameters(SelectedHostExec);
-                        hostToPoll = SelectedHostExec;
-                        break;
-                    case HostTypes.OPERDB:
-                        CheckHostParameters(SelectedHostOperDb);
-                        hostToPoll = SelectedHostOperDb;
-                        break;
-                    case HostTypes.OPERAPP1:
-                        CheckHostParameters(SelectedHostOperAppOne);
-                        hostToPoll = SelectedHostOperAppOne;
-                        break;
-                    case HostTypes.OPERAPP2:
-                        CheckHostParameters(SelectedHostOperAppTwo);
-                        hostToPoll = SelectedHostOperAppTwo;
-                        break;
-                    case HostTypes.ENS:
-                        CheckHostParameters(SelectedHostEns);
-                        hostToPoll = SelectedHostEns;
-                        break;
-                    case HostTypes.MS:
-                        CheckHostParameters(SelectedHostMs);
-                        hostToPoll = SelectedHostMs;
-                        break;
-                }
-
-                return hostToPoll;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Error setting parameters for Host command, {ex.Message}");
-                Log.Error($"StackTrace: {ex.StackTrace}");
-                throw;
-            }
-        }
-
         /// <summary>
         /// Swaps configured search/replace terms for all applicable properties of all CM's for the selected host
         /// </summary>
@@ -906,6 +666,312 @@ namespace VibesSwap.ViewModel.Pages
                 Log.Error($"Error swapping property terms, {ex.Message}");
                 Log.Error($"StackTrace: {ex.StackTrace}");
             }
+        }
+
+        #endregion
+
+        #region Handlers
+
+        /// <summary>
+        /// Event handler for a completed HTTP poll
+        /// Will update GUI for the CM modified
+        /// </summary>
+        /// <param name="sender">Sender of event, expected to be null</param>
+        /// <param name="e">CmHelperEventArgs with relevant details</param>
+        private void OnPollComplete(object sender, CmHelperEventArgs e)
+        {
+            try
+            {
+                // This VM is not the sender, return
+                if (GetHashCode() != e.SubscriberHashCode)
+                {
+                    return;
+                }
+                // Set CM Status
+                if (CmsDisplayExec.Any(c => c.Id == e.Cm.Id))
+                {
+                    CmsDisplayExec.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                }
+                else if (CmsDisplayOperDb.Any(c => c.Id == e.Cm.Id))
+                {
+                    CmsDisplayOperDb.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                }
+                else if (CmsDisplayOperAppOne.Any(c => c.Id == e.Cm.Id))
+                {
+                    CmsDisplayOperAppOne.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                }
+                else if (CmsDisplayOperAppTwo.Any(c => c.Id == e.Cm.Id))
+                {
+                    CmsDisplayOperAppTwo.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                }
+                else if (CmsDisplayEns.Any(c => c.Id == e.Cm.Id))
+                {
+                    CmsDisplayEns.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                }
+                else if (CmsDisplayMs.Any(c => c.Id == e.Cm.Id))
+                {
+                    CmsDisplayMs.Single(c => c.Id == e.Cm.Id).CmStatus = e.CmStatus == HttpStatusCode.OK ? CmStates.Alive : CmStates.Offline;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error updating GUI with CM changes: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// Event handler for a completed SSH command
+        /// Will update GUI for the CM changed
+        /// </summary>
+        /// <param name="sender">Sender of event, expected to be null</param>
+        /// <param name="e">CmHelperEventArgs with relevant details</param>
+        private void OnCmCommandComplete(object sender, CmHelperEventArgs e)
+        {
+            try
+            {
+                // This VM is not the sender, return
+                if (e.SubscriberHashCode != GetHashCode())
+                {
+                    return;
+                }
+
+                // Set CM Status
+                if (CmsDisplayExec.Contains(e.CmChanged))
+                {
+                    switch (e.CmStatus)
+                    {
+                        case HttpStatusCode.OK:
+                            CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Alive;
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Offline;
+                            break;
+                        case HttpStatusCode.NoContent:
+                            CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
+                            break;
+                        default:
+                            CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
+                            PollCmAsync(CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id));
+                            break;
+                    }
+                }
+                else if (CmsDisplayOperDb.Contains(e.CmChanged))
+                {
+                    switch (e.CmStatus)
+                    {
+                        case HttpStatusCode.OK:
+                            CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Alive;
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Offline;
+                            break;
+                        case HttpStatusCode.NoContent:
+                            CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
+                            break;
+                        default:
+                            CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
+                            PollCmAsync(CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id));
+                            break;
+                    }
+                }
+                else if (CmsDisplayOperAppOne.Contains(e.CmChanged))
+                {
+                    switch (e.CmStatus)
+                    {
+                        case HttpStatusCode.OK:
+                            CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Alive;
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Offline;
+                            break;
+                        case HttpStatusCode.NoContent:
+                            CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
+                            break;
+                        default:
+                            CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
+                            PollCmAsync(CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id));
+                            break;
+                    }
+                }
+                else if (CmsDisplayOperAppTwo.Contains(e.CmChanged))
+                {
+                    switch (e.CmStatus)
+                    {
+                        case HttpStatusCode.OK:
+                            CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Alive;
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Offline;
+                            break;
+                        case HttpStatusCode.NoContent:
+                            CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
+                            break;
+                        default:
+                            CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
+                            PollCmAsync(CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id));
+                            break;
+                    }
+                }
+                else if (CmsDisplayEns.Contains(e.CmChanged))
+                {
+                    switch (e.CmStatus)
+                    {
+                        case HttpStatusCode.OK:
+                            CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Alive;
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Offline;
+                            break;
+                        case HttpStatusCode.NoContent:
+                            CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
+                            break;
+                        default:
+                            CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
+                            PollCmAsync(CmsDisplayEns.Single(c => c.Id == e.CmChanged.Id));
+                            break;
+                    }
+                }
+                else if (CmsDisplayMs.Contains(e.CmChanged))
+                {
+                    switch (e.CmStatus)
+                    {
+                        case HttpStatusCode.OK:
+                            CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Alive;
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Offline;
+                            break;
+                        case HttpStatusCode.NoContent:
+                            CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
+                            break;
+                        default:
+                            CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
+                            PollCmAsync(CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id));
+                            break;
+                    }
+                }
+
+                // Update properties
+                if (e.DeploymentProperties != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERDB || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2 || e.Host.HostType == HostTypes.ENS || e.Host.HostType == HostTypes.MS))
+                {
+                    StoreDeploymentProperties(e.CmChanged, e.DeploymentProperties);
+                    Application.Current.Dispatcher.Invoke(delegate
+                    {
+                        LoadData(e.CmChanged);
+                    });
+                }
+
+                // Popup hosts
+                if (e.Host != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2))
+                {
+                    PopupHostsFile(e);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error updating GUI with CM changes: {ex.Message}");
+                Log.Error($"Stack Trace: {ex.StackTrace}");
+            }
+        }
+
+        #endregion
+
+        #region Helpers
+
+        /// <summary>
+        /// Sets up up Host/CM target and checks for missing params
+        /// Common code used by all CM commands, but specific to this host
+        /// </summary>
+        /// <param name="target">The HostType to target</param>
+        /// <returns>Tuple containing the target Host/Cm, validated</returns>
+        internal override sealed (VibesHost, VibesCm) SetTargets(object target)
+        {
+            VibesHost hostToPoll = null;
+            VibesCm cmToPoll = null;
+
+            switch (target)
+            {
+                case HostTypes.EXEC:
+                    CheckSingleParameters(SelectedHostExec, SelectedCmExec);
+
+                    hostToPoll = SelectedHostExec;
+                    cmToPoll = SelectedCmExec;
+                    break;
+                case HostTypes.OPERDB:
+                    CheckSingleParameters(SelectedHostOperDb, SelectedCmOperDb);
+
+                    hostToPoll = SelectedHostOperDb;
+                    cmToPoll = SelectedCmOperDb;
+                    break;
+                case HostTypes.OPERAPP1:
+                    CheckSingleParameters(SelectedHostOperAppOne, SelectedCmOperAppOne);
+
+                    hostToPoll = SelectedHostOperAppOne;
+                    cmToPoll = SelectedCmOperAppOne;
+                    break;
+                case HostTypes.OPERAPP2:
+                    CheckSingleParameters(SelectedHostOperAppTwo, SelectedCmOperAppTwo);
+
+                    hostToPoll = SelectedHostOperAppTwo;
+                    cmToPoll = SelectedCmOperAppTwo;
+                    break;
+                case HostTypes.ENS:
+                    CheckSingleParameters(SelectedHostEns, SelectedCmEns);
+
+                    hostToPoll = SelectedHostEns;
+                    cmToPoll = SelectedCmEns;
+                    break;
+                case HostTypes.MS:
+                    CheckSingleParameters(SelectedHostMs, SelectedCmMs);
+
+                    hostToPoll = SelectedHostMs;
+                    cmToPoll = SelectedCmMs;
+                    break;
+            }
+
+            return (hostToPoll, cmToPoll);
+        }
+
+        /// <summary>
+        /// Sets up up Host target and checks for missing params
+        /// Common code used by all CM commands, but specific to this host
+        /// </summary>
+        /// <param name="target">The HostType to target</param>
+        /// <returns>The target Host/Cm, validated</returns>
+        internal override sealed VibesHost SetTargetHost(object target)
+        {
+            VibesHost hostToPoll = null;
+
+            switch (target)
+            {
+                case HostTypes.EXEC:
+                    CheckHostParameters(SelectedHostExec);
+                    hostToPoll = SelectedHostExec;
+                    break;
+                case HostTypes.OPERDB:
+                    CheckHostParameters(SelectedHostOperDb);
+                    hostToPoll = SelectedHostOperDb;
+                    break;
+                case HostTypes.OPERAPP1:
+                    CheckHostParameters(SelectedHostOperAppOne);
+                    hostToPoll = SelectedHostOperAppOne;
+                    break;
+                case HostTypes.OPERAPP2:
+                    CheckHostParameters(SelectedHostOperAppTwo);
+                    hostToPoll = SelectedHostOperAppTwo;
+                    break;
+                case HostTypes.ENS:
+                    CheckHostParameters(SelectedHostEns);
+                    hostToPoll = SelectedHostEns;
+                    break;
+                case HostTypes.MS:
+                    CheckHostParameters(SelectedHostMs);
+                    hostToPoll = SelectedHostMs;
+                    break;
+            }
+
+            return hostToPoll;
         }
 
         #endregion

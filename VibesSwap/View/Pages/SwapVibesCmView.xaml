@@ -125,6 +125,7 @@
                                         Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM"
                                         Width="*"
+                                        MinWidth="120"
                                         IsReadOnly="True"
                                         Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM Status"
@@ -287,6 +288,7 @@
                                         Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM"
                                         Width="*"
+                                        MinWidth="120"
                                         IsReadOnly="True"
                                         Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM Status"
@@ -461,6 +463,7 @@
                                         Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM"
                                         Width="*"
+                                        MinWidth="120"
                                         IsReadOnly="True"
                                         Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM Status"
@@ -635,6 +638,7 @@
                                         Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM"
                                         Width="*"
+                                        MinWidth="120"
                                         IsReadOnly="True"
                                         Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM Status"
@@ -797,6 +801,7 @@
                                         Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM"
                                         Width="*"
+                                        MinWidth="120"
                                         IsReadOnly="True"
                                         Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM Status"
@@ -959,6 +964,7 @@
                                         Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM"
                                         Width="*"
+                                        MinWidth="120"
                                         IsReadOnly="True"
                                         Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="CM Status"

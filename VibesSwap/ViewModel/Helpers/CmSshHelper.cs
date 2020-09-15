@@ -1,6 +1,5 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
-using Serilog;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -67,6 +66,22 @@ namespace VibesSwap.ViewModel.Helpers
         #region Methods
 
         /// <summary>
+        /// Uses SSH command to start remote CM
+        /// </summary>
+        /// <param name="host">The VibesHost to connect to</param>
+        /// <param name="cm">The VibesCm to start</param>
+        /// /// <returns>Task<bool>, True if CM is running, otherwise false, though this is backup functionality, expected use is the event CmCommandComplete</returns>        
+        public static async Task<bool> StartCm(VibesHost host, VibesCm cm, int hashCode)
+        {
+            ValidateParameters(host, cm);
+            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -iu vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}";
+            string sshResult = await ExecuteSshCommand(host, sshCommand);
+
+            OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
+            return sshResult.Contains("running");
+        }
+
+        /// <summary>
         /// Uses SSH command to stop remote CM
         /// </summary>
         /// <param name="host">The VibesHost to connect to</param>
@@ -77,43 +92,7 @@ namespace VibesSwap.ViewModel.Helpers
         {
             ValidateParameters(host, cm);
             string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource stop {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -iu vibes sh {cm.CmCorePath}/bin/cm_stop -i {cm.CmResourceName}";
-            string sshResult = string.Empty;
-
-            try
-            {
-                sshResult = await ExecuteSshCommand(host, sshCommand);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"SSH error: Error Stopping CM: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
-
-            OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.BadRequest, hashCode: hashCode);
-            return sshResult.Contains("running");
-        }
-
-        /// <summary>
-        /// Uses SSH command to start remote CM
-        /// </summary>
-        /// <param name="host">The VibesHost to connect to</param>
-        /// <param name="cm">The VibesCm to start</param>
-        /// /// <returns>Task<bool>, True if CM is running, otherwise false, though this is backup functionality, expected use is the event CmCommandComplete</returns>        
-        public static async Task<bool> StartCm(VibesHost host, VibesCm cm, int hashCode)
-        {
-            ValidateParameters(host, cm);
-            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -iu vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}";
-            string sshResult = string.Empty;
-            
-            try
-            {
-                sshResult = await ExecuteSshCommand(host, sshCommand);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"SSH error: Error Starting CM: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
+            string sshResult = await ExecuteSshCommand(host, sshCommand);
 
             OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
             return sshResult.Contains("running");
@@ -128,25 +107,16 @@ namespace VibesSwap.ViewModel.Helpers
         /// <param name="paramToReplace">The text pattern to replace with</param>
         public static async void AlterCm(VibesHost host, VibesCm cm, string paramToEdit, string paramToReplace, int hashCode)
         {
-            try
+            ValidateParameters(host, cm);
+            if (string.IsNullOrEmpty(paramToEdit) || string.IsNullOrEmpty(paramToReplace))
             {
-                ValidateParameters(host, cm);
-                if (string.IsNullOrEmpty(paramToEdit) || string.IsNullOrEmpty(paramToReplace))
-                {
-                    throw new ArgumentNullException($"Attempted to alter CM {cm.CmResourceName} without parameters to add/remove");
-                }
-
-                string sshCommand = $"echo '{host.SshPassword}\n' | sudo -S sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
-                _ = await ExecuteSshCommand(host, sshCommand);
-                Log.Information($"Executed Command {sshCommand}");
-
-                OnCmCommandComplete(cm, HttpStatusCode.NoContent, hashCode: hashCode);
+                throw new ArgumentNullException($"Attempted to alter CM {cm.CmResourceName} without parameters to add/remove");
             }
-            catch (Exception ex)
-            {
-                Log.Error($"SSH error: Error altering CM: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
+
+            string sshCommand = $"echo '{host.SshPassword}\n' | sudo -S sed -i 's${paramToEdit}${paramToReplace}$' {cm.CmPath}/conf/deployment.properties";
+            _ = await ExecuteSshCommand(host, sshCommand);
+
+            OnCmCommandComplete(cm, HttpStatusCode.NoContent, hashCode: hashCode);
         }
 
         /// <summary>
@@ -157,19 +127,9 @@ namespace VibesSwap.ViewModel.Helpers
         /// <returns>string containing contents of CM deployment.properties</returns>
         public static async Task<string> GetCmParams(VibesHost host, VibesCm cm, int hashCode)
         {
-            string sshResult = string.Empty;
-
-            try
-            {
-                ValidateParameters(host, cm);
-                string sshCommand = $"cat {cm.CmPath}/conf/deployment.properties";
-                sshResult = await ExecuteSshCommand(host, sshCommand);               
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"SSH error: Error Getting Deployment Properties: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
+            ValidateParameters(host, cm);
+            string sshCommand = $"cat {cm.CmPath}/conf/deployment.properties";
+            string sshResult = await ExecuteSshCommand(host, sshCommand);
 
             OnCmCommandComplete(host, cm, sshResult, hashCode: hashCode);
             return sshResult;
@@ -184,16 +144,7 @@ namespace VibesSwap.ViewModel.Helpers
         {
             ValidateParameters(host);
             string sshCommand = $"cat /etc/hosts";
-            string sshResult = string.Empty;
-            try
-            {
-                sshResult = await ExecuteSshCommand(host, sshCommand);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"SSH error: Error Getting Hosts File: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
+            string sshResult = await ExecuteSshCommand(host, sshCommand);
 
             OnCmCommandComplete(host, sshResult, hashCode: hashCode);
             return sshResult;
@@ -206,19 +157,11 @@ namespace VibesSwap.ViewModel.Helpers
         /// <param name="indMoveToProd">True if moving from hlcint to prod, false for opposite</param>
         public static async void SwitchHostsFile(VibesHost host, bool indMoveToProd, int hashCode)
         {
-            try
-            {
-                ValidateParameters(host, null);
-                string sshCommand = indMoveToProd ? $"echo '{ host.SshPassword }\n' | sudo -S cp /etc/hosts.prod /etc/hosts" : $"echo '{ host.SshPassword }\n' | sudo -S cp /etc/hosts.hlcint /etc/hosts";
-                string sshResult = await ExecuteSshCommand(host, sshCommand);
-                // Get hostsfile after switch
-                await GetHostsFile(host, hashCode);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"SSH error: Error swapping Hosts File: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-            }
+            ValidateParameters(host, null);
+            string sshCommand = indMoveToProd ? $"echo '{ host.SshPassword }\n' | sudo -S cp /etc/hosts.prod /etc/hosts" : $"echo '{ host.SshPassword }\n' | sudo -S cp /etc/hosts.hlcint /etc/hosts";
+            _ = await ExecuteSshCommand(host, sshCommand);
+            // Get hostsfile after switch
+            _ = await GetHostsFile(host, hashCode);
         }
 
         #region Event Methods
