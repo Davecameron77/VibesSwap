@@ -100,7 +100,7 @@ namespace VibesSwap.ViewModel.Helpers
                 // Other error
                 else if (ex.InnerException.ToString().Contains("Unable to connect to the remote server"))
                 {
-                    Log.Information($"HTTP error: Unable to complete request to CM {cmToCheck.CmResourceName} on {cmToCheck.VibesHost.Url}");
+                    Log.Information($"CM {cmToCheck.CmResourceName} on {cmToCheck.VibesHost.Url} is reporting as offline");
                     statusCode = HttpStatusCode.ServiceUnavailable;
                     OnPollComplete(cmToCheck, statusCode, hashCode);
                     return statusCode;

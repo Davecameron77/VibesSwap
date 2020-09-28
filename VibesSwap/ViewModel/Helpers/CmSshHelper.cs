@@ -74,7 +74,7 @@ namespace VibesSwap.ViewModel.Helpers
         public static async Task<bool> StartCm(VibesHost host, VibesCm cm, int hashCode)
         {
             ValidateParameters(host, cm);
-            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -iu vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}";
+            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -u vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}";
             string sshResult = await ExecuteSshCommand(host, sshCommand);
 
             OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
@@ -91,7 +91,7 @@ namespace VibesSwap.ViewModel.Helpers
         public static async Task<bool> StopCm(VibesHost host, VibesCm cm, int hashCode)
         {
             ValidateParameters(host, cm);
-            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource stop {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -iu vibes sh {cm.CmCorePath}/bin/cm_stop -i {cm.CmResourceName}";
+            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource stop {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -u vibes sh {cm.CmCorePath}/bin/cm_stop -i {cm.CmResourceName}";
             string sshResult = await ExecuteSshCommand(host, sshCommand);
 
             OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
