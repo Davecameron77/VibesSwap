@@ -1,6 +1,8 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
+using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using VibesSwap.Model;
@@ -74,7 +76,7 @@ namespace VibesSwap.ViewModel.Helpers
         public static async Task<bool> StartCm(VibesHost host, VibesCm cm, int hashCode)
         {
             ValidateParameters(host, cm);
-            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -u vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}";
+            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -Su vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}";
             string sshResult = await ExecuteSshCommand(host, sshCommand);
 
             OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
@@ -91,7 +93,7 @@ namespace VibesSwap.ViewModel.Helpers
         public static async Task<bool> StopCm(VibesHost host, VibesCm cm, int hashCode)
         {
             ValidateParameters(host, cm);
-            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource stop {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -u vibes sh {cm.CmCorePath}/bin/cm_stop -i {cm.CmResourceName}";
+            string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource stop {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -Su vibes sh {cm.CmCorePath}/bin/cm_stop -i {cm.CmResourceName}";
             string sshResult = await ExecuteSshCommand(host, sshCommand);
 
             OnCmCommandComplete(cm, sshResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
@@ -268,6 +270,47 @@ namespace VibesSwap.ViewModel.Helpers
                 result = sshResult.Result;
 
                 return result;
+            }
+        }
+
+        /// <summary>
+        /// Sends a list of commands to the specified host
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        private async static Task<List<string>> ExecuteMultipleSsshCommand(VibesHost host, List<string> commands)
+        {
+            List<string> results = new List<string>();
+
+            // Authentication
+            instance.sshPassword = host.SshPassword;
+            KeyboardInteractiveAuthenticationMethod keybAuth = new KeyboardInteractiveAuthenticationMethod(host.SshUsername);
+            keybAuth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
+
+            // Connection Info
+            ConnectionInfo connInfo = new ConnectionInfo(host.Url, 22, host.SshUsername, keybAuth);
+
+            using (SshClient client = new SshClient(connInfo))
+            {
+                ShellStream sshStream = client.CreateShellStream("", 80, 40, 80, 40, 1024);
+                if (sshStream.CanWrite)
+                {
+                    await Task.Run(() =>
+                    {
+                        foreach (string sshCommand in commands)
+                        {
+                            sshStream.WriteLine(sshCommand);
+                            results.Add(sshStream.ReadLine());
+                            sshStream.Flush();
+                        }
+                    });
+                }
+
+                sshStream.Close();
+                client.Disconnect();
+
+                return results;
             }
         }
 
