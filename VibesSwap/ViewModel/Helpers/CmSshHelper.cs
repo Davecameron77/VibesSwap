@@ -3,7 +3,9 @@ using Renci.SshNet.Common;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using VibesSwap.Model;
 
@@ -98,22 +100,16 @@ namespace VibesSwap.ViewModel.Helpers
             foreach (VibesCm cm in cms)
             {
                 ValidateParameters(host, cm);
-                string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -Su vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}";
+                string sshCommand = host.IndClustered 
+                    ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource start {cm.CmResourceName}\n" 
+                    : $"echo '{host.SshPassword}\n' | sudo -Su vibes sh {cm.CmCorePath}/bin/cm_start -i {cm.CmResourceName}\n";
                 commandsToSend.Add((cm, sshCommand));
             }
 
-            using (CustomSshClient client = new CustomSshClient())
+            var sshResults = await ExecuteMultipleSshCommand(host, commandsToSend);
+            foreach (var (cm, commandResult) in sshResults)
             {
-                client.Connect(host.Url, 22, host.SshUsername, host.SshPassword);
-
-                // Get back a (VibesCm, SshResult) so that OnCmCommandComplete can be sent for each CM instance for which a command was sent, to update the GUI
-                var sshResults = await ExecuteMultipleSshCommand(host, commandsToSend);
-                foreach ((VibesCm cm, string commandResult) result in sshResults)
-                {
-                    OnCmCommandComplete(result.cm, result.commandResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
-                }
-
-                client.Disconnect();
+                OnCmCommandComplete(cm, commandResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
             }
 
             return true;
@@ -150,21 +146,16 @@ namespace VibesSwap.ViewModel.Helpers
             foreach (VibesCm cm in cms)
             {
                 ValidateParameters(host, cm);
-                string sshCommand = host.IndClustered ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource stop {cm.CmResourceName}" : $"echo '{host.SshPassword}\n' | sudo -Su vibes sh {cm.CmCorePath}/bin/cm_stop -i {cm.CmResourceName}";
+                string sshCommand = host.IndClustered 
+                    ? $"echo '{host.SshPassword}\n' | sudo -S /usr/sbin/crm resource stop {cm.CmResourceName}\n" 
+                    : $"echo '{host.SshPassword}\n' | sudo -Su vibes sh {cm.CmCorePath}/bin/cm_stop -i {cm.CmResourceName}\n";
                 commandsToSend.Add((cm, sshCommand));
             }
 
-            using (CustomSshClient client = new CustomSshClient())
+            var sshResults = await ExecuteMultipleSshCommand(host, commandsToSend);
+            foreach (var (cm, commandResult) in sshResults)
             {
-                client.Connect(host.Url, 22, host.SshUsername, host.SshPassword);
-
-                var sshResults = await ExecuteMultipleSshCommand(host, commandsToSend);
-                foreach (var (cm, commandResult) in sshResults)
-                {
-                    OnCmCommandComplete(cm, commandResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
-                }
-
-                client.Disconnect();
+                OnCmCommandComplete(cm, commandResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
             }
 
             return true;
@@ -205,22 +196,14 @@ namespace VibesSwap.ViewModel.Helpers
             foreach (var command in commands)
             {
                 ValidateParameters(host, command.cm);
-                string sshCommand = $"echo '{host.SshPassword}\n' | sudo -S sed -i 's${command.paramToSearch}${command.paramToReplace}$' {command.cm.CmPath}/conf/deployment.properties";
+                string sshCommand = $"echo {host.SshPassword}\n | sudo -S sed -i s${command.paramToSearch}${command.paramToReplace}$ {command.cm.CmPath}/conf/deployment.properties";
                 commandsToSend.Add((command.cm, sshCommand));
             }
 
-            using (CustomSshClient client = new CustomSshClient())
+            var sshResults = await ExecuteMultipleSshCommand(host, commandsToSend);
+            foreach (var (cm, commandResult) in sshResults)
             {
-                client.Connect(host.Url, 22, host.SshUsername, host.SshPassword);
-
-                // Get back a (VibesCm, SshResult) so that OnCmCommandComplete can be sent for each CM instance for which a command was sent, to update the GUI
-                var sshResults = await ExecuteMultipleSshCommand(host, commandsToSend);
-                foreach (var (cm, commandResult) in sshResults)
-                {
-                    OnCmCommandComplete(cm, commandResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
-                }
-
-                client.Disconnect();
+                OnCmCommandComplete(cm, commandResult.Contains("running") ? HttpStatusCode.OK : HttpStatusCode.ServiceUnavailable, hashCode: hashCode);
             }
 
             return true;
@@ -311,6 +294,22 @@ namespace VibesSwap.ViewModel.Helpers
         #region helpers
 
         /// <summary>
+        /// Provides Password to SSH client
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void HandleKeyEvent(object sender, AuthenticationPromptEventArgs e)
+        {
+            foreach (AuthenticationPrompt prompt in e.Prompts)
+            {
+                if (prompt.Request.IndexOf("Password:", StringComparison.InvariantCultureIgnoreCase) != -1)
+                {
+                    prompt.Response = instance.sshPassword;
+                }
+            }
+        }
+
+        /// <summary>
         /// Validates host/cm parameters to ensure command success
         /// </summary>
         /// <param name="host">The host for which parameters need validating</param>
@@ -340,12 +339,29 @@ namespace VibesSwap.ViewModel.Helpers
         private async static Task<string> ExecuteSshCommand(VibesHost host, string sshCommand)
         {
             string result = string.Empty;
-            CustomSshClient client = new CustomSshClient();
-            client.Connect(host.Url, 22, host.SshUsername, host.SshPassword);
-            await Task.Run(() => { result = client.Execute(sshCommand); });
 
-            client.Disconnect();
-            return result;
+            // Authentication
+            instance.sshPassword = host.SshPassword;
+            KeyboardInteractiveAuthenticationMethod keybAuth = new KeyboardInteractiveAuthenticationMethod(host.SshUsername);
+            keybAuth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
+
+            // Connection Info
+            ConnectionInfo connInfo = new ConnectionInfo(host.Url, 22, host.SshUsername, keybAuth);
+
+            using (SshClient client = new SshClient(connInfo))
+            {
+                client.Connect();
+                Log.Debug($"SSH client connected to {host.Url} for single SSH command");
+
+                var sshResult = await Task.Run(() => client.RunCommand(sshCommand));
+                result = sshResult.Result;
+                Log.Debug($"SSH command {sshCommand} resulted in {result}");
+
+                client.Disconnect();
+                Log.Debug($"SSH client disconnected");
+
+                return result;
+            }
         }
 
         /// <summary>
@@ -356,16 +372,68 @@ namespace VibesSwap.ViewModel.Helpers
         /// <returns></returns>
         private async static Task<List<(VibesCm cm, string commandResult)>> ExecuteMultipleSshCommand(VibesHost host, List<(VibesCm cm, string sshCommand)> commands)
         {
-            List<(VibesCm, string)> results = new List<(VibesCm, string)>();
-            CustomSshClient client = new CustomSshClient();
-            client.Connect(host.Url, 22, host.SshUsername, host.SshPassword);
+            List<(VibesCm cmChanged, string commandResult)> results = new List<(VibesCm cmChanged, string commandResult)>();
 
-            foreach(var (cm, sshCommand) in commands)
+            // Authentication
+            instance.sshPassword = host.SshPassword;
+            KeyboardInteractiveAuthenticationMethod keybAuth = new KeyboardInteractiveAuthenticationMethod(host.SshUsername);
+            keybAuth.AuthenticationPrompt += new EventHandler<AuthenticationPromptEventArgs>(HandleKeyEvent);
+
+            // Connection Info
+            ConnectionInfo connInfo = new ConnectionInfo(host.Url, 22, host.SshUsername, keybAuth);
+
+            try
             {
-                await Task.Run(() => { results.Add((cm, client.Execute(sshCommand))); });
-            }
+                using (SshClient client = new SshClient(connInfo))
+                {
+                    client.Connect();
+                    ShellStream sshStream = client.CreateShellStream("", 80, 40, 80, 40, 1024);
+                    if (sshStream.CanWrite)
+                    {
+                        Log.Debug($"SSH client connected to {host.Url} for multiple SSH commands");
+                        await Task.Run(() =>
+                        {
+                            //TODO - Maybe this is removed, trying to flush stream
+                            sshStream.Flush();
+                            while (sshStream.Length > 0)
+                            {
+                                _ = sshStream.Read();
+                            }
 
-            client.Disconnect();
+                            foreach (var (cm, sshCommand) in commands)
+                            {
+                                Log.Debug($"Sending command {sshCommand}");
+                                sshStream.WriteLine(sshCommand);
+                                sshStream.Flush();
+                                StringBuilder resultBuilder = new StringBuilder();
+                                while (sshStream.Length > 0)
+                                {
+                                    resultBuilder.Append(sshStream.ReadLine());
+                                }
+                                Log.Debug($"Received result {resultBuilder}");
+                                string sshResult = resultBuilder.ToString();
+                                results.Add((cm, sshResult));
+
+                                Log.Debug($"SSH command {sshCommand} resulted in {sshResult}");
+                                sshStream.Flush();
+                            }
+                        });
+                    }
+                    else
+                    {
+                        Log.Error($"SSH connect failed");
+                    }
+                    sshStream.Close();
+                    Log.Debug($"SSH client disconnected from shell session");
+                    client.Disconnect();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error establishing SSH shell, error: {ex.Message}");
+            }
+            
+
             return results;
         }
 
