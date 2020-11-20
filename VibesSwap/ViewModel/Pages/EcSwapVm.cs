@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Serilog;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,7 +12,12 @@ using VibesSwap.ViewModel.Pages.Base;
 
 namespace VibesSwap.ViewModel.Pages
 {
-    internal class EcSwapVm : CmControlBase
+    /// <summary>
+    /// VM for CM EC Swap view
+    /// VM logic here is only for appliation specific tasks
+    /// All HTTP/SSH calls go via CmControlBase
+    /// </summary>
+    class EcSwapVm : CmControlBase
     {
         #region Constructors
 
@@ -47,16 +51,16 @@ namespace VibesSwap.ViewModel.Pages
 
         public ObservableCollection<VibesCm> CmsDisplayCommOne { get; set; }
         public ObservableCollection<VibesCm> CmsDisplayCommTwo { get; set; }
-        
+
         public VibesHost SelectedHostCommOne { get; set; }
         public VibesHost SelectedHostCommTwo { get; set; }
-        
+
         private VibesCm _selectedCmCommOne;
         public VibesCm SelectedCmCommOne
         {
             get { return _selectedCmCommOne; }
-            set 
-            { 
+            set
+            {
                 _selectedCmCommOne = value;
                 if (value != null)
                 {
@@ -72,8 +76,8 @@ namespace VibesSwap.ViewModel.Pages
         public VibesCm SelectedCmCommTwo
         {
             get { return _selectedCmCommTwo; }
-            set 
-            { 
+            set
+            {
                 _selectedCmCommTwo = value;
                 if (value != null)
                 {
@@ -115,6 +119,7 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
+                // Single CM is updated, only update that one CM
                 if (parameter is VibesCm cmChanged)
                 {
                     using (DataContext context = new DataContext())
@@ -123,10 +128,10 @@ namespace VibesSwap.ViewModel.Pages
 
                         if (CmsDisplayCommOne.Contains(cmChanged))
                         {
-                            CmsDisplayCommOne.Remove(CmsDisplayCommOne.Single(c => c.Id == cmChanged.Id));   
+                            CmsDisplayCommOne.Remove(CmsDisplayCommOne.Single(c => c.Id == cmChanged.Id));
                             CmsDisplayCommOne.Add(newCm);
                             SelectedCmCommOne = newCm;
-                            
+
                         }
                         if (CmsDisplayCommTwo.Contains(cmChanged))
                         {
@@ -135,7 +140,7 @@ namespace VibesSwap.ViewModel.Pages
                             SelectedCmCommTwo = newCm;
                         }
                         return;
-                    }  
+                    }
                 }
 
                 // Comm1
@@ -149,113 +154,13 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch (Exception ex)
             {
-                Log.Error($"Error loading CM EC's from DB: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
-                MessageBox.Show("Error loading data to GUI", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogAndReportException(ex, "Error loading data to GUI", true);
             }
         }
 
         #endregion
 
-        #region Bulk Transaction/GUI Bound
-
-        /// <summary>
-        /// Starts all CM's asyncronously from GUI via command binding
-        /// An event is expected back on command complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void StartAll(object parameter)
-        {
-            try
-            {
-                switch (parameter)
-                {
-                    case HostTypes.COMM1:
-                        StartCollection(CmsDisplayCommOne, SelectedHostCommOne);
-                        break;
-                    case HostTypes.COMM2:
-                        StartCollection(CmsDisplayCommTwo, SelectedHostCommTwo);
-                        break;
-                }
-            }
-            catch (ArgumentNullException ex)
-            {
-                LogAndReportException(ex, $"Unable to start all CM's, Error: {ex.Message}", true);
-            }
-        }
-
-        /// <summary>
-        /// Stops all CM's asyncronously from GUI via command binding
-        /// An event is expected back on command complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void StopAll(object parameter)
-        {
-            try
-            {
-                switch (parameter)
-                {
-                    case HostTypes.COMM1:
-                        StopCollection(CmsDisplayCommOne, SelectedHostCommOne);
-                        break;
-                    case HostTypes.COMM2:
-                        StopCollection(CmsDisplayCommTwo, SelectedHostCommTwo);
-                        break;
-                }
-            }
-            catch (ArgumentNullException ex)
-            {
-                LogAndReportException(ex, $"Unable to stop all CM's, Error: {ex.Message}", true);
-            }
-        }
-
-        /// <summary>
-        /// Polls all CM's asyncronously from GUI via command binding
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void PollAll(object parameter)
-        {
-            try
-            {
-                switch (parameter)
-                {
-                    case HostTypes.COMM1:
-                        PollCollection(CmsDisplayCommOne, SelectedHostCommOne);
-                        break;
-                    case HostTypes.COMM2:
-                        PollCollection(CmsDisplayCommTwo, SelectedHostCommTwo);
-                        break;
-                }
-            }
-            catch (ArgumentNullException ex)
-            {
-                LogAndReportException(ex, $"Unable to poll all CM's, Error: {ex.Message}", true);
-            }
-        }
-
-        /// <summary>
-        /// Swaps all CM's on specified host
-        /// </summary>
-        /// <param name="parameter">Enum HostTypes</param>
-        private void SwapAll(object parameter)
-        {
-            try
-            {
-                switch (parameter)
-                {
-                    case HostTypes.COMM1:
-                        SwapCollection(CmsDisplayCommOne, SelectedHostCommOne);
-                        break;
-                    case HostTypes.COMM2:
-                        SwapCollection(CmsDisplayCommTwo, SelectedHostCommTwo);
-                        break;
-                }
-            }
-            catch (ArgumentNullException ex)
-            {
-                LogAndReportException(ex, $"Unable to swap all CM's, Error: {ex.Message}", true);
-            }
-        }
+        #region GUI Bound
 
         /// <summary>
         /// Swaps configured search/replace terms for all applicable properties of all CM's for the selected host
@@ -358,8 +263,7 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch (Exception ex)
             {
-                Log.Error($"Error updating EC Swap GUI with HTTP status: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
+                LogAndReportException(ex, $"Error updating EC Swap GUI with HTTP status: {ex.Message}", false);
             }
         }
 
@@ -428,7 +332,7 @@ namespace VibesSwap.ViewModel.Pages
                         LoadData(e.CmChanged);
                     });
                 }
-                
+
                 // Popup hosts
                 if (e.Host != null && (e.Host.HostType == HostTypes.COMM1 || e.Host.HostType == HostTypes.COMM2))
                 {
@@ -437,10 +341,9 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch (Exception ex)
             {
-                Log.Error($"Error updating EC Swap GUI with CM changes: {ex.Message}");
-                Log.Error($"Stack Trace: {ex.StackTrace}");
+                LogAndReportException(ex, $"Error updating EC Swap GUI with CM changes: {ex.Message}", false);
             }
-        }       
+        }
 
         #endregion
 
@@ -452,10 +355,11 @@ namespace VibesSwap.ViewModel.Pages
         /// </summary>
         /// <param name="target">The HostType to target</param>
         /// <returns>Tuple containing the target Host/Cm, validated</returns>
-        internal override sealed (VibesHost, VibesCm) SetTargets(object target)
+        internal override sealed (VibesHost, VibesCm, ObservableCollection<VibesCm>) SetTargets(object target)
         {
             VibesHost hostToPoll = null;
             VibesCm cmToPoll = null;
+            ObservableCollection<VibesCm> cms = null;
 
             switch (target)
             {
@@ -464,16 +368,18 @@ namespace VibesSwap.ViewModel.Pages
 
                     hostToPoll = SelectedHostCommOne;
                     cmToPoll = SelectedCmCommOne;
+                    cms = CmsDisplayCommOne;
                     break;
                 case HostTypes.COMM2:
                     CheckSingleParameters(SelectedHostCommTwo, SelectedCmCommTwo);
 
                     hostToPoll = SelectedHostCommTwo;
                     cmToPoll = SelectedCmCommTwo;
+                    cms = CmsDisplayCommTwo;
                     break;
             }
 
-            return (hostToPoll, cmToPoll);
+            return (hostToPoll, cmToPoll, cms);
         }
 
         /// <summary>

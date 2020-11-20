@@ -2,8 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:helpers="clr-namespace:VibesSwap.ViewModel.Helpers"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:model="clr-namespace:VibesSwap.Model.Dimensional"
              mc:Ignorable="d" 
              d:DesignHeight="500" 
              d:DesignWidth="960">
@@ -62,14 +62,14 @@
                     Content="Add New Host"
                     Style="{StaticResource FormButton}"
                     Command="{Binding AddRemoveHostCommand}"
-                    CommandParameter="{x:Static helpers:GuiOperations.Add}"/>
+                    CommandParameter="{x:Static model:GuiOperations.Add}"/>
             <Button Grid.Row="3"
                     Grid.Column="1"
                     Content="Remove Selected Host"
                     IsEnabled="{Binding CanEditHost}"
                     Style="{StaticResource FormButton}"
                     Command="{Binding AddRemoveHostCommand}" 
-                    CommandParameter="{x:Static helpers:GuiOperations.Remove}"/>
+                    CommandParameter="{x:Static model:GuiOperations.Remove}"/>
 
             <TextBlock Grid.Row="4"
                        Grid.Column="0"
@@ -184,14 +184,14 @@
                     Content="Add New CM"
                     Style="{StaticResource FormButton}"
                     Command="{Binding AddRemoveCmCommand}"
-                    CommandParameter="{x:Static helpers:GuiOperations.Add}"/>
+                    CommandParameter="{x:Static model:GuiOperations.Add}"/>
             <Button Grid.Row="3"
                     Grid.Column="1"
                     Content="Remove Selected CM"
                     IsEnabled="{Binding CanEditCm}"
                     Style="{StaticResource FormButton}"
                     Command="{Binding AddRemoveCmCommand}"
-                    CommandParameter="{x:Static helpers:GuiOperations.Remove}"/>
+                    CommandParameter="{x:Static model:GuiOperations.Remove}"/>
 
             <TextBlock Grid.Row="4"
                        Grid.Column="0"

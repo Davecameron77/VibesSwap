@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,14 +15,8 @@ using VibesSwap.ViewModel.Helpers;
 
 namespace VibesSwap.ViewModel.Pages.Base
 {
-    /// <summary>
-    /// Provides a base for CM control VM's, and common fuctions or abstract definitions
-    /// Whenever possible VM logic shall be here, and only extended to child view models when architecure prevents it
-    /// </summary>
     internal abstract partial class CmControlBase : VmBase
     {
-        #region Methods    
-
         #region Called on setup
 
         /// <summary>
@@ -32,6 +27,7 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="hostType">The type of host from which to fetch CM's</param>
         internal void LoadCmForSwap(ICollection<VibesCm> cmCollection, HostTypes hostType, int hostId = 0)
         {
+            // CmsDisplay<Host>, clear before populating
             cmCollection.Clear();
             using (DataContext context = new DataContext())
             {
@@ -39,8 +35,10 @@ namespace VibesSwap.ViewModel.Pages.Base
                 {
                     // HostId sent but not found, return
                     if (hostId != 0 && !context.EnvironmentHosts.Any(h => h.Id == hostId)) return;
+                    // Find any configured host(s) in database where the hostid is the same
                     var hosts = hostId != 0 ? context.EnvironmentHosts.Where(h => h.Id == hostId).OrderBy(h => h.Name) : context.EnvironmentHosts.Where(h => h.HostType == hostType).OrderBy(h => h.Name);
 
+                    // Load all CM's for this host
                     foreach (VibesHost host in hosts)
                     {
                         foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties).Include(c => c.VibesHost).OrderBy(c => c.CmResourceName))
@@ -51,7 +49,6 @@ namespace VibesSwap.ViewModel.Pages.Base
                                 prop.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
                             }
                             cmCollection.Add(newCm);
-                            PollCmAsync(newCm);
                         }
                     }
                 }
@@ -90,10 +87,13 @@ namespace VibesSwap.ViewModel.Pages.Base
                 VibesCm cmToUpdate = context.HostCms.SingleOrDefault(c => c.Id == cmChanged.Id);
                 XDocument xProperties = XDocument.Parse(deploymentProperties);
 
+                // Loop through deployment properties and only fetch desired properties
                 foreach (XElement node in xProperties.Descendants("parameter"))
                 {
+                    // Property types to search for
                     if (
-                        node.Value.ToLower().Contains("http:") || 
+                        node.Value.ToLower().Contains("http:") ||
+                        node.FirstAttribute.Value.Contains("URL_TO") ||
                         node.FirstAttribute.Value == "useVibes" ||
                         node.FirstAttribute.Value.Contains("smart_suite_server_name") ||
                         node.FirstAttribute.Value.Contains("smart_suite_username") ||
@@ -103,7 +103,7 @@ namespace VibesSwap.ViewModel.Pages.Base
                         string propertyKey = node.Attribute("name").Value;
                         string propertyVal = node.Value;
 
-                        // Property Exists
+                        // Property Exists, update
                         if (context.DeploymentProperties.Any(p => p.CmId == cmChanged.Id && p.PropertyKey == propertyKey))
                         {
                             DeploymentProperty propToUpdate = context.DeploymentProperties.SingleOrDefault(p => p.CmId == cmChanged.Id && p.PropertyKey == propertyKey);
@@ -113,7 +113,7 @@ namespace VibesSwap.ViewModel.Pages.Base
                         }
                         else
                         {
-                            // Property does not exist
+                            // Property does not exist, add
                             context.DeploymentProperties.Add(new DeploymentProperty
                             {
                                 PropertyKey = propertyKey,
@@ -151,13 +151,15 @@ namespace VibesSwap.ViewModel.Pages.Base
 
         /// <summary>
         /// Method to be extended by child classes, to set host/cm targets prior to other method calls
+        /// Will perform validation as well, using methods found in the attached partial
         /// </summary>
         /// <param name="target">The HostType to target</param>
         /// <returns>Tuple containing the currently selected Host/CM</returns>
-        internal abstract (VibesHost targetHost, VibesCm targetCm) SetTargets(object target);
+        internal abstract (VibesHost, VibesCm, ObservableCollection<VibesCm>) SetTargets(object target);
 
         /// <summary>
         /// Method to be extended by child classes, to set host target prior to other method calls
+        /// Will perform validation as well, using methods found in the attached partial
         /// </summary>
         /// <param name="target">The HostType to target</param>
         internal abstract VibesHost SetTargetHost(object target);
@@ -175,110 +177,6 @@ namespace VibesSwap.ViewModel.Pages.Base
         internal abstract void PrePopulateTargets(object target);
 
         #endregion
-
-        #region Bulk Transactions
-
-        /// <summary>
-        /// Starts entire collection of CM's
-        /// </summary>
-        /// <param name="collectionToStart">The collection of CM's to start</param>
-        /// <param name="hostCredentials">The host to which the CM's belong</param>
-        internal void StartCollection(ICollection<VibesCm> collectionToStart, VibesHost hostCredentials)
-        {
-            List<VibesCm> cmsToStart = new List<VibesCm>();
-            CheckBulkParameters(collectionToStart, hostCredentials);
-
-            foreach (VibesCm cm in collectionToStart)
-            {
-                // Block a start attempt if CM state is not known to avoid sending frivolous ssh commands to server
-                if (cm.CmStatus != CmStates.Offline)
-                {
-                    Log.Error($"Attempted to start CM {cm.CmResourceName} in unknown state, skipped");
-                    continue;
-                }
-                cm.CmStatus = CmStates.CommandSent;
-                cmsToStart.Add(cm);
-            }
-            Task.Run(() => CmSshHelper.StartCmMultiple(hostCredentials, cmsToStart, GetHashCode()));
-        }
-
-        /// <summary>
-        /// Stops entire collection of CM's
-        /// </summary>
-        /// <param name="collectionToStop">The collection of CM's to stop</param>
-        /// <param name="hostCredentials">The host to which the CM's belong</param>
-        internal void StopCollection(ICollection<VibesCm> collectionToStop, VibesHost hostCredentials)
-        {
-            List<VibesCm> cmsToStop = new List<VibesCm>();
-            CheckBulkParameters(collectionToStop, hostCredentials);
-
-            foreach (VibesCm cm in collectionToStop)
-            {
-                // Block a stop attempt if CM state is not known to avoid sending frivolous ssh commands to server
-                if (cm.CmStatus != CmStates.Alive)
-                {
-                    Log.Error($"Attempted to stop CM {cm.CmResourceName} in unknown state, skipped");
-                    continue;
-                }
-                cm.CmStatus = CmStates.CommandSent;
-                cmsToStop.Add(cm);
-            }
-            Log.Information("Stopping collection");
-            Task.Run(() => CmSshHelper.StopCmMultiple(hostCredentials, cmsToStop, GetHashCode()));
-        }
-
-        /// <summary>
-        /// Swaps entire collection of CM's
-        /// </summary>
-        /// <param name="collectionToSwap">The collection of CM's to swap</param>
-        /// <param name="hostCredentials">The host to which the CM's belong</param>
-        internal void SwapCollection(ICollection<VibesCm> collectionToSwap, VibesHost hostCredentials)
-        {
-            CheckBulkParameters(collectionToSwap, hostCredentials);
-            List<(VibesCm cmToEdit, string paramToEdit, string paramToChange)> editsToMake = new List<(VibesCm, string, string)>();
-
-            foreach (VibesCm cm in collectionToSwap)
-            {
-                foreach (DeploymentProperty propertyToChange in cm.DeploymentProperties)
-                {
-                    if (string.IsNullOrEmpty(propertyToChange.SearchPattern) || string.IsNullOrEmpty(propertyToChange.ReplacePattern))
-                    {
-                        continue;
-                    }
-                    else if (cm.CmStatus != CmStates.Offline)
-                    {
-                        Log.Error($"Attempted to swap CM {cm.CmResourceName} in unknown state, skipped");
-                        continue;
-                    }
-                    else
-                    {
-                        editsToMake.Add((cm, propertyToChange.SearchPattern, propertyToChange.ReplacePattern));
-                    }
-                }
-                if (cm.CmStatus != CmStates.CommandSent) cm.CmStatus = CmStates.CommandSent;
-            }
-            Task.Run(() => CmSshHelper.AlterCmMultiple(hostCredentials, editsToMake, GetHashCode()));
-        }
-
-        /// <summary>
-        /// Polls entire collection of CM's
-        /// </summary>
-        /// <param name="collectionToPoll">The collection of CM's to poll</param>
-        /// <param name="hostCredentials">The host to which the CM's belong</param>
-        internal void PollCollection(ICollection<VibesCm> collectionToPoll, VibesHost hostCredentials)
-        {
-            CheckBulkParameters(collectionToPoll, hostCredentials);
-
-            foreach (VibesCm cm in collectionToPoll)
-            {
-                Task.Run(() => CmHttpHelper.CheckCmStatus(cm.VibesHost, cm, GetHashCode()));
-                cm.CmStatus = CmStates.Polling;
-            }
-        }
-
-        #endregion
-
-        #endregion
     }
 
     // GUI Bound
@@ -288,7 +186,7 @@ namespace VibesSwap.ViewModel.Pages.Base
 
         /// <summary>
         /// Starts a remote CM
-        /// An event is expected back on command complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
+        /// Feedback is returned via CmSshHelper.OnCmCommandComplete
         /// </summary>
         /// <param name="parameter">Enum HostTypes</param>
         internal void StartCm(object parameter)
@@ -297,14 +195,14 @@ namespace VibesSwap.ViewModel.Pages.Base
             {
                 var targets = SetTargets(parameter);
                 // Block a start attempt if CM state is not known to avoid sending frivolous ssh commands to server
-                if (targets.targetCm.CmStatus != CmStates.Offline)
+                if (targets.Item2.CmStatus != CmStates.Offline)
                 {
                     MessageBox.Show("CM must be confirmed stopped prior to starting!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Log.Error($"Attempted to start CM {targets.targetCm.CmResourceName} in unknown state, skipped");
+                    Log.Error($"Attempted to start CM {targets.Item2.CmResourceName} in unknown state, skipped");
                     return;
                 }
-                Task.Run(() => CmSshHelper.StartCm(host: targets.targetHost, cm: targets.targetCm, hashCode: GetHashCode()));
-                targets.targetCm.CmStatus = CmStates.CommandSent;
+                Task.Run(() => CmSshHelper.StartCm(targets.Item1, targets.Item2, GetHashCode()));
+                targets.Item2.CmStatus = CmStates.CommandSent;
             }
             catch (ArgumentNullException ex)
             {
@@ -313,8 +211,37 @@ namespace VibesSwap.ViewModel.Pages.Base
         }
 
         /// <summary>
+        /// Starts a list of remote CM's
+        /// Feedback is returned via CmSshHelper.OnCmCommandComplete
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
+        internal void StartAll(object parameter)
+        {
+            try
+            {
+                var targets = SetTargets(parameter);
+                List<VibesCm> cmsToStart = new List<VibesCm>();
+
+                foreach (VibesCm cm in targets.Item3)
+                {
+                    // Block a start attempt if CM state is not known to avoid sending frivolous ssh commands to server
+                    if (cm.CmStatus == CmStates.Offline)
+                    {
+                        cm.CmStatus = CmStates.CommandSent;
+                        cmsToStart.Add(cm);
+                    }
+                }
+                Task.Run(() => CmSshHelper.StartCmMultiple(targets.Item1, cmsToStart, GetHashCode()));
+            }
+            catch (ArgumentNullException ex)
+            {
+                LogAndReportException(ex, $"Unable to start CM's, Error: {ex.Message}", true);
+            }
+        }
+
+        /// <summary>
         /// Stops a remote CM
-        /// An event is expected back on command complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
+        /// Feedback is returned via CmSshHelper.OnCmCommandComplete
         /// </summary>
         /// <param name="parameter">Enum HostTypes</param>
         internal void StopCm(object parameter)
@@ -323,18 +250,47 @@ namespace VibesSwap.ViewModel.Pages.Base
             {
                 var targets = SetTargets(parameter);
                 // Block a stop attempt if CM state is not known to avoid sending frivolous ssh commands to server
-                if (targets.targetCm.CmStatus != CmStates.Alive)
+                if (targets.Item2.CmStatus != CmStates.Alive)
                 {
                     MessageBox.Show("CM must be confirmed started prior to stopping!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Log.Error($"Attempted to stop CM {targets.targetCm.CmResourceName} in unknown state, skipped");
+                    Log.Error($"Attempted to stop CM {targets.Item2.CmResourceName} in unknown state, skipped");
                     return;
                 }
-                Task.Run(() => CmSshHelper.StopCm(host: targets.targetHost, cm: targets.targetCm, hashCode: GetHashCode()));
-                targets.targetCm.CmStatus = CmStates.CommandSent;
+                Task.Run(() => CmSshHelper.StopCm(targets.Item1, targets.Item2, GetHashCode()));
+                targets.Item2.CmStatus = CmStates.CommandSent;
             }
             catch (ArgumentNullException ex)
             {
                 LogAndReportException(ex, $"Unable to stop CM, Error: {ex.Message}", true);
+            }
+        }
+
+        /// <summary>
+        /// Stops a list of remote CM's
+        /// Feedback is returned via CmSshHelper.OnCmCommandComplete
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
+        internal void StopAll(object parameter)
+        {
+            try
+            {
+                var targets = SetTargets(parameter);
+                List<VibesCm> cmsToStop = new List<VibesCm>();
+
+                foreach (VibesCm cm in targets.Item3)
+                {
+                    // Block a stop attempt if CM state is not known to avoid sending frivolous ssh commands to server
+                    if (cm.CmStatus == CmStates.Alive)
+                    {
+                        cm.CmStatus = CmStates.CommandSent;
+                        cmsToStop.Add(cm);
+                    }
+                }
+                Task.Run(() => CmSshHelper.StopCmMultiple(targets.Item1, cmsToStop, GetHashCode()));
+            }
+            catch (ArgumentNullException ex)
+            {
+                LogAndReportException(ex, $"Unable to stop CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -348,12 +304,34 @@ namespace VibesSwap.ViewModel.Pages.Base
             try
             {
                 var targets = SetTargets(parameter);
-                Task.Run(() => CmHttpHelper.CheckCmStatus(host: targets.targetHost, cm: targets.targetCm, hashCode: GetHashCode()));
-                targets.targetCm.CmStatus = CmStates.Polling;
+                Task.Run(() => CmHttpHelper.CheckCmStatus(targets.Item1, targets.Item2, GetHashCode()));
+                targets.Item2.CmStatus = CmStates.Polling;
             }
             catch (ArgumentNullException ex)
             {
                 LogAndReportException(ex, $"Unable to poll CM, Error: {ex.Message}", true);
+            }
+        }
+
+        /// <summary>
+        /// Polls a list of remote CM's
+        /// An event is expected back on command complete, which requires subscribing to CmHttpHelper.PollComplete, in order to update the GUI
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
+        internal void PollAll(object parameter)
+        {
+            try
+            {
+                var targets = SetTargets(parameter);
+                foreach (VibesCm cm in targets.Item3)
+                {
+                    Task.Run(() => CmHttpHelper.CheckCmStatus(targets.Item1, cm, GetHashCode()));
+                    cm.CmStatus = CmStates.Polling;
+                }
+            }
+            catch (ArgumentNullException ex)
+            {
+                LogAndReportException(ex, $"Unable to poll CM's, Error: {ex.Message}", true);
             }
         }
 
@@ -367,25 +345,57 @@ namespace VibesSwap.ViewModel.Pages.Base
             {
                 var targets = SetTargets(parameter);
                 // Block a swap attempt if CM state is not known to avoid sending frivolous ssh commands to server
-                if (targets.targetCm.CmStatus != CmStates.Offline)
+                if (targets.Item2.CmStatus != CmStates.Offline)
                 {
                     MessageBox.Show("CM must be stopped prior to editing!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Log.Error($"Attempted to swap CM {targets.targetCm.CmResourceName} in unknown state, skipped");
+                    Log.Error($"Attempted to swap CM {targets.Item2.CmResourceName} in unknown state, skipped");
                     return;
                 }
-                foreach (DeploymentProperty propertyToChange in targets.targetCm.DeploymentProperties)
+                foreach (DeploymentProperty propertyToChange in targets.Item2.DeploymentProperties)
                 {
                     if (string.IsNullOrEmpty(propertyToChange.SearchPattern) || string.IsNullOrEmpty(propertyToChange.ReplacePattern))
                     {
                         continue;
                     }
-                    Task.Run(() => CmSshHelper.AlterCm(host: targets.targetHost, cm: targets.targetCm, paramToEdit: propertyToChange.SearchPattern, paramToReplace: propertyToChange.ReplacePattern, hashCode: GetHashCode()));
+                    Task.Run(() => CmSshHelper.AlterCm(targets.Item1, targets.Item2, propertyToChange.SearchPattern, propertyToChange.ReplacePattern, GetHashCode()));
                 }
-                if (targets.targetCm.CmStatus != CmStates.CommandSent) targets.targetCm.CmStatus = CmStates.CommandSent;
+                if (targets.Item2.CmStatus != CmStates.CommandSent) targets.Item2.CmStatus = CmStates.CommandSent;
             }
             catch (ArgumentNullException ex)
             {
                 LogAndReportException(ex, $"Unable to modify CM, Error: {ex.Message}", true);
+            }
+        }
+
+        /// <summary>
+        /// Swaps a list of remote CM's deployment properties as configured
+        /// Feedback is returned via CmSshHelper.OnCmCommandComplete
+        /// </summary>
+        /// <param name="parameter">Enum HostTypes</param>
+        internal void SwapAll(object parameter)
+        {
+            try
+            {
+                var targets = SetTargets(parameter);
+                List<VibesCm> cmsToCommand = new List<VibesCm>();
+                foreach (VibesCm cm in targets.Item3)
+                {
+                    if (cm.CmStatus != CmStates.Offline)
+                    {
+                        Log.Error($"Attempted to alter CM {targets.Item2.CmResourceName} in unknown state, skipped");
+                        continue;
+                    }
+                    else
+                    {
+                        cmsToCommand.Add(cm);
+                        cm.CmStatus = CmStates.CommandSent;
+                    }
+                }
+                Task.Run(() => CmSshHelper.AlterCmMultiple(targets.Item1, cmsToCommand, GetHashCode()));
+            }
+            catch (ArgumentNullException ex)
+            {
+                LogAndReportException(ex, $"Unable to alter CM, Error: {ex.Message}", true);
             }
         }
 
@@ -398,7 +408,7 @@ namespace VibesSwap.ViewModel.Pages.Base
             try
             {
                 var targets = SetTargets(parameter);
-                Task.Run(() => CmSshHelper.GetCmParams(host: targets.targetHost, cm: targets.targetCm, hashCode: GetHashCode()));
+                Task.Run(() => CmSshHelper.GetCmParams(targets.Item1, targets.Item2, GetHashCode()));
             }
             catch (ArgumentNullException ex)
             {
@@ -415,7 +425,7 @@ namespace VibesSwap.ViewModel.Pages.Base
             try
             {
                 VibesHost target = SetTargetHost(parameter);
-                Task.Run(() => CmSshHelper.GetHostsFile(host: target, hashCode: GetHashCode()));
+                Task.Run(() => CmSshHelper.GetHostsFile(target, GetHashCode()));
             }
             catch (ArgumentNullException ex)
             {
@@ -432,7 +442,7 @@ namespace VibesSwap.ViewModel.Pages.Base
             try
             {
                 VibesHost target = SetTargetHost(parameter);
-                Task.Run(() => CmSshHelper.SwitchHostsFile(host: target, indMoveToProd: true, hashCode: GetHashCode()));
+                Task.Run(() => CmSshHelper.SwitchHostsFile(target, true, GetHashCode()));
             }
             catch (ArgumentNullException ex)
             {
@@ -449,7 +459,7 @@ namespace VibesSwap.ViewModel.Pages.Base
             try
             {
                 VibesHost target = SetTargetHost(parameter);
-                Task.Run(() => CmSshHelper.SwitchHostsFile(host: target, indMoveToProd: false, hashCode: GetHashCode()));
+                Task.Run(() => CmSshHelper.SwitchHostsFile(target, false, GetHashCode()));
             }
             catch (ArgumentNullException ex)
             {
@@ -492,6 +502,7 @@ namespace VibesSwap.ViewModel.Pages.Base
             if (string.IsNullOrEmpty(cm.CmResourceName)) throw new ArgumentNullException("CM Resource Name");
             if (string.IsNullOrEmpty(cm.CmCorePath)) throw new ArgumentNullException("CM Core Path");
             if (string.IsNullOrEmpty(cm.CmPath)) throw new ArgumentNullException("CM Path");
+            if (string.IsNullOrEmpty(cm.CmPort)) throw new ArgumentNullException("CM Port");
         }
 
         /// <summary>
