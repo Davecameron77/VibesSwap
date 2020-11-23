@@ -217,6 +217,28 @@ namespace VibesSwap.ViewModel.Helpers
         }
 
         /// <summary>
+        /// Gets deployment.properties for a list of supplied CM's
+        /// </summary>
+        /// <param name="host">The host on which the CM is installed</param>
+        /// <param name="cms">The CM to query</param>
+        /// <param name="hashCode">The has of the sending VM</param>
+        public static void GetAllCmParams(VibesHost host, List<VibesCm> cms, int hashCode)
+        {
+            ValidateParameters(host);
+            List<(VibesCm, string command)> commands = new List<(VibesCm, string)>();
+            foreach (VibesCm cm in cms)
+            {
+                string sshCommand = SshCommands.EchoCmProperties(cm);
+                commands.Add((cm, sshCommand));
+            }
+            var results = Task.Run(() => ExecuteMultipleSshCommand(host, commands));
+            foreach (var result in results.Result)
+            {
+                OnCmCommandComplete(result.host, result.cm, result.result, hashCode: hashCode);
+            }
+        }
+
+        /// <summary>
         /// Get hosts file from specified host
         /// </summary>
         /// <param name="host">The host to query</param>
@@ -268,7 +290,7 @@ namespace VibesSwap.ViewModel.Helpers
         /// /// <param name="hashCode">The hashcode of the sender</param>
         private static void OnCmCommandComplete(VibesHost targetHost, VibesCm targetCm, string deploymentProperties, int hashCode)
         {
-            CmCommandComplete?.Invoke(null, new CmHelperEventArgs { Host = targetHost, CmChanged = targetCm, CmStatus = HttpStatusCode.NoContent, DeploymentProperties = deploymentProperties, SubscriberHashCode = hashCode });
+            CmCommandComplete?.Invoke(null, new CmHelperEventArgs { Host = targetHost, CmChanged = targetCm, CmStatus = HttpStatusCode.Continue, DeploymentProperties = deploymentProperties, SubscriberHashCode = hashCode });
         }
 
         /// <summary>
@@ -376,9 +398,9 @@ namespace VibesSwap.ViewModel.Helpers
         /// <param name="host"></param>
         /// <param name="commands"></param>
         /// <returns></returns>
-        private static List<(VibesCm cm, string result)> ExecuteMultipleSshCommand(VibesHost host, List<(VibesCm cm, string command)> commands)
+        private static List<(VibesHost host, VibesCm cm, string result)> ExecuteMultipleSshCommand(VibesHost host, List<(VibesCm cm, string command)> commands)
         {
-            List<(VibesCm cm, string result)> results = new List<(VibesCm cm, string result)>();
+            List<(VibesHost host, VibesCm cm, string result)> results = new List<(VibesHost host, VibesCm cm, string result)>();
 
             // Authentication
             instance.SshPassword = host.SshPassword;
@@ -402,7 +424,7 @@ namespace VibesSwap.ViewModel.Helpers
                             Log.Debug($"Sending multiple SSH command {command.CommandText} to {host.Name}");
                             string result = command.Execute();
 
-                            results.Add((sshCommand.cm, result));
+                            results.Add((host, sshCommand.cm, result));
                             Log.Debug($"Received multiple SSH result {result}");
                         }
                     }

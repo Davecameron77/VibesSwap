@@ -69,6 +69,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static model:HostTypes.COMM1}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
+                        CommandParameter="{x:Static model:HostTypes.COMM1}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="2"
@@ -209,6 +213,10 @@
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.COMM2}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
                         CommandParameter="{x:Static  model:HostTypes.COMM2}"/>
             </StackPanel>
 

@@ -95,6 +95,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Get Hosts"
                         Style="{StaticResource FormButton}"
                         Command="{Binding GetHostsCommand}"
@@ -270,6 +274,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="1"
@@ -432,6 +440,10 @@
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Get Hosts"
                         Style="{StaticResource FormButton}"
@@ -608,6 +620,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Get Hosts"
                         Style="{StaticResource FormButton}"
                         Command="{Binding GetHostsCommand}"
@@ -782,6 +798,10 @@
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
                         CommandParameter="{x:Static  model:HostTypes.MS}"/>
             </StackPanel>
 

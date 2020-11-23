@@ -28,16 +28,19 @@ namespace VibesSwap.ViewModel.Pages
 
             RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(GetProperties);
+            GetAllPropsCommand = new RelayCommand(GetAllProperties);
+            PrePopulateTermsCommand = new RelayCommand(PrePopulateTargets);
+            SwitchTermsCommand = new RelayCommand(SwapPropertyTargets);
+
             StartCmCommand = new RelayCommand(StartCm);
             StopCmCommand = new RelayCommand(StopCm);
             PollCmCommand = new RelayCommand(PollCm);
             SwapCmCommand = new RelayCommand(SwapCm);
+
             StartAllCommand = new RelayCommand(StartAll);
             StopAllCommand = new RelayCommand(StopAll);
             SwapAllCommand = new RelayCommand(SwapAll);
-            PollAllCommand = new RelayCommand(PollAll);
-            SwitchTermsCommand = new RelayCommand(SwapPropertyTargets);
-            PrePopulateTermsCommand = new RelayCommand(PrePopulateTargets);
+            PollAllCommand = new RelayCommand(PollAll);      
 
             CmHttpHelper.PollComplete += OnPollComplete;
             CmSshHelper.CmCommandComplete += OnCmCommandComplete;
@@ -104,6 +107,7 @@ namespace VibesSwap.ViewModel.Pages
         public RelayCommand StopAllCommand { get; set; }
         public RelayCommand PollAllCommand { get; set; }
         public RelayCommand SwapAllCommand { get; set; }
+        public RelayCommand GetAllPropsCommand { get; set; }
 
         #endregion
 
@@ -125,9 +129,11 @@ namespace VibesSwap.ViewModel.Pages
                     using (DataContext context = new DataContext())
                     {
                         VibesCm newCm = context.HostCms.Where(c => c.Id == cmChanged.Id).Include(c => c.DeploymentProperties).Include(c => c.VibesHost).FirstOrDefault().DeepCopy();
+                        newCm.CmStatus = CmStates.Updated;
 
                         if (CmsDisplayCommOne.Contains(cmChanged))
                         {
+                            
                             CmsDisplayCommOne.Remove(CmsDisplayCommOne.Single(c => c.Id == cmChanged.Id));
                             CmsDisplayCommOne.Add(newCm);
                             SelectedCmCommOne = newCm;
@@ -297,6 +303,9 @@ namespace VibesSwap.ViewModel.Pages
                         case HttpStatusCode.NoContent:
                             CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
                             break;
+                        case HttpStatusCode.Continue:
+                            CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Updated;
+                            break;
                         default:
                             CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
                             PollCmAsync(CmsDisplayCommOne.Single(c => c.Id == e.CmChanged.Id));
@@ -316,6 +325,9 @@ namespace VibesSwap.ViewModel.Pages
                         case HttpStatusCode.NoContent:
                             CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
                             break;
+                        case HttpStatusCode.Continue:
+                            CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Updated;
+                            break;
                         default:
                             CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
                             PollCmAsync(CmsDisplayCommTwo.Single(c => c.Id == e.CmChanged.Id));
@@ -334,7 +346,7 @@ namespace VibesSwap.ViewModel.Pages
                 }
 
                 // Popup hosts
-                if (e.Host != null && (e.Host.HostType == HostTypes.COMM1 || e.Host.HostType == HostTypes.COMM2))
+                if (e.HostsFile != null && e.Host != null && (e.Host.HostType == HostTypes.COMM1 || e.Host.HostType == HostTypes.COMM2))
                 {
                     PopupHostsFile(e);
                 }

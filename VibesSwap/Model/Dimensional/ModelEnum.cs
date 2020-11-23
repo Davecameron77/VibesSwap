@@ -35,6 +35,7 @@
         Unchecked,
         Polling,
         CommandSent,
+        Updated,
         Altered
     }
 

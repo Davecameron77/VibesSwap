@@ -36,6 +36,7 @@ namespace VibesSwap.ViewModel.Pages
 
             RefreshCommand = new RelayCommand(LoadData);
             UpdatePropertiesCommand = new RelayCommand(GetProperties);
+            GetAllPropsCommand = new RelayCommand(GetAllProperties);
             GetHostsCommand = new RelayCommand(GetHosts);
             SetProdHostsCommand = new RelayCommand(SetProdHosts);
             SetHlcHostsCommand = new RelayCommand(SetHlcHosts);
@@ -173,6 +174,7 @@ namespace VibesSwap.ViewModel.Pages
         public RelayCommand StopAllCommand { get; set; }
         public RelayCommand PollAllCommand { get; set; }
         public RelayCommand SwapAllCommand { get; set; }
+        public RelayCommand GetAllPropsCommand { get; set; }
 
         #endregion
 
@@ -194,6 +196,7 @@ namespace VibesSwap.ViewModel.Pages
                     if (parameter is VibesCm cmChanged)
                     {
                         VibesCm newCm = context.HostCms.Where(c => c.Id == cmChanged.Id).Include(c => c.DeploymentProperties).Include(c => c.VibesHost).FirstOrDefault().DeepCopy();
+                        newCm.CmStatus = CmStates.Updated;
 
                         if (CmsDisplayExec.Contains(cmChanged))
                         {
@@ -310,70 +313,63 @@ namespace VibesSwap.ViewModel.Pages
         /// <param name="target">The host to swap CM's on</param>
         internal sealed override void SwapPropertyTargets(object target)
         {
-            try
+            switch (target)
             {
-                switch (target)
-                {
-                    case HostTypes.EXEC:
-                        foreach (VibesCm cm in CmsDisplayExec)
+                case HostTypes.EXEC:
+                    foreach (VibesCm cm in CmsDisplayExec)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
-                            {
-                                string temp = property.SearchPattern;
-                                property.SearchPattern = property.ReplacePattern;
-                                property.ReplacePattern = temp;
-                            }
+                            string temp = property.SearchPattern;
+                            property.SearchPattern = property.ReplacePattern;
+                            property.ReplacePattern = temp;
                         }
-                        break;
-                    case HostTypes.OPERDB:
-                        foreach (VibesCm cm in CmsDisplayOperDb)
+                    }
+                    break;
+                case HostTypes.OPERDB:
+                    foreach (VibesCm cm in CmsDisplayOperDb)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
-                            {
-                                string temp = property.SearchPattern;
-                                property.SearchPattern = property.ReplacePattern;
-                                property.ReplacePattern = temp;
-                            }
+                            string temp = property.SearchPattern;
+                            property.SearchPattern = property.ReplacePattern;
+                            property.ReplacePattern = temp;
                         }
-                        break;
-                    case HostTypes.OPERAPP1:
-                        foreach (VibesCm cm in CmsDisplayOperAppOne)
+                    }
+                    break;
+                case HostTypes.OPERAPP1:
+                    foreach (VibesCm cm in CmsDisplayOperAppOne)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
-                            {
-                                string temp = property.SearchPattern;
-                                property.SearchPattern = property.ReplacePattern;
-                                property.ReplacePattern = temp;
-                            }
+                            string temp = property.SearchPattern;
+                            property.SearchPattern = property.ReplacePattern;
+                            property.ReplacePattern = temp;
                         }
-                        break;
-                    case HostTypes.OPERAPP2:
-                        foreach (VibesCm cm in CmsDisplayOperAppTwo)
+                    }
+                    break;
+                case HostTypes.OPERAPP2:
+                    foreach (VibesCm cm in CmsDisplayOperAppTwo)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
-                            {
-                                string temp = property.SearchPattern;
-                                property.SearchPattern = property.ReplacePattern;
-                                property.ReplacePattern = temp;
-                            }
+                            string temp = property.SearchPattern;
+                            property.SearchPattern = property.ReplacePattern;
+                            property.ReplacePattern = temp;
                         }
-                        break;
-                    case HostTypes.MS:
-                        foreach (VibesCm cm in CmsDisplayMs)
+                    }
+                    break;
+                case HostTypes.MS:
+                    foreach (VibesCm cm in CmsDisplayMs)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
-                            {
-                                string temp = property.SearchPattern;
-                                property.SearchPattern = property.ReplacePattern;
-                                property.ReplacePattern = temp;
-                            }
+                            string temp = property.SearchPattern;
+                            property.SearchPattern = property.ReplacePattern;
+                            property.ReplacePattern = temp;
                         }
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogAndReportException(ex, $"Error swapping property terms: {ex.Message}", false);
+                    }
+                    break;
             }
         }
 
@@ -383,80 +379,73 @@ namespace VibesSwap.ViewModel.Pages
         /// <param name="target">The host to pre-populate CM's on</param>
         internal sealed override void PrePopulateTargets(object target)
         {
-            try
+            switch (target)
             {
-                switch (target)
-                {
-                    case HostTypes.EXEC:
-                        foreach (VibesCm cm in CmsDisplayExec)
+                case HostTypes.EXEC:
+                    foreach (VibesCm cm in CmsDisplayExec)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                if (property.PropertyValue.Contains("cm-bpi11"))
-                                {
-                                    property.SearchPattern = "cm-bpi11";
-                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
-                                }
+                                property.SearchPattern = "cm-bpi11";
+                                property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
-                        break;
-                    case HostTypes.OPERDB:
-                        foreach (VibesCm cm in CmsDisplayOperDb)
+                    }
+                    break;
+                case HostTypes.OPERDB:
+                    foreach (VibesCm cm in CmsDisplayOperDb)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                if (property.PropertyValue.Contains("cm-bpi11"))
-                                {
-                                    property.SearchPattern = "cm-bpi11";
-                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
-                                }
+                                property.SearchPattern = "cm-bpi11";
+                                property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
-                        break;
-                    case HostTypes.OPERAPP1:
-                        foreach (VibesCm cm in CmsDisplayOperAppOne)
+                    }
+                    break;
+                case HostTypes.OPERAPP1:
+                    foreach (VibesCm cm in CmsDisplayOperAppOne)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                if (property.PropertyValue.Contains("cm-bpi11"))
-                                {
-                                    property.SearchPattern = "cm-bpi11";
-                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
-                                }
+                                property.SearchPattern = "cm-bpi11";
+                                property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
-                        break;
-                    case HostTypes.OPERAPP2:
-                        foreach (VibesCm cm in CmsDisplayOperAppTwo)
+                    }
+                    break;
+                case HostTypes.OPERAPP2:
+                    foreach (VibesCm cm in CmsDisplayOperAppTwo)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                if (property.PropertyValue.Contains("cm-bpi11"))
-                                {
-                                    property.SearchPattern = "cm-bpi11";
-                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
-                                }
+                                property.SearchPattern = "cm-bpi11";
+                                property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
-                        break;
-                    case HostTypes.MS:
-                        foreach (VibesCm cm in CmsDisplayMs)
+                    }
+                    break;
+                case HostTypes.MS:
+                    foreach (VibesCm cm in CmsDisplayMs)
+                    {
+                        foreach (DeploymentProperty property in cm.DeploymentProperties)
                         {
-                            foreach (DeploymentProperty property in cm.DeploymentProperties)
+                            if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                if (property.PropertyValue.Contains("cm-bpi11"))
-                                {
-                                    property.SearchPattern = "cm-bpi11";
-                                    property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
-                                }
+                                property.SearchPattern = "cm-bpi11";
+                                property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogAndReportException(ex, $"Error swapping property terms: {ex.Message}", false);
+                    }
+                    break;
             }
         }
 
@@ -503,7 +492,7 @@ namespace VibesSwap.ViewModel.Pages
             }
             catch (Exception ex)
             {
-                LogAndReportException(ex, $"Error updating GUI with CM changes: {ex.Message}", false);
+                LogAndReportException(ex, $"Error updating VIBES Swap GUI with HTTP status: {ex.Message}", false);
             }
         }
 
@@ -537,6 +526,9 @@ namespace VibesSwap.ViewModel.Pages
                         case HttpStatusCode.NoContent:
                             CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
                             break;
+                        case HttpStatusCode.Continue:
+                            CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Updated;
+                            break;
                         default:
                             CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
                             PollCmAsync(CmsDisplayExec.Single(c => c.Id == e.CmChanged.Id));
@@ -555,6 +547,9 @@ namespace VibesSwap.ViewModel.Pages
                             break;
                         case HttpStatusCode.NoContent:
                             CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
+                            break;
+                        case HttpStatusCode.Continue:
+                            CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Updated;
                             break;
                         default:
                             CmsDisplayOperDb.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
@@ -575,6 +570,9 @@ namespace VibesSwap.ViewModel.Pages
                         case HttpStatusCode.NoContent:
                             CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
                             break;
+                        case HttpStatusCode.Continue:
+                            CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Updated;
+                            break;
                         default:
                             CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
                             PollCmAsync(CmsDisplayOperAppOne.Single(c => c.Id == e.CmChanged.Id));
@@ -593,6 +591,9 @@ namespace VibesSwap.ViewModel.Pages
                             break;
                         case HttpStatusCode.NoContent:
                             CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
+                            break;
+                        case HttpStatusCode.Continue:
+                            CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Updated;
                             break;
                         default:
                             CmsDisplayOperAppTwo.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
@@ -613,6 +614,9 @@ namespace VibesSwap.ViewModel.Pages
                         case HttpStatusCode.NoContent:
                             CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Altered;
                             break;
+                        case HttpStatusCode.Continue:
+                            CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Updated;
+                            break;
                         default:
                             CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id).CmStatus = CmStates.Unchecked;
                             PollCmAsync(CmsDisplayMs.Single(c => c.Id == e.CmChanged.Id));
@@ -631,14 +635,14 @@ namespace VibesSwap.ViewModel.Pages
                 }
 
                 // Popup hosts
-                if (e.Host != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2))
+                if (e.HostsFile != null && e.Host != null && (e.Host.HostType == HostTypes.EXEC || e.Host.HostType == HostTypes.OPERAPP1 || e.Host.HostType == HostTypes.OPERAPP2))
                 {
                     PopupHostsFile(e);
                 }
             }
             catch (Exception ex)
             {
-                LogAndReportException(ex, $"Error updating GUI with CM changes: {ex.Message}", false);
+                LogAndReportException(ex, $"Error updating Vibes CM swap GUI with CM changes: {ex.Message}", false);
             }
         }
 
