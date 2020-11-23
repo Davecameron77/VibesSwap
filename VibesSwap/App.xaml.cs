@@ -61,7 +61,7 @@ namespace VibesSwap
         #region Methods
 
         /// <summary>
-        /// Configures services for Dependency Injection
+        /// Configures services for Dependency Injection, set logging level here
         /// </summary>
         /// <param name="services">IServiceCollection of Services</param>
         internal void ConfigureServices(IServiceCollection services)
