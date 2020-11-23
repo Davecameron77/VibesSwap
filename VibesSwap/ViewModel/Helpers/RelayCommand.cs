@@ -28,7 +28,7 @@ namespace VibesSwap.ViewModel.Helpers
         /// <remarks><seealso cref="CanExecute"/> will always return true.</remarks>
         public RelayCommand(Action<object> execute) : this(execute, null)
         {
-            
+
         }
 
         #endregion

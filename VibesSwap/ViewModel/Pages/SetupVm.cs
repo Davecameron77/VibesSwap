@@ -29,8 +29,6 @@ namespace VibesSwap.ViewModel.Pages
 
         #region Members
 
-        private ILogger _logger { get; }
-
         public ObservableCollection<VibesHost> DisplayHosts { get; set; }
         public ObservableCollection<VibesCm> DisplayCms { get; set; }
         public List<string> HostTypes { get; set; }
@@ -44,8 +42,8 @@ namespace VibesSwap.ViewModel.Pages
         public VibesHost SelectedHost
         {
             get { return _selectedHost; }
-            set 
-            { 
+            set
+            {
                 if (value != null)
                 {
                     _selectedHost = value;
@@ -61,8 +59,8 @@ namespace VibesSwap.ViewModel.Pages
         public string SelectedHostType
         {
             get { return _selectedHostTYpe; }
-            set 
-            { 
+            set
+            {
                 if (value != null)
                 {
                     _selectedHostTYpe = value;
@@ -159,7 +157,7 @@ namespace VibesSwap.ViewModel.Pages
         {
             try
             {
-                switch(type)
+                switch (type)
                 {
                     case GuiObjectTypes.VibesHost:
                         using (DataContext context = new DataContext())
@@ -215,7 +213,7 @@ namespace VibesSwap.ViewModel.Pages
                 Log.Error($"Error loading data to GUI: {ex.Message}");
             }
         }
-        
+
         /// <summary>
         /// Load boilerplate data only when no data is configured locally
         /// </summary>
@@ -243,7 +241,7 @@ namespace VibesSwap.ViewModel.Pages
             {
                 Log.Error($"Error loading boilerplate data: {ex.Message}");
             }
-            
+
         }
 
         /// <summary>
@@ -312,8 +310,9 @@ namespace VibesSwap.ViewModel.Pages
                         }
                         using (DataContext context = new DataContext())
                         {
-                            context.Add(new VibesCm { 
-                                CmResourceName = "Please enter a CM resource name", 
+                            context.Add(new VibesCm
+                            {
+                                CmResourceName = "Please enter a CM resource name",
                                 VibesHost = context.EnvironmentHosts.SingleOrDefault(h => h.Id == SelectedHost.Id),
                                 VibesHostId = context.EnvironmentHosts.SingleOrDefault(h => h.Id == SelectedHost.Id).Id
                             });

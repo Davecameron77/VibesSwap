@@ -15,7 +15,6 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -95,6 +94,10 @@
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
                         CommandParameter="{x:Static  model:HostTypes.EXEC}"/>
                 <Button Content="Get Hosts"
                         Style="{StaticResource FormButton}"
@@ -271,6 +274,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.OPERDB}"/>
             </StackPanel>
 
             <DataGrid Grid.Row="1"
@@ -433,6 +440,10 @@
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERAPP1}"/>
                 <Button Content="Get Hosts"
                         Style="{StaticResource FormButton}"
@@ -609,6 +620,10 @@
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
                         CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.OPERAPP2}"/>
                 <Button Content="Get Hosts"
                         Style="{StaticResource FormButton}"
                         Command="{Binding GetHostsCommand}"
@@ -721,172 +736,9 @@
 
         <!--#endregion-->
 
-        <!--#region ENS-->
-
-        <Grid Grid.Row="5"
-              Grid.Column="0"
-              Grid.ColumnSpan="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"
-                                  MinWidth="200 "/>
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="2*"
-                                  MinWidth="400"/>
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="3*"
-                                  MinWidth="400"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Row="0"
-                       Grid.Column="0"
-                       Style="{StaticResource PageSubHeader}"
-                       Text="ENS" />
-
-            <ListBox Grid.Row="1"
-                     Grid.Column="0"
-                     ItemsSource="{Binding HostsDisplayEns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     SelectedItem="{Binding SelectedHostEns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource FormListBox}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-
-            <GridSplitter Grid.Row="0"
-                          Grid.Column="1"
-                          Grid.RowSpan="2"
-                          Width="3"
-                          HorizontalAlignment="Center"
-                          Background="LightGray" />
-
-            <StackPanel Grid.Row="0"
-                        Grid.Column="2"
-                        Orientation="Horizontal">
-                <Button Content="Poll All CM's"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding PollAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-                <Button Content="Start All CM's"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding StartAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-                <Button Content="Stop All CM's"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding StopAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-                <Button Content="Swap All CM's"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding SwapAllCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-            </StackPanel>
-
-            <DataGrid Grid.Row="1"
-                      Grid.Column="2"
-                      CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayEns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding SelectedCmEns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      Style="{StaticResource FormDataGrid}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="CM Type"
-                                        Width="Auto"
-                                        IsReadOnly="True"
-                                        Binding="{Binding CmType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTextColumn Header="CM"
-                                        Width="*"
-                                        IsReadOnly="True"
-                                        Binding="{Binding CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTextColumn Header="CM Status"
-                                        Width="Auto"
-                                        MinWidth="120"
-                                        IsReadOnly="True"
-                                        Binding="{Binding CmStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                </DataGrid.Columns>
-            </DataGrid>
-
-            <GridSplitter Grid.Row="0"
-                          Grid.Column="3"
-                          Grid.RowSpan="2"
-                          Width="3"
-                          HorizontalAlignment="Center"
-                          Background="LightGray" />
-
-            <StackPanel Grid.Row="0"
-                        Grid.Column="4"
-                        Orientation="Horizontal">
-                <Button Content="Poll CM"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding PollCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-                <Button Content="Start CM"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding StartCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-                <Button Content="Stop CM"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding StopCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-                <Button Content="Swap CM"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding SwapCmCommand}"
-                        CommandParameter="{x:Static  model:HostTypes.ENS}"/>
-                <Button Content="Get Properties"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding UpdatePropertiesCommand}"
-                        CommandParameter="{x:Static model:HostTypes.ENS}"/>
-                <Separator Width="20" />
-                <Button Content="Switch Terms"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding SwitchTermsCommand}"
-                        CommandParameter="{x:Static model:HostTypes.ENS}"/>
-                <Button Content="Prepopulate Terms"
-                        Style="{StaticResource FormButton}"
-                        Command="{Binding PrePopulateTermsCommand}"
-                        CommandParameter="{x:Static model:HostTypes.ENS}"/>
-            </StackPanel>
-
-            <DataGrid Grid.Row="1"
-                      Grid.Column="4"
-                      ItemsSource="{Binding SelectedCmEns.DeploymentProperties}"
-                      CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      AutoGenerateColumns="False"
-                      Style="{StaticResource FormDataGrid}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Property"
-                                        IsReadOnly="True"
-                                        Width="Auto"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTextColumn Header="Value"
-                                        IsReadOnly="True"
-                                        Width="500"
-                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTextColumn Header="Search Pattern"
-                                        IsReadOnly="False"
-                                        Width="*"
-                                        MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <DataGridTextColumn Header="Replace Pattern"
-                                        IsReadOnly="False"
-                                        Width="*"
-                                        MinWidth="200"
-                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </Grid>
-
-        <!--#endregion-->
-
         <!--#region MS-->
 
-        <Grid Grid.Row="6"
+        <Grid Grid.Row="5"
               Grid.Column="0"
               Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
@@ -946,6 +798,10 @@
                 <Button Content="Swap All CM's"
                         Style="{StaticResource FormButton}"
                         Command="{Binding SwapAllCommand}"
+                        CommandParameter="{x:Static  model:HostTypes.MS}"/>
+                <Button Content="Get All Props"
+                        Style="{StaticResource FormButton}"
+                        Command="{Binding GetAllPropsCommand}"
                         CommandParameter="{x:Static  model:HostTypes.MS}"/>
             </StackPanel>
 

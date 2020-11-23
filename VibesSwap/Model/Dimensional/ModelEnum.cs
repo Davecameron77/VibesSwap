@@ -9,8 +9,7 @@
         OPERAPP1,
         OPERAPP2,
         MS,
-        BPI,
-        ENS
+        BPI
     }
 
     public enum CmTypes
@@ -23,7 +22,6 @@
         CM_ODB,
         CM_BPI,
         CM_MS,
-        CM_ENS,
         CM_MDS,
         CM_PSS,
         CM_BSIS,
@@ -37,6 +35,19 @@
         Unchecked,
         Polling,
         CommandSent,
+        Updated,
         Altered
+    }
+
+    internal enum GuiObjectTypes
+    {
+        VibesHost = 1,
+        VibesCm = 2
+    }
+
+    internal enum GuiOperations
+    {
+        Add = 1,
+        Remove = 2
     }
 }

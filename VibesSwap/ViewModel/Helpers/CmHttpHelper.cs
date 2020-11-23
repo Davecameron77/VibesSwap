@@ -54,7 +54,7 @@ namespace VibesSwap.ViewModel.Helpers
                 if (hostToCheck == null || cmToCheck == null)
                 {
                     string missingParameter = hostToCheck == null ? "Selected Host" : "Selected CM";
-                    throw new Exception($"Error starting/stopping/editing CM, Missing parameter {missingParameter}");
+                    throw new Exception($"Error polling CM, Missing parameter {missingParameter}");
                 }
 
                 int.TryParse(cmToCheck.CmPort, out int port);
@@ -82,7 +82,7 @@ namespace VibesSwap.ViewModel.Helpers
             catch (Exception ex)
             {
                 // HTTP timeout, CM offline
-                if(ex.Message.Contains("A task was canceled."))
+                if (ex.Message.Contains("A task was canceled."))
                 {
                     Log.Information($"HTTP error: Request to {cmToCheck.CmResourceName} timed out");
                     statusCode = HttpStatusCode.RequestTimeout;
@@ -90,7 +90,7 @@ namespace VibesSwap.ViewModel.Helpers
                     return statusCode;
                 }
                 // Unkonwn Host
-                else if(ex.InnerException.ToString().Contains("The remote name could not be resolved"))
+                else if (ex.InnerException.ToString().Contains("The remote name could not be resolved"))
                 {
                     Log.Information($"HTTP error: Unable to resolve hostname {cmToCheck.VibesHost.Url} for CM {cmToCheck.CmResourceName}");
                     statusCode = HttpStatusCode.NotFound;
@@ -110,7 +110,7 @@ namespace VibesSwap.ViewModel.Helpers
                 Log.Error($"Stack Trace: {ex.StackTrace}");
                 OnPollComplete(cmToCheck, statusCode, hashCode);
             }
-            
+
             OnPollComplete(cmToCheck, statusCode, hashCode);
             return statusCode;
         }

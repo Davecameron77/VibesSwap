@@ -16,6 +16,10 @@ namespace VibesSwap
     {
         #region Constructors
 
+        /// <summary>
+        /// Constructor for application
+        /// Sets up logging and other services as configured
+        /// </summary>
         public App()
         {
             try
@@ -56,6 +60,10 @@ namespace VibesSwap
 
         #region Methods
 
+        /// <summary>
+        /// Configures services for Dependency Injection
+        /// </summary>
+        /// <param name="services">IServiceCollection of Services</param>
         internal void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<MainWindow>();
@@ -64,9 +72,15 @@ namespace VibesSwap
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .WriteTo.RollingFile(Path.Combine(StaticGlobals.GetAppDirectory(), "VibesSwap-{Date}.log"), fileSizeLimitBytes: 5242880, retainedFileCountLimit: 5)
+                .MinimumLevel.Information()
                 .CreateLogger();
         }
 
+        /// <summary>
+        /// Adds MainWindow to Dependency Injection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnStartup(object sender, StartupEventArgs e)
         {
             var MainWindow = _serviceProvider.GetService<MainWindow>();

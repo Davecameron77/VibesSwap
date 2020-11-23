@@ -210,8 +210,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Model\Dimensional\SshCommand.cs" />
     <Compile Include="Model\Dimensional\VibesSwapSshCommand.cs" />
+    <Compile Include="ViewModel\Helpers\SshCommands.cs" />
     <Compile Include="ViewModel\Pages\Base\CmControlBase.cs" />
     <Compile Include="ViewModel\Helpers\CmHelperEventArgs.cs" />
     <Compile Include="Model\DataContext.cs" />
@@ -223,7 +223,6 @@
     <Compile Include="ViewModel\Helpers\CmSshHelper.cs" />
     <Compile Include="ViewModel\Helpers\RelayCommand.cs" />
     <Compile Include="ViewModel\Helpers\StaticGlobals.cs" />
-    <Compile Include="ViewModel\Helpers\ViewModelEnum.cs" />
     <Compile Include="ViewModel\Pages\EcSwapVm.cs" />
     <Compile Include="ViewModel\Pages\SetupVm.cs" />
     <Compile Include="ViewModel\Pages\VibesCmSwapVm.cs" />
