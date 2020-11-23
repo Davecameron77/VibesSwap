@@ -72,7 +72,7 @@ namespace VibesSwap
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .WriteTo.RollingFile(Path.Combine(StaticGlobals.GetAppDirectory(), "VibesSwap-{Date}.log"), fileSizeLimitBytes: 5242880, retainedFileCountLimit: 5)
-                .MinimumLevel.Error()
+                .MinimumLevel.Information()
                 .CreateLogger();
         }
 
