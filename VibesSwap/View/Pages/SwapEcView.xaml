@@ -80,7 +80,7 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding CmsDisplayCommOne, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedItem="{Binding SelectedCmCommOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource FormDataGrid}">
                 <DataGrid.Columns>
@@ -152,22 +152,22 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyKey, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="500"
-                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -225,7 +225,7 @@
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding CmsDisplayCommTwo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding CmsDisplayCommTwo, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedItem="{Binding SelectedCmCommTwo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource FormDataGrid}">
                 <DataGrid.Columns>
@@ -298,21 +298,21 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyKey, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="500"
-                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

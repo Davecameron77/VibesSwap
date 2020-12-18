@@ -59,7 +59,7 @@
 
             <ListBox Grid.Row="1"
                      Grid.Column="0"
-                     ItemsSource="{Binding HostsDisplayExec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ItemsSource="{Binding HostsDisplayExec, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      SelectedItem="{Binding SelectedHostExec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource FormListBox}">
                 <ListBox.ItemTemplate>
@@ -190,21 +190,21 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyKey, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="500"
-                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -238,7 +238,7 @@
 
             <ListBox Grid.Row="1"
                      Grid.Column="0"
-                     ItemsSource="{Binding HostsDisplayOperDb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ItemsSource="{Binding HostsDisplayOperDb, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      SelectedItem="{Binding SelectedHostOperDb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource FormListBox}">
                 <ListBox.ItemTemplate>
@@ -357,21 +357,21 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyKey, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="500"
-                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -405,7 +405,7 @@
 
             <ListBox Grid.Row="1"
                      Grid.Column="0"
-                     ItemsSource="{Binding HostsDisplayOperAppOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ItemsSource="{Binding HostsDisplayOperAppOne, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      SelectedItem="{Binding SelectedHostOperAppOne, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource FormListBox}">
                 <ListBox.ItemTemplate>
@@ -536,21 +536,21 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyKey, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="500"
-                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -584,7 +584,7 @@
 
             <ListBox Grid.Row="1"
                      Grid.Column="0"
-                     ItemsSource="{Binding HostsDisplayOperAppTwo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ItemsSource="{Binding HostsDisplayOperAppTwo, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      SelectedItem="{Binding SelectedHostOperAppTwo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource FormListBox}">
                 <ListBox.ItemTemplate>
@@ -715,21 +715,21 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyKey, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="500"
-                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -763,7 +763,7 @@
 
             <ListBox Grid.Row="1"
                      Grid.Column="0"
-                     ItemsSource="{Binding HostsDisplayMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ItemsSource="{Binding HostsDisplayMs, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      SelectedItem="{Binding SelectedHostMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource FormListBox}">
                 <ListBox.ItemTemplate>
@@ -882,21 +882,21 @@
                     <DataGridTextColumn Header="Property"
                                         IsReadOnly="True"
                                         Width="Auto"
-                                        Binding="{Binding PropertyKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyKey, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Value"
                                         IsReadOnly="True"
                                         Width="500"
-                                        Binding="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding PropertyValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     <DataGridTextColumn Header="Search Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding SearchPattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                     <DataGridTextColumn Header="Replace Pattern"
                                         IsReadOnly="False"
                                         Width="*"
                                         MinWidth="200"
-                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Binding="{Binding ReplacePattern, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

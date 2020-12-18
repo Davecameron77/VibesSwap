@@ -53,7 +53,7 @@
             <ListBox Grid.Row="1"
                      Grid.Column="0"
                      Grid.ColumnSpan="2"
-                     ItemsSource="{Binding DisplayHosts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ItemsSource="{Binding DisplayHosts, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      SelectedItem="{Binding SelectedHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      DisplayMemberPath="Name" />
 
@@ -99,7 +99,7 @@
             <TextBox Grid.Row="6"
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditHost}"
-                     Text="{Binding SelectedHost.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedHost.Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Style="{StaticResource FormTextBox}"/>
 
             <TextBlock Grid.Row="7"
@@ -109,7 +109,7 @@
             <TextBox Grid.Row="7"
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditHost}"
-                     Text="{Binding SelectedHost.Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedHost.Url, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Style="{StaticResource FormTextBox}"/>
 
             <TextBlock Grid.Row="8"
@@ -119,7 +119,7 @@
             <TextBox Grid.Row="8"
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditHost}"
-                     Text="{Binding SelectedHost.SshUsername, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedHost.SshUsername, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Style="{StaticResource FormTextBox}"/>
 
             <TextBlock Grid.Row="9"
@@ -129,7 +129,7 @@
             <TextBox Grid.Row="9"
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditHost}"
-                     Text="{Binding SelectedHost.SshPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedHost.SshPassword, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Style="{StaticResource FormTextBox}"
                      FontFamily="pack://application:,,,/View/Style/#password">
                 <TextBox.InputBindings>
@@ -175,7 +175,7 @@
             <ListBox Grid.Row="1"
                      Grid.Column="0"
                      Grid.ColumnSpan="2"
-                     ItemsSource="{Binding DisplayCms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ItemsSource="{Binding DisplayCms, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      SelectedItem="{Binding SelectedCm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      DisplayMemberPath="CmResourceName" />
 
@@ -211,7 +211,7 @@
             <TextBox Grid.Row="5"
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditCm}"
-                     Text="{Binding SelectedCm.CmResourceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedCm.CmResourceName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Style="{StaticResource FormTextBox}"/>
 
             <TextBlock Grid.Row="6"
@@ -221,7 +221,7 @@
             <TextBox Grid.Row="6"
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditCm}"
-                     Text="{Binding SelectedCm.CmCorePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedCm.CmCorePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Style="{StaticResource FormTextBox}"/>
 
             <TextBlock Grid.Row="7"
@@ -231,7 +231,7 @@
             <TextBox Grid.Row="7"
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditCm}"
-                     Text="{Binding SelectedCm.CmPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedCm.CmPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Style="{StaticResource FormTextBox}"/>
 
             <TextBlock Grid.Row="8"
@@ -241,7 +241,7 @@
             <TextBox Grid.Row="8"
                      Grid.Column="1"
                      IsEnabled="{Binding CanEditCm}"
-                     Text="{Binding SelectedCm.CmPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedCm.CmPort, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                      Style="{StaticResource FormTextBox}"/>
         </Grid>
         

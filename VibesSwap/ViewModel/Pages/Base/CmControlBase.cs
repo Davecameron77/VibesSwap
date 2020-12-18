@@ -44,6 +44,8 @@ namespace VibesSwap.ViewModel.Pages.Base
                         foreach (VibesCm cm in context.HostCms.Where(c => c.VibesHostId == host.Id).Include(c => c.DeploymentProperties).Include(c => c.VibesHost).OrderBy(c => c.CmResourceName))
                         {
                             var newCm = cm.DeepCopy();
+                            newCm.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);
+
                             foreach (DeploymentProperty prop in newCm.DeploymentProperties)
                             {
                                 prop.PropertyChanged += new PropertyChangedEventHandler(PersistTargetChanges);

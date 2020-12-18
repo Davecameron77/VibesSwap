@@ -23,7 +23,7 @@ namespace VibesSwap.ViewModel.Pages.Base
         #endregion
 
         #region Methods
-
+        
         /// <summary>
         /// Autosave CM changes when PropertyChanged fires, used to save objects on keypress
         /// </summary>
@@ -31,6 +31,12 @@ namespace VibesSwap.ViewModel.Pages.Base
         /// <param name="args">Propertychanged args</param>
         internal void PersistTargetChanges(object sender, PropertyChangedEventArgs args)
         {
+            // Stop execution if sender is VM
+            if (sender is SetupVm || sender is VibesCmSwapVm || sender is EcSwapVm)
+            {
+                return;
+            }
+
             try
             {
                 // Host on setup page
@@ -69,6 +75,7 @@ namespace VibesSwap.ViewModel.Pages.Base
                 // CM deployment properties on swap page
                 else if (sender is DeploymentProperty property)
                 {
+                    Log.Information($"PropertyChanged Called, sender is {property.PropertyKey} and CM is {property.Cm.CmResourceName}");
                     using (DataContext context = new DataContext())
                     {
                         if (context.HostCms.Any(p => p.Id == property.CmId))
@@ -80,10 +87,6 @@ namespace VibesSwap.ViewModel.Pages.Base
                             context.SaveChanges();
                         }
                     }
-                }
-                else if (sender is VibesCmSwapVm || sender is EcSwapVm)
-                {
-                    return;
                 }
                 else
                 {
