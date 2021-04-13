@@ -216,7 +216,7 @@ namespace VibesSwap.ViewModel.Pages
                         {
                             if (property.PropertyValue.Contains("cm-lm11"))
                             {
-                                property.SearchPattern = "cm-lm11";
+                                property.SearchPattern = "cm-lm11.yvr.com";
                                 property.ReplacePattern = "cm-lm11.hlcvibes.yvr.com";
                             }
                         }
@@ -229,7 +229,7 @@ namespace VibesSwap.ViewModel.Pages
                         {
                             if (property.PropertyValue.Contains("cm-lm11"))
                             {
-                                property.SearchPattern = "cm-lm11";
+                                property.SearchPattern = "cm-lm11.yvr.com";
                                 property.ReplacePattern = "cm-lm11.hlcvibes.yvr.com";
                             }
                         }

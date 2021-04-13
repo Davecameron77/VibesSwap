@@ -388,7 +388,7 @@ namespace VibesSwap.ViewModel.Pages
                         {
                             if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                property.SearchPattern = "cm-bpi11";
+                                property.SearchPattern = "cm-bpi11.yvr.com";
                                 property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
@@ -401,7 +401,7 @@ namespace VibesSwap.ViewModel.Pages
                         {
                             if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                property.SearchPattern = "cm-bpi11";
+                                property.SearchPattern = "cm-bpi11.yvr.com";
                                 property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
@@ -414,7 +414,7 @@ namespace VibesSwap.ViewModel.Pages
                         {
                             if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                property.SearchPattern = "cm-bpi11";
+                                property.SearchPattern = "cm-bpi11.yvr.com";
                                 property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
@@ -427,7 +427,7 @@ namespace VibesSwap.ViewModel.Pages
                         {
                             if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                property.SearchPattern = "cm-bpi11";
+                                property.SearchPattern = "cm-bpi11.yvr.com";
                                 property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }
@@ -440,7 +440,7 @@ namespace VibesSwap.ViewModel.Pages
                         {
                             if (property.PropertyValue.Contains("cm-bpi11"))
                             {
-                                property.SearchPattern = "cm-bpi11";
+                                property.SearchPattern = "cm-bpi11.yvr.com";
                                 property.ReplacePattern = "cm-bpi11.hlcvibes.yvr.com";
                             }
                         }

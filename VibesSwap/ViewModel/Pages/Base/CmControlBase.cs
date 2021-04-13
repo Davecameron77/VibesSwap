@@ -15,6 +15,10 @@ using VibesSwap.ViewModel.Helpers;
 
 namespace VibesSwap.ViewModel.Pages.Base
 {
+    /// <summary>
+    /// Viewmodel base class for all VM's which control CM's
+    /// Contains common properties/methods used by all such VM's
+    /// </summary>
     internal abstract partial class CmControlBase : VmBase
     {
         #region Called on setup
@@ -181,7 +185,10 @@ namespace VibesSwap.ViewModel.Pages.Base
         #endregion
     }
 
-    // GUI Bound
+    /// <summary>
+    /// Viewmodel base class for all VM's which control CM's
+    /// Contains common GUI bound methods used by all such VM's
+    /// </summary>
     internal abstract partial class CmControlBase : VmBase
     {
         #region GUI Bound Methods
@@ -495,7 +502,10 @@ namespace VibesSwap.ViewModel.Pages.Base
         #endregion       
     }
 
-    // Validators
+    /// <summary>
+    /// Viewmodel base class for all VM's which control CM's
+    /// Contains common validator methods used by all such VM's
+    /// </summary>
     internal abstract partial class CmControlBase : VmBase
     {
         #region Validators
